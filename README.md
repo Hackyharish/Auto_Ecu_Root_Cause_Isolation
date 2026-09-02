@@ -1,10 +1,15 @@
 # Automated Root Cause Isolation in Multi-ECU Networks Using Signal Dependency Mapping and UDS Diagnostics in Vector CANoe
 
+[![Project Status: In Progress](https://img.shields.io/badge/Status-In%20Progress-yellow.svg)](https://github.com/Hackyharish/Auto_Ecu_Root_Cause_Isolation)
 [![Vector CANoe](https://img.shields.io/badge/Platform-Vector%20CANoe-blue.svg)](https://www.vector.com/)
 [![CAN Bus](https://img.shields.io/badge/Bus-CAN%20500kbps-orange.svg)](https://www.iso.org/)
 [![Diagnostics](https://img.shields.io/badge/Protocol-ISO%2014229%20UDS-green.svg)](https://www.iso.org/)
 [![Transport Layer](https://img.shields.io/badge/Transport-ISO%2015765--2%20DoCAN-yellow.svg)](https://www.iso.org/)
 [![Academic Context](https://img.shields.io/badge/Capstone-Tata%20Technologies%20TechPulse-red.svg)](https://www.tatatechnologies.com/)
+
+> [!NOTE]
+> 🚧 **Project Status: In Progress / Active Development**  
+> Simulation nodes, CAPL diagnostic handlers, and DBC dependencies are functional. Ongoing work includes advanced fault scenarios, dynamic panel dashboard refinement, and hardware-in-the-loop (HIL) benchmarking.
 
 ---
 
