@@ -95,10 +95,7 @@ The simulation is deployed on a **500 kbps High-Speed CAN Bus** in Vector CANoe 
 │   └── Fault_Injector.can                 # Automated & panel fault injection test suite
 ├── Panel/
 │   └── System_Variables.vsysvar           # CANoe system variables definition file
-├── Documentation/
-│   └── A_to_Z_Implementation_Guide.md     # Comprehensive manual & setup instructions
-├── Zeroth_Review_Presentation.tex         # LaTeX Beamer presentation for Review 0
-├── Logs/                                  # BLF / ASC simulation traces
+├── Logs/                                  # Simulation trace output directory (.blf / .asc)
 └── README.md                              # Repository overview and documentation
 ```
 
