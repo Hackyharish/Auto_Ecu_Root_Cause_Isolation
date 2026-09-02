@@ -1,0 +1,268 @@
+/*@!Encoding:1252*/
+/* =========================================================================
+   Node: TCM.can (Transmission Control Module)
+   Project: Automated Root Cause Isolation in Multi-ECU Networks
+   Description: Simulates Automatic Transmission ECU. Demonstrates cross-ECU
+                signal dependency handling (ECM & ABS telemetry), automatic
+                gear shifts, secondary symptom DTC qualification, and UDS Server.
+   Author: IVN Capstone Team | Tata Technologies TechPulse
+   ========================================================================= */
+
+includes
+{
+  #include "Common_UDS.cin"
+}
+
+variables
+{
+  // Timers
+  msTimer t_TCM_20ms;
+
+  // CAN Messages
+  message 0x300 msg_TCM;
+  message 0x7E9 msg_TCM_DiagResp;
+
+  // Transmission State Variables
+  byte   g_CurrentGear = 3; // D1
+  byte   g_TargetGear = 3;
+  byte   g_ClutchStatus = 1; // ENGAGED
+  double g_TransOilTemp = 85.0;
+  byte   g_DegradedMode = 0;
+  byte   g_AliveCounter = 0;
+
+  // Subscribed External Data (Dependencies)
+  double g_RxEngineRPM = 850.0;
+  double g_RxThrottlePos = 0.0;
+  double g_RxVehicleSpeed = 0.0;
+  double g_RxSpeedFL = 0.0;
+  double g_RxSpeedFR = 0.0;
+  dword  g_LastECMTimestamp = 0;
+  dword  g_LastABSTimestamp = 0;
+
+  // Diagnostic State & DTC Memory
+  byte g_DiagSession = UDS_SUBF_DEFAULT_SESSION;
+  struct DTCEntry g_TCM_DTCs[MAX_DTCS];
+  int g_NumDTCs = 0;
+
+  // Secondary Fault Tracking Flags
+  byte g_Symptom_U0415_Active = 0;
+  byte g_Symptom_U0401_Active = 0;
+  byte g_Symptom_U0100_Active = 0;
+}
+
+on start
+{
+  write("[TCM] Node Started. Monitoring ECM and ABS dependency channels...");
+  g_NumDTCs = 0;
+  setTimer(t_TCM_20ms, 20);
+}
+
+// -----------------------------------------------------------------------------
+// 20ms Cyclic Broadcast: TCM_Status (0x300)
+// -----------------------------------------------------------------------------
+on timer t_TCM_20ms
+{
+  g_AliveCounter = (g_AliveCounter + 1) & 0x0F;
+
+  // Shift Logic (Dependent on Vehicle Speed & Throttle)
+  if (g_DegradedMode == 1)
+  {
+    g_CurrentGear = 5; // Limp-home 3rd gear lock
+    g_TargetGear = 5;
+  }
+  else
+  {
+    if (g_RxVehicleSpeed < 20.0)      { g_CurrentGear = 3; g_TargetGear = 3; } // D1
+    else if (g_RxVehicleSpeed < 40.0) { g_CurrentGear = 4; g_TargetGear = 4; } // D2
+    else if (g_RxVehicleSpeed < 65.0) { g_CurrentGear = 5; g_TargetGear = 5; } // D3
+    else if (g_RxVehicleSpeed < 90.0) { g_CurrentGear = 6; g_TargetGear = 6; } // D4
+    else                              { g_CurrentGear = 7; g_TargetGear = 7; } // D5
+  }
+
+  // Cross-Dependency Check 1: ABS Wheel Speed Anomaly (C0035 propagation)
+  // If FL is 0 while FR > 25 km/h, TCM registers U0415-81 (Invalid Data from ABS)
+  if (g_RxSpeedFL < 5.0 && g_RxSpeedFR > 25.0)
+  {
+    if (g_Symptom_U0415_Active == 0)
+    {
+      g_Symptom_U0415_Active = 1;
+      g_DegradedMode = 1;
+      AddDTC(0xD41581, (DTC_STATUS_TEST_FAILED | DTC_STATUS_CONFIRMED_DTC)); // U0415-81
+      write("[TCM] SECONDARY SYMPTOM DETECTED: U0415-81 (Invalid Data From ABS Module). Entering Degraded Shift Mode.");
+    }
+  }
+  else if (g_RxSpeedFL >= 5.0 && g_Symptom_U0415_Active == 1)
+  {
+    g_Symptom_U0415_Active = 0;
+    g_DegradedMode = 0;
+  }
+
+  // Cross-Dependency Check 2: ECM Throttle Sensor Failure (P0122 propagation)
+  // If Throttle is 0 while Engine RPM > 2000, TCM registers U0401-86 (Invalid Data from ECM)
+  if (g_RxThrottlePos < 1.0 && g_RxEngineRPM > 2000.0)
+  {
+    if (g_Symptom_U0401_Active == 0)
+    {
+      g_Symptom_U0401_Active = 1;
+      AddDTC(0xD40186, (DTC_STATUS_TEST_FAILED | DTC_STATUS_CONFIRMED_DTC)); // U0401-86
+      write("[TCM] SECONDARY SYMPTOM DETECTED: U0401-86 (Invalid Data From ECM).");
+    }
+  }
+  else if (g_RxThrottlePos >= 1.0 && g_Symptom_U0401_Active == 1)
+  {
+    g_Symptom_U0401_Active = 0;
+  }
+
+  // Cross-Dependency Check 3: ECM Node Loss (Timeout > 250ms)
+  if ((timeNow() - g_LastECMTimestamp) > 250000 && g_LastECMTimestamp > 0)
+  {
+    if (g_Symptom_U0100_Active == 0)
+    {
+      g_Symptom_U0100_Active = 1;
+      g_DegradedMode = 1;
+      AddDTC(0xD10000, (DTC_STATUS_TEST_FAILED | DTC_STATUS_CONFIRMED_DTC)); // U0100-00
+      write("[TCM] SECONDARY SYMPTOM DETECTED: U0100-00 (Lost Comm with ECM/PCM).");
+    }
+  }
+  else
+  {
+    g_Symptom_U0100_Active = 0;
+  }
+
+  // Populate CAN Payload (0x300)
+  msg_TCM.byte(0) = g_CurrentGear | (g_TargetGear << 4);
+  msg_TCM.byte(1) = g_ClutchStatus;
+  msg_TCM.byte(2) = (byte)(g_TransOilTemp + 40.0);
+  msg_TCM.byte(3) = g_DegradedMode & 0x01;
+  msg_TCM.byte(4) = (g_NumDTCs > 0) ? 0x01 : 0x00;
+  msg_TCM.byte(5) = 0x00;
+  msg_TCM.byte(6) = g_AliveCounter;
+  msg_TCM.byte(7) = (msg_TCM.byte(0) ^ msg_TCM.byte(1) ^ msg_TCM.byte(2) ^ msg_TCM.byte(6)) & 0xFF;
+  msg_TCM.dlc = 8;
+
+  if (@sysvar::Fault_Node_Cutoff_TCM == 0)
+  {
+    output(msg_TCM);
+  }
+
+  setTimer(t_TCM_20ms, 20);
+}
+
+// -----------------------------------------------------------------------------
+// Subscriptions: ECM_Data_1 (0x100) & ABS_WheelSpeeds (0x200)
+// -----------------------------------------------------------------------------
+on message 0x100
+{
+  g_RxEngineRPM = (this.byte(0) | (this.byte(1) << 8)) * 0.25;
+  g_RxThrottlePos = this.byte(2) * 0.5;
+  g_LastECMTimestamp = timeNow();
+}
+
+on message 0x200
+{
+  g_RxSpeedFL = (this.byte(0) | (this.byte(1) << 8)) * 0.01;
+  g_RxSpeedFR = (this.byte(2) | (this.byte(3) << 8)) * 0.01;
+  g_RxVehicleSpeed = (g_RxSpeedFL + g_RxSpeedFR) / 2.0;
+  g_LastABSTimestamp = timeNow();
+}
+
+// -----------------------------------------------------------------------------
+// UDS Diagnostic Server (0x7E1 Physical / 0x7DF Functional)
+// -----------------------------------------------------------------------------
+on message 0x7E1, 0x7DF
+{
+  byte sid;
+  byte subf;
+  sid = this.byte(1);
+
+  if (sid == UDS_SID_DIAGNOSTIC_SESSION_CONTROL)
+  {
+    subf = this.byte(2);
+    g_DiagSession = subf;
+    msg_TCM_DiagResp.byte(0) = 0x06;
+    msg_TCM_DiagResp.byte(1) = 0x50;
+    msg_TCM_DiagResp.byte(2) = subf;
+    msg_TCM_DiagResp.byte(3) = 0x00;
+    msg_TCM_DiagResp.byte(4) = 0x32;
+    msg_TCM_DiagResp.byte(5) = 0x01;
+    msg_TCM_DiagResp.byte(6) = 0xF4;
+    msg_TCM_DiagResp.byte(7) = 0xAA;
+    msg_TCM_DiagResp.dlc = 8;
+    output(msg_TCM_DiagResp);
+  }
+  else if (sid == UDS_SID_CLEAR_DIAGNOSTIC_INFORMATION)
+  {
+    g_NumDTCs = 0;
+    g_DegradedMode = 0;
+    msg_TCM_DiagResp.byte(0) = 0x01;
+    msg_TCM_DiagResp.byte(1) = 0x54;
+    msg_TCM_DiagResp.byte(2) = 0xAA;
+    msg_TCM_DiagResp.dlc = 8;
+    output(msg_TCM_DiagResp);
+    write("[TCM-UDS] DTCs Cleared.");
+  }
+  else if (sid == UDS_SID_READ_DTC_INFORMATION)
+  {
+    subf = this.byte(2);
+    if (subf == UDS_SUBF_REPORT_DTC_BY_STATUS_MASK)
+    {
+      if (g_NumDTCs == 0)
+      {
+        msg_TCM_DiagResp.byte(0) = 0x03;
+        msg_TCM_DiagResp.byte(1) = 0x59;
+        msg_TCM_DiagResp.byte(2) = 0x02;
+        msg_TCM_DiagResp.byte(3) = 0x00;
+        msg_TCM_DiagResp.dlc = 8;
+        output(msg_TCM_DiagResp);
+      }
+      else
+      {
+        msg_TCM_DiagResp.byte(0) = 0x06;
+        msg_TCM_DiagResp.byte(1) = 0x59;
+        msg_TCM_DiagResp.byte(2) = 0x02;
+        msg_TCM_DiagResp.byte(3) = (g_TCM_DTCs[0].dtcNumber >> 16) & 0xFF;
+        msg_TCM_DiagResp.byte(4) = (g_TCM_DTCs[0].dtcNumber >> 8) & 0xFF;
+        msg_TCM_DiagResp.byte(5) = (g_TCM_DTCs[0].dtcNumber) & 0xFF;
+        msg_TCM_DiagResp.byte(6) = g_TCM_DTCs[0].statusMask;
+        msg_TCM_DiagResp.byte(7) = 0xAA;
+        msg_TCM_DiagResp.dlc = 8;
+        output(msg_TCM_DiagResp);
+        write("[TCM-UDS] ReadDTC response sent: 0x%06X (Status: 0x%02X)", g_TCM_DTCs[0].dtcNumber, g_TCM_DTCs[0].statusMask);
+      }
+    }
+  }
+  else if (sid == UDS_SID_READ_DATA_BY_IDENTIFIER)
+  {
+    word did;
+    did = (this.byte(2) << 8) | this.byte(3);
+    if (did == 0x0300) // TCM Gear State DID
+    {
+      msg_TCM_DiagResp.byte(0) = 0x04;
+      msg_TCM_DiagResp.byte(1) = 0x62;
+      msg_TCM_DiagResp.byte(2) = 0x03;
+      msg_TCM_DiagResp.byte(3) = 0x00;
+      msg_TCM_DiagResp.byte(4) = g_CurrentGear;
+      msg_TCM_DiagResp.dlc = 8;
+      output(msg_TCM_DiagResp);
+    }
+  }
+}
+
+void AddDTC(dword dtcCode, byte status)
+{
+  int i;
+  for (i = 0; i < g_NumDTCs; i++)
+  {
+    if (g_TCM_DTCs[i].dtcNumber == dtcCode)
+    {
+      g_TCM_DTCs[i].statusMask = status;
+      return;
+    }
+  }
+  if (g_NumDTCs < MAX_DTCS)
+  {
+    g_TCM_DTCs[g_NumDTCs].dtcNumber = dtcCode;
+    g_TCM_DTCs[g_NumDTCs].statusMask = status;
+    g_NumDTCs++;
+  }
+}

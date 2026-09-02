@@ -1,0 +1,162 @@
+VERSION "1.0"
+
+
+NS_ : 
+	NS_DESC_
+	CM_
+	BA_DEF_
+	BA_
+	VAL_
+	CAT_DEF_
+	CAT_
+	FILTER
+	BA_DEF_DEF_
+	EV_DATA_
+	ENVVAR_DATA_
+	SGTYPE_
+	SGTYPE_VAL_
+	BA_DEF_SGTYPE_
+	BA_SGTYPE_
+	SIG_TYPE_REF_
+	VAL_TABLE_
+	SIG_GROUP_
+	SIG_VALTYPE_
+	SIGTYPE_VALTYPE_
+	BO_TX_BU_
+	BA_DEF_REL_
+	BA_REL_
+	BA_DEF_DEF_REL_
+	BU_SG_REL_
+	BU_EV_REL_
+	BU_BO_REL_
+	SG_MUL_VAL_
+
+BS_:
+
+BU_: ECM TCM ABS_ESP BCM DIAG_TESTER
+
+BO_ 256 ECM_Data_1: 8 ECM
+ SG_ EngineSpeed : 0|16@1+ (0.25,0) [0|8000] "rpm" TCM,ABS_ESP,BCM
+ SG_ ThrottlePosition : 16|8@1+ (0.5,0) [0|100] "%" TCM,ABS_ESP
+ SG_ EngineTorque : 24|12@1+ (0.5,-500) [-500|1500] "Nm" TCM,ABS_ESP
+ SG_ EngineStatus : 36|4@1+ (1,0) [0|15] "" TCM,BCM
+ SG_ ECM_AliveCounter : 40|4@1+ (1,0) [0|15] "cnt" TCM,ABS_ESP,BCM
+ SG_ ECM_Checksum : 48|8@1+ (1,0) [0|255] "raw" TCM,ABS_ESP,BCM
+
+BO_ 261 ECM_Data_2: 8 ECM
+ SG_ CoolantTemperature : 0|8@1+ (1,-40) [-40|150] "degC" BCM,TCM
+ SG_ FuelFlowRate : 8|12@1+ (0.1,0) [0|400] "L/h" BCM
+ SG_ CheckEngineMIL : 20|2@1+ (1,0) [0|3] "" BCM
+ SG_ ECM_FaultCode : 24|16@1+ (1,0) [0|65535] "" DIAG_TESTER
+
+BO_ 512 ABS_WheelSpeeds: 8 ABS_ESP
+ SG_ WheelSpeed_FL : 0|16@1+ (0.01,0) [0|300] "km/h" ECM,TCM,BCM
+ SG_ WheelSpeed_FR : 16|16@1+ (0.01,0) [0|300] "km/h" ECM,TCM,BCM
+ SG_ WheelSpeed_RL : 32|16@1+ (0.01,0) [0|300] "km/h" ECM,TCM,BCM
+ SG_ WheelSpeed_RR : 48|16@1+ (0.01,0) [0|300] "km/h" ECM,TCM,BCM
+
+BO_ 517 ABS_Dynamics: 8 ABS_ESP
+ SG_ VehicleSpeed : 0|16@1+ (0.01,0) [0|300] "km/h" ECM,TCM,BCM
+ SG_ YawRate : 16|12@1+ (0.05,-100) [-100|100] "deg/s" ECM
+ SG_ BrakePressure : 28|12@1+ (0.1,0) [0|250] "bar" ECM,TCM
+ SG_ ABS_Active : 40|1@1+ (1,0) [0|1] "" BCM,ECM,TCM
+ SG_ ESP_Fault : 41|1@1+ (1,0) [0|1] "" BCM,ECM,TCM
+ SG_ ABS_AliveCounter : 44|4@1+ (1,0) [0|15] "cnt" ECM,TCM,BCM
+ SG_ ABS_Checksum : 48|8@1+ (1,0) [0|255] "raw" ECM,TCM,BCM
+
+BO_ 768 TCM_Status: 8 TCM
+ SG_ CurrentGear : 0|4@1+ (1,0) [0|15] "" ECM,BCM
+ SG_ TargetGear : 4|4@1+ (1,0) [0|15] "" ECM,BCM
+ SG_ ClutchStatus : 8|2@1+ (1,0) [0|3] "" ECM
+ SG_ TransmissionOilTemp : 16|8@1+ (1,-40) [-40|160] "degC" BCM
+ SG_ TCM_DegradedMode : 24|1@1+ (1,0) [0|1] "" ECM,BCM
+ SG_ TCM_FaultCode : 32|16@1+ (1,0) [0|65535] "" DIAG_TESTER
+ SG_ TCM_AliveCounter : 48|4@1+ (1,0) [0|15] "cnt" ECM,BCM
+ SG_ TCM_Checksum : 56|8@1+ (1,0) [0|255] "raw" ECM,BCM
+
+BO_ 1024 BCM_Status: 8 BCM
+ SG_ IgnitionState : 0|2@1+ (1,0) [0|3] "" ECM,TCM,ABS_ESP
+ SG_ BrakeSwitchStatus : 2|1@1+ (1,0) [0|1] "" ECM,TCM,ABS_ESP
+ SG_ DriverDoorState : 3|1@1+ (1,0) [0|1] "" DIAG_TESTER
+ SG_ HazardStatus : 4|1@1+ (1,0) [0|1] "" ECM,TCM,ABS_ESP
+ SG_ BCM_AliveCounter : 48|4@1+ (1,0) [0|15] "cnt" ECM,TCM,ABS_ESP
+
+BO_ 2015 DIAG_Functional_Req: 8 DIAG_TESTER
+ SG_ Diag_Func_Data : 0|64@1+ (1,0) [0|0] "" ECM,TCM,ABS_ESP,BCM
+
+BO_ 2016 ECM_Diag_Req: 8 DIAG_TESTER
+ SG_ ECM_Req_Data : 0|64@1+ (1,0) [0|0] "" ECM
+
+BO_ 2024 ECM_Diag_Resp: 8 ECM
+ SG_ ECM_Resp_Data : 0|64@1+ (1,0) [0|0] "" DIAG_TESTER
+
+BO_ 2017 TCM_Diag_Req: 8 DIAG_TESTER
+ SG_ TCM_Req_Data : 0|64@1+ (1,0) [0|0] "" TCM
+
+BO_ 2025 TCM_Diag_Resp: 8 TCM
+ SG_ TCM_Resp_Data : 0|64@1+ (1,0) [0|0] "" DIAG_TESTER
+
+BO_ 2018 ABS_Diag_Req: 8 DIAG_TESTER
+ SG_ ABS_Req_Data : 0|64@1+ (1,0) [0|0] "" ABS_ESP
+
+BO_ 2026 ABS_Diag_Resp: 8 ABS_ESP
+ SG_ ABS_Resp_Data : 0|64@1+ (1,0) [0|0] "" DIAG_TESTER
+
+BO_ 2019 BCM_Diag_Req: 8 DIAG_TESTER
+ SG_ BCM_Req_Data : 0|64@1+ (1,0) [0|0] "" BCM
+
+BO_ 2027 BCM_Diag_Resp: 8 BCM
+ SG_ BCM_Resp_Data : 0|64@1+ (1,0) [0|0] "" DIAG_TESTER
+
+
+CM_ BU_ ECM "Engine Control Module - Powertrain Master";
+CM_ BU_ TCM "Transmission Control Module - Gearbox & Shift Logic";
+CM_ BU_ ABS_ESP "Anti-Lock Braking and Electronic Stability Program";
+CM_ BU_ BCM "Body Control Module - Vehicle States & Cluster Gateway";
+CM_ BU_ DIAG_TESTER "Diagnostic Master Tester Node - UDS ISO 14229 Root Cause Engine";
+
+CM_ BO_ 256 "Primary powertrain dynamic telemetry from Engine Control Module";
+CM_ BO_ 512 "High-frequency individual wheel speed measurements from ABS node";
+CM_ BO_ 517 "Vehicle longitudinal and lateral dynamic status from ABS/ESP";
+CM_ BO_ 768 "Gearbox shift scheduling and status from Transmission Control Module";
+CM_ BO_ 1024 "Chassis power mode and switch status from Body Control Module";
+CM_ BO_ 2015 "UDS Functional Diagnostic Request broadcast (ISO 15765-2 / ISO 14229)";
+
+BA_DEF_ BO_  "GenMsgCycleTime" INT 0 10000;
+BA_DEF_ BO_  "GenMsgSendType" ENUM  "Cyclic","Event","CyclicAndEvent";
+BA_DEF_ SG_  "GenSigStartValue" FLOAT 0 100000;
+BA_DEF_  "BusType" STRING ;
+
+BA_DEF_DEF_  "GenMsgCycleTime" 100;
+BA_DEF_DEF_  "GenMsgSendType" "Cyclic";
+BA_DEF_DEF_  "GenSigStartValue" 0;
+BA_DEF_DEF_  "BusType" "CAN";
+
+BA_ "GenMsgCycleTime" BO_ 256 10;
+BA_ "GenMsgCycleTime" BO_ 261 50;
+BA_ "GenMsgCycleTime" BO_ 512 10;
+BA_ "GenMsgCycleTime" BO_ 517 20;
+BA_ "GenMsgCycleTime" BO_ 768 20;
+BA_ "GenMsgCycleTime" BO_ 1024 50;
+BA_ "GenMsgSendType" BO_ 2015 1;
+BA_ "GenMsgSendType" BO_ 2016 1;
+BA_ "GenMsgSendType" BO_ 2024 1;
+BA_ "GenMsgSendType" BO_ 2017 1;
+BA_ "GenMsgSendType" BO_ 2025 1;
+BA_ "GenMsgSendType" BO_ 2018 1;
+BA_ "GenMsgSendType" BO_ 2026 1;
+BA_ "GenMsgSendType" BO_ 2019 1;
+BA_ "GenMsgSendType" BO_ 2027 1;
+
+VAL_ 256 EngineStatus 0 "STOPPED" 1 "CRANKING" 2 "IDLE" 3 "RUNNING" 4 "LIMP_HOME" 15 "FAULT" ;
+VAL_ 261 CheckEngineMIL 0 "OFF" 1 "SOLID_ON" 2 "FLASHING_CRITICAL" ;
+VAL_ 768 CurrentGear 0 "N" 1 "P" 2 "R" 3 "D1" 4 "D2" 5 "D3" 6 "D4" 7 "D5" 8 "D6" 15 "FAULT" ;
+VAL_ 768 TargetGear 0 "N" 1 "P" 2 "R" 3 "D1" 4 "D2" 5 "D3" 6 "D4" 7 "D5" 8 "D6" ;
+VAL_ 768 ClutchStatus 0 "DISENGAGED" 1 "ENGAGED" 2 "SLIPPING" 3 "ERROR" ;
+VAL_ 1024 IgnitionState 0 "OFF" 1 "ACC" 2 "ON" 3 "START" ;
+VAL_ 1024 BrakeSwitchStatus 0 "RELEASED" 1 "PRESSED" ;
+VAL_ 1024 DriverDoorState 0 "CLOSED" 1 "OPEN" ;
+VAL_ 1024 HazardStatus 0 "OFF" 1 "ON" ;
+VAL_ 517 ABS_Active 0 "INACTIVE" 1 "ACTIVE" ;
+VAL_ 517 ESP_Fault 0 "NO_FAULT" 1 "FAULT_ACTIVE" ;
+VAL_ 768 TCM_DegradedMode 0 "NORMAL" 1 "DEGRADED" ;

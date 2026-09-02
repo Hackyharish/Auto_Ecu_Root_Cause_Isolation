@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<systemvariables version="4">
+  <namespace name="" comment="" interface="">
+    <variable anlyzLocal="2" readOnly="false" valueSequence="false" unit="%" name="Sim_AcceleratorPedal" comment="Pedal position in percent" bitcount="32" isSigned="true" encoding="65001" type="float">
+      <defaultvalue>0</defaultvalue>
+    </variable>
+    <variable anlyzLocal="2" readOnly="false" valueSequence="false" unit="" name="Fault_ABS_WheelSpeedFL" comment="Inject Left Front Wheel Speed Sensor Fault" bitcount="32" isSigned="true" encoding="65001" type="int">
+      <defaultvalue>0</defaultvalue>
+    </variable>
+    <variable anlyzLocal="2" readOnly="false" valueSequence="false" unit="" name="Fault_ECM_ThrottleSensor" comment="Inject Throttle Sensor Low Circuit Fault" bitcount="32" isSigned="true" encoding="65001" type="int">
+      <defaultvalue>0</defaultvalue>
+    </variable>
+    <variable anlyzLocal="2" readOnly="false" valueSequence="false" unit="" name="Fault_Node_Cutoff_ECM" comment="Cutoff ECM node communication" bitcount="32" isSigned="true" encoding="65001" type="int">
+      <defaultvalue>0</defaultvalue>
+    </variable>
+    <variable anlyzLocal="2" readOnly="false" valueSequence="false" unit="" name="Fault_Node_Cutoff_ABS" comment="Cutoff ABS node communication" bitcount="32" isSigned="true" encoding="65001" type="int">
+      <defaultvalue>0</defaultvalue>
+    </variable>
+    <variable anlyzLocal="2" readOnly="false" valueSequence="false" unit="" name="Fault_Node_Cutoff_TCM" comment="Cutoff TCM node communication" bitcount="32" isSigned="true" encoding="65001" type="int">
+      <defaultvalue>0</defaultvalue>
+    </variable>
+    <variable anlyzLocal="2" readOnly="false" valueSequence="false" unit="" name="Fault_Node_Cutoff_BCM" comment="Cutoff BCM node communication" bitcount="32" isSigned="true" encoding="65001" type="int">
+      <defaultvalue>0</defaultvalue>
+    </variable>
+    <variable anlyzLocal="2" readOnly="false" valueSequence="false" unit="" name="Fault_Reset_All" comment="Reset all injected faults" bitcount="32" isSigned="true" encoding="65001" type="int">
+      <defaultvalue>0</defaultvalue>
+    </variable>
+    <variable anlyzLocal="2" readOnly="false" valueSequence="false" unit="" name="Trigger_RCA_Scan" comment="Trigger Automated Root Cause Isolation Diagnostic Scan" bitcount="32" isSigned="true" encoding="65001" type="int">
+      <defaultvalue>0</defaultvalue>
+    </variable>
+    <variable anlyzLocal="2" readOnly="false" valueSequence="false" unit="ms" name="RCA_Result_Latency" comment="Execution latency of RCA scan" bitcount="32" isSigned="true" encoding="65001" type="float">
+      <defaultvalue>0</defaultvalue>
+    </variable>
+  </namespace>
+</systemvariables>

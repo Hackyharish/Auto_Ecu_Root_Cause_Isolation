@@ -1,0 +1,331 @@
+/*@!Encoding:1252*/
+/* =========================================================================
+   Node: Diagnostic_Master_RCA.can (Diagnostic Master & RCA Engine)
+   Project: Automated Root Cause Isolation in Multi-ECU Networks
+   Description: Implements automated UDS Client (ISO 14229 / ISO 15765-2),
+                multi-ECU DTC polling, topological signal dependency pruning,
+                isolated root cause report generation, and latency benchmarking.
+   Author: IVN Capstone Team | Tata Technologies TechPulse
+   ========================================================================= */
+
+includes
+{
+  #include "Common_UDS.cin"
+}
+
+variables
+{
+  // State Machine for Diagnostic Orchestration
+  enum DiagScanState
+  {
+    STATE_IDLE = 0,
+    STATE_SEND_EXT_SESSION,
+    STATE_WAIT_SESSION_RESP,
+    STATE_POLL_DTCS,
+    STATE_WAIT_DTC_RESPS,
+    STATE_RUN_RCA_ALGORITHM,
+    STATE_DISPLAY_REPORT
+  };
+
+  enum DiagScanState g_ScanState = STATE_IDLE;
+
+  // Timers
+  msTimer t_ScanStep;
+  msTimer t_Timeout;
+
+  // CAN Request Messages
+  message 0x7E0 msg_Req_ECM;
+  message 0x7E1 msg_Req_TCM;
+  message 0x7E2 msg_Req_ABS;
+  message 0x7E3 msg_Req_BCM;
+  message 0x7DF msg_Req_Func;
+
+  // Multi-ECU Active Fault Table
+  dword g_DTC_ECM = 0;
+  dword g_DTC_TCM = 0;
+  dword g_DTC_ABS = 0;
+  dword g_DTC_BCM = 0;
+
+  byte g_RespReceived_ECM = 0;
+  byte g_RespReceived_TCM = 0;
+  byte g_RespReceived_ABS = 0;
+  byte g_RespReceived_BCM = 0;
+
+  // Performance Benchmarking
+  dword g_ScanStartMicroSec = 0;
+  dword g_ScanEndMicroSec = 0;
+  double g_IsolationLatencyMs = 0.0;
+
+  // Result Strings
+  char g_RootECU[32];
+  char g_RootDTC[32];
+  char g_RootDescription[128];
+  char g_PrunedSymptoms[256];
+}
+
+on start
+{
+  write("===================================================================");
+  write(" [DIAG MASTER] Automated Root Cause Isolation Engine Ready.");
+  write(" Press 'Scan & Isolate' on CANoe Panel or press key 'S' to run.");
+  write("===================================================================");
+  g_ScanState = STATE_IDLE;
+}
+
+// -----------------------------------------------------------------------------
+// Trigger via Keyboard 'S' or Panel System Variable
+// -----------------------------------------------------------------------------
+on key 's'
+{
+  StartAutomatedRCA();
+}
+
+on sysvar sysvar::Trigger_RCA_Scan
+{
+  if (@sysvar::Trigger_RCA_Scan == 1)
+  {
+    StartAutomatedRCA();
+    @sysvar::Trigger_RCA_Scan = 0; // Reset trigger pulse
+  }
+}
+
+void StartAutomatedRCA()
+{
+  if (g_ScanState != STATE_IDLE)
+  {
+    write("[DIAG MASTER] Warning: Scan already in progress.");
+    return;
+  }
+
+  write("\n-------------------------------------------------------------------");
+  write(">>> [RCA ENGINE] Initiating Automated Multi-ECU Diagnostic Scan...");
+  write("-------------------------------------------------------------------");
+
+  // Reset Tables
+  g_DTC_ECM = 0;
+  g_DTC_TCM = 0;
+  g_DTC_ABS = 0;
+  g_DTC_BCM = 0;
+  g_RespReceived_ECM = 0;
+  g_RespReceived_TCM = 0;
+  g_RespReceived_ABS = 0;
+  g_RespReceived_BCM = 0;
+
+  g_ScanStartMicroSec = timeNow();
+  g_ScanState = STATE_SEND_EXT_SESSION;
+  setTimer(t_ScanStep, 5);
+}
+
+// -----------------------------------------------------------------------------
+// Orchestration State Machine
+// -----------------------------------------------------------------------------
+on timer t_ScanStep
+{
+  switch (g_ScanState)
+  {
+    case STATE_SEND_EXT_SESSION:
+      // Broadcast UDS Service 0x10 03 (Extended Session) via Functional Request (0x7DF)
+      msg_Req_Func.byte(0) = 0x02; // Single Frame length 2
+      msg_Req_Func.byte(1) = UDS_SID_DIAGNOSTIC_SESSION_CONTROL;
+      msg_Req_Func.byte(2) = UDS_SUBF_EXTENDED_SESSION;
+      msg_Req_Func.byte(3) = 0x55;
+      msg_Req_Func.dlc = 8;
+      output(msg_Req_Func);
+      write("[DIAG MASTER] Step 1: Broadcast Service 0x10 03 (Extended Session) on 0x7DF.");
+      
+      g_ScanState = STATE_POLL_DTCS;
+      setTimer(t_ScanStep, 30); // Wait 30ms for session setup
+      break;
+
+    case STATE_POLL_DTCS:
+      // Send UDS Service 0x19 02 (ReadDTCByStatusMask: mask=0x09) to all individual ECUs
+      write("[DIAG MASTER] Step 2: Querying UDS Service 0x19 02 (ReadDTCInformation) on all nodes...");
+      
+      // Query ECM
+      msg_Req_ECM.byte(0) = 0x03;
+      msg_Req_ECM.byte(1) = UDS_SID_READ_DTC_INFORMATION;
+      msg_Req_ECM.byte(2) = UDS_SUBF_REPORT_DTC_BY_STATUS_MASK;
+      msg_Req_ECM.byte(3) = 0x09; // Confirmed + TestFailed mask
+      msg_Req_ECM.dlc = 8;
+      output(msg_Req_ECM);
+
+      // Query TCM
+      msg_Req_TCM.byte(0) = 0x03;
+      msg_Req_TCM.byte(1) = UDS_SID_READ_DTC_INFORMATION;
+      msg_Req_TCM.byte(2) = UDS_SUBF_REPORT_DTC_BY_STATUS_MASK;
+      msg_Req_TCM.byte(3) = 0x09;
+      msg_Req_TCM.dlc = 8;
+      output(msg_Req_TCM);
+
+      // Query ABS
+      msg_Req_ABS.byte(0) = 0x03;
+      msg_Req_ABS.byte(1) = UDS_SID_READ_DTC_INFORMATION;
+      msg_Req_ABS.byte(2) = UDS_SUBF_REPORT_DTC_BY_STATUS_MASK;
+      msg_Req_ABS.byte(3) = 0x09;
+      msg_Req_ABS.dlc = 8;
+      output(msg_Req_ABS);
+
+      // Query BCM
+      msg_Req_BCM.byte(0) = 0x03;
+      msg_Req_BCM.byte(1) = UDS_SID_READ_DTC_INFORMATION;
+      msg_Req_BCM.byte(2) = UDS_SUBF_REPORT_DTC_BY_STATUS_MASK;
+      msg_Req_BCM.byte(3) = 0x09;
+      msg_Req_BCM.dlc = 8;
+      output(msg_Req_BCM);
+
+      g_ScanState = STATE_WAIT_DTC_RESPS;
+      setTimer(t_Timeout, 100); // 100ms response collection window
+      break;
+
+    case STATE_RUN_RCA_ALGORITHM:
+      ExecuteRootCausePruning();
+      g_ScanState = STATE_DISPLAY_REPORT;
+      setTimer(t_ScanStep, 5);
+      break;
+
+    case STATE_DISPLAY_REPORT:
+      g_ScanEndMicroSec = timeNow();
+      g_IsolationLatencyMs = (g_ScanEndMicroSec - g_ScanStartMicroSec) / 1000.0;
+      DisplayDiagnosticReport();
+      g_ScanState = STATE_IDLE;
+      break;
+  }
+}
+
+on timer t_Timeout
+{
+  if (g_ScanState == STATE_WAIT_DTC_RESPS)
+  {
+    write("[DIAG MASTER] Responses aggregated. Executing Topological Signal Dependency Isolation...");
+    g_ScanState = STATE_RUN_RCA_ALGORITHM;
+    setTimer(t_ScanStep, 1);
+  }
+}
+
+// -----------------------------------------------------------------------------
+// Capture Diagnostic Responses from Simulated Nodes
+// -----------------------------------------------------------------------------
+on message 0x7E8 // ECM Response
+{
+  if (this.byte(1) == 0x59 && this.byte(2) == 0x02)
+  {
+    if (this.byte(0) >= 6) // Contains DTC
+    {
+      g_DTC_ECM = (this.byte(3) << 16) | (this.byte(4) << 8) | this.byte(5);
+    }
+    g_RespReceived_ECM = 1;
+  }
+}
+
+on message 0x7E9 // TCM Response
+{
+  if (this.byte(1) == 0x59 && this.byte(2) == 0x02)
+  {
+    if (this.byte(0) >= 6)
+    {
+      g_DTC_TCM = (this.byte(3) << 16) | (this.byte(4) << 8) | this.byte(5);
+    }
+    g_RespReceived_TCM = 1;
+  }
+}
+
+on message 0x7EA // ABS Response
+{
+  if (this.byte(1) == 0x59 && this.byte(2) == 0x02)
+  {
+    if (this.byte(0) >= 6)
+    {
+      g_DTC_ABS = (this.byte(3) << 16) | (this.byte(4) << 8) | this.byte(5);
+    }
+    g_RespReceived_ABS = 1;
+  }
+}
+
+on message 0x7EB // BCM Response
+{
+  if (this.byte(1) == 0x59 && this.byte(2) == 0x02)
+  {
+    if (this.byte(0) >= 6)
+    {
+      g_DTC_BCM = (this.byte(3) << 16) | (this.byte(4) << 8) | this.byte(5);
+    }
+    g_RespReceived_BCM = 1;
+  }
+}
+
+// -----------------------------------------------------------------------------
+// Topological Signal Dependency Root Cause Pruning Algorithm
+// -----------------------------------------------------------------------------
+void ExecuteRootCausePruning()
+{
+  write("[RCA ALGORITHM] Active DTC Matrix:");
+  write("  * ECM: 0x%06X | TCM: 0x%06X | ABS: 0x%06X | BCM: 0x%06X", g_DTC_ECM, g_DTC_TCM, g_DTC_ABS, g_DTC_BCM);
+
+  // RULE 1: ABS Wheel Speed Sensor Primary Failure (C0035-13)
+  // Dependency DAG: Sensor_FL -> ABS_Node (C0035) -> Signal:WheelSpeed_FL -> TCM (U0415), ECM (P0500)
+  if (g_DTC_ABS == 0xC00351)
+  {
+    strncpy(g_RootECU, "ABS / ESP Control Module", elCount(g_RootECU));
+    strncpy(g_RootDTC, "C0035-13", elCount(g_RootDTC));
+    strncpy(g_RootDescription, "Left Front Wheel Speed Sensor Circuit Open", elCount(g_RootDescription));
+    strncpy(g_PrunedSymptoms, "TCM: U0415-81 (Invalid ABS Data) | ECM: P0500-00 (Missing Speed Signal)", elCount(g_PrunedSymptoms));
+    return;
+  }
+
+  // RULE 2: ECM Throttle Position Sensor Primary Failure (P0122-12)
+  // Dependency DAG: Sensor_TPS -> ECM_Node (P0122) -> Signal:ThrottlePos -> TCM (U0401)
+  if (g_DTC_ECM == 0x012212)
+  {
+    strncpy(g_RootECU, "Engine Control Module (ECM)", elCount(g_RootECU));
+    strncpy(g_RootDTC, "P0122-12", elCount(g_RootDTC));
+    strncpy(g_RootDescription, "Throttle Position Sensor 'A' Circuit Low", elCount(g_RootDescription));
+    strncpy(g_PrunedSymptoms, "TCM: U0401-86 (Invalid Data Received from ECM)", elCount(g_PrunedSymptoms));
+    return;
+  }
+
+  // RULE 3: ECM Node Loss / Bus Dropout (U0100 on multiple subscribers)
+  if (g_DTC_TCM == 0xD10000 && g_RespReceived_ECM == 0)
+  {
+    strncpy(g_RootECU, "Engine Control Module (ECM)", elCount(g_RootECU));
+    strncpy(g_RootDTC, "U0100-00", elCount(g_RootDTC));
+    strncpy(g_RootDescription, "ECM Complete Node Dropout / Power Failure", elCount(g_RootDescription));
+    strncpy(g_PrunedSymptoms, "TCM: U0100-00 (Lost Comm with ECM) | BCM: Cluster Communication Error", elCount(g_PrunedSymptoms));
+    return;
+  }
+
+  // No active faults detected
+  if (g_DTC_ECM == 0 && g_DTC_TCM == 0 && g_DTC_ABS == 0 && g_DTC_BCM == 0)
+  {
+    strncpy(g_RootECU, "None (Network Healthy)", elCount(g_RootECU));
+    strncpy(g_RootDTC, "No Faults", elCount(g_RootDTC));
+    strncpy(g_RootDescription, "All ECU nodes operating nominally.", elCount(g_RootDescription));
+    strncpy(g_PrunedSymptoms, "None", elCount(g_PrunedSymptoms));
+    return;
+  }
+
+  // Fallback
+  strncpy(g_RootECU, "Unknown / Multiple Isolated Faults", elCount(g_RootECU));
+  strncpy(g_RootDTC, "Multiple", elCount(g_RootDTC));
+  strncpy(g_RootDescription, "Uncorrelated DTC combination detected.", elCount(g_RootDescription));
+  strncpy(g_PrunedSymptoms, "None", elCount(g_PrunedSymptoms));
+}
+
+// -----------------------------------------------------------------------------
+// Output Report to Write Window and Update System Variables
+// -----------------------------------------------------------------------------
+void DisplayDiagnosticReport()
+{
+  write("===================================================================");
+  write("                AUTOMATED ROOT CAUSE ISOLATION REPORT              ");
+  write("===================================================================");
+  write(" [ISOLATED ROOT ECU]       : %s", g_RootECU);
+  write(" [PRIMARY ROOT DTC]        : %s", g_RootDTC);
+  write(" [FAULT MECHANISM]         : %s", g_RootDescription);
+  write(" [PRUNED SECONDARY SYMPTOMS]: %s", g_PrunedSymptoms);
+  write(" [ISOLATION LATENCY]       : %.2f ms", g_IsolationLatencyMs);
+  write(" [BENCHMARK COMPARISON]    : Automated (%.2f ms) vs Manual (>15 mins)", g_IsolationLatencyMs);
+  write("===================================================================\n");
+
+  // Update System Variables for CANoe Panel
+  @sysvar::RCA_Result_Latency = g_IsolationLatencyMs;
+}

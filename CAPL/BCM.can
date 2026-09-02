@@ -1,0 +1,129 @@
+/*@!Encoding:1252*/
+/* =========================================================================
+   Node: BCM.can (Body Control Module)
+   Project: Automated Root Cause Isolation in Multi-ECU Networks
+   Description: Simulates Body Control Module (Power mode, Brake switch,
+                Cluster warnings) & UDS Diagnostic Server (0x7E3 / 0x7EB).
+   Author: IVN Capstone Team | Tata Technologies TechPulse
+   ========================================================================= */
+
+includes
+{
+  #include "Common_UDS.cin"
+}
+
+variables
+{
+  msTimer t_BCM_50ms;
+
+  message 0x400 msg_BCM;
+  message 0x7EB msg_BCM_DiagResp;
+
+  byte g_IgnitionState = 2; // ON
+  byte g_BrakeSwitch = 0;   // RELEASED
+  byte g_DriverDoor = 0;    // CLOSED
+  byte g_HazardState = 0;   // OFF
+  byte g_AliveCounter = 0;
+
+  // Diagnostic State & DTC Memory
+  byte g_DiagSession = UDS_SUBF_DEFAULT_SESSION;
+  struct DTCEntry g_BCM_DTCs[MAX_DTCS];
+  int g_NumDTCs = 0;
+}
+
+on start
+{
+  write("[BCM] Node Initialized. Starting 50ms cyclic state broadcast...");
+  g_NumDTCs = 0;
+  setTimer(t_BCM_50ms, 50);
+}
+
+// -----------------------------------------------------------------------------
+// 50ms Cyclic Broadcast: BCM_Status (0x400)
+// -----------------------------------------------------------------------------
+on timer t_BCM_50ms
+{
+  g_AliveCounter = (g_AliveCounter + 1) & 0x0F;
+
+  msg_BCM.byte(0) = (g_IgnitionState & 0x03) | ((g_BrakeSwitch & 0x01) << 2) | ((g_DriverDoor & 0x01) << 3) | ((g_HazardState & 0x01) << 4);
+  msg_BCM.byte(1) = 0x00;
+  msg_BCM.byte(2) = 0x00;
+  msg_BCM.byte(3) = 0x00;
+  msg_BCM.byte(4) = 0x00;
+  msg_BCM.byte(5) = 0x00;
+  msg_BCM.byte(6) = g_AliveCounter;
+  msg_BCM.byte(7) = (msg_BCM.byte(0) ^ msg_BCM.byte(6)) & 0xFF;
+  msg_BCM.dlc = 8;
+
+  if (@sysvar::Fault_Node_Cutoff_BCM == 0)
+  {
+    output(msg_BCM);
+  }
+
+  setTimer(t_BCM_50ms, 50);
+}
+
+// -----------------------------------------------------------------------------
+// UDS Diagnostic Server (0x7E3 Physical / 0x7DF Functional)
+// -----------------------------------------------------------------------------
+on message 0x7E3, 0x7DF
+{
+  byte sid;
+  byte subf;
+  sid = this.byte(1);
+
+  if (sid == UDS_SID_DIAGNOSTIC_SESSION_CONTROL)
+  {
+    subf = this.byte(2);
+    g_DiagSession = subf;
+    msg_BCM_DiagResp.byte(0) = 0x06;
+    msg_BCM_DiagResp.byte(1) = 0x50;
+    msg_BCM_DiagResp.byte(2) = subf;
+    msg_BCM_DiagResp.byte(3) = 0x00;
+    msg_BCM_DiagResp.byte(4) = 0x32;
+    msg_BCM_DiagResp.byte(5) = 0x01;
+    msg_BCM_DiagResp.byte(6) = 0xF4;
+    msg_BCM_DiagResp.byte(7) = 0xAA;
+    msg_BCM_DiagResp.dlc = 8;
+    output(msg_BCM_DiagResp);
+  }
+  else if (sid == UDS_SID_CLEAR_DIAGNOSTIC_INFORMATION)
+  {
+    g_NumDTCs = 0;
+    msg_BCM_DiagResp.byte(0) = 0x01;
+    msg_BCM_DiagResp.byte(1) = 0x54;
+    msg_BCM_DiagResp.byte(2) = 0xAA;
+    msg_BCM_DiagResp.dlc = 8;
+    output(msg_BCM_DiagResp);
+    write("[BCM-UDS] DTCs Cleared.");
+  }
+  else if (sid == UDS_SID_READ_DTC_INFORMATION)
+  {
+    subf = this.byte(2);
+    if (subf == UDS_SUBF_REPORT_DTC_BY_STATUS_MASK)
+    {
+      if (g_NumDTCs == 0)
+      {
+        msg_BCM_DiagResp.byte(0) = 0x03;
+        msg_BCM_DiagResp.byte(1) = 0x59;
+        msg_BCM_DiagResp.byte(2) = 0x02;
+        msg_BCM_DiagResp.byte(3) = 0x00;
+        msg_BCM_DiagResp.dlc = 8;
+        output(msg_BCM_DiagResp);
+      }
+      else
+      {
+        msg_BCM_DiagResp.byte(0) = 0x06;
+        msg_BCM_DiagResp.byte(1) = 0x59;
+        msg_BCM_DiagResp.byte(2) = 0x02;
+        msg_BCM_DiagResp.byte(3) = (g_BCM_DTCs[0].dtcNumber >> 16) & 0xFF;
+        msg_BCM_DiagResp.byte(4) = (g_BCM_DTCs[0].dtcNumber >> 8) & 0xFF;
+        msg_BCM_DiagResp.byte(5) = (g_BCM_DTCs[0].dtcNumber) & 0xFF;
+        msg_BCM_DiagResp.byte(6) = g_BCM_DTCs[0].statusMask;
+        msg_BCM_DiagResp.byte(7) = 0xAA;
+        msg_BCM_DiagResp.dlc = 8;
+        output(msg_BCM_DiagResp);
+      }
+    }
+  }
+}

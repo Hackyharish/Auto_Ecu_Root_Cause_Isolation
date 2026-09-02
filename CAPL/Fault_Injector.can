@@ -1,0 +1,73 @@
+/*@!Encoding:1252*/
+/* =========================================================================
+   Node: Fault_Injector.can (Automated Test & Fault Injection Suite)
+   Project: Automated Root Cause Isolation in Multi-ECU Networks
+   Description: Orchestrates fault injection scenarios (WSS failure, TPS failure,
+                ECU node loss, bus-off) for testing the RCA engine.
+   Author: IVN Capstone Team | Tata Technologies TechPulse
+   ========================================================================= */
+
+variables
+{
+  msTimer t_AutoTestSeq;
+  int g_TestStep = 0;
+}
+
+on start
+{
+  write("[FAULT INJECTOR] Subsystem active. Ready for panel triggers or automated sequences.");
+}
+
+// -----------------------------------------------------------------------------
+// Clear All Injected Faults
+// -----------------------------------------------------------------------------
+on sysvar sysvar::Fault_Reset_All
+{
+  if (@sysvar::Fault_Reset_All == 1)
+  {
+    @sysvar::Fault_ABS_WheelSpeedFL = 0;
+    @sysvar::Fault_ECM_ThrottleSensor = 0;
+    @sysvar::Fault_Node_Cutoff_ECM = 0;
+    @sysvar::Fault_Node_Cutoff_ABS = 0;
+    @sysvar::Fault_Node_Cutoff_TCM = 0;
+    @sysvar::Fault_Node_Cutoff_BCM = 0;
+    @sysvar::Fault_Reset_All = 0;
+    write("[FAULT INJECTOR] All faults cleared. Network operating nominally.");
+  }
+}
+
+// -----------------------------------------------------------------------------
+// Automated Scenario 1: Wheel Speed Sensor Fault Injection
+// -----------------------------------------------------------------------------
+on key '1'
+{
+  write("[TEST] Key '1' pressed: Injecting Wheel Speed Sensor FL Open Circuit Fault...");
+  @sysvar::Fault_ABS_WheelSpeedFL = 1;
+}
+
+// -----------------------------------------------------------------------------
+// Automated Scenario 2: Throttle Position Sensor Fault Injection
+// -----------------------------------------------------------------------------
+on key '2'
+{
+  write("[TEST] Key '2' pressed: Injecting Throttle Position Sensor Low Circuit Fault...");
+  @sysvar::Fault_ECM_ThrottleSensor = 1;
+}
+
+// -----------------------------------------------------------------------------
+// Automated Scenario 3: Complete ECM Node Dropout
+// -----------------------------------------------------------------------------
+on key '3'
+{
+  write("[TEST] Key '3' pressed: Injecting ECM Complete Communication Timeout / Cutoff...");
+  @sysvar::Fault_Node_Cutoff_ECM = 1;
+}
+
+// -----------------------------------------------------------------------------
+// Reset All via Key '0'
+// -----------------------------------------------------------------------------
+on key '0'
+{
+  write("[TEST] Key '0' pressed: Clearing all synthetic faults...");
+  @sysvar::Fault_Reset_All = 1;
+}

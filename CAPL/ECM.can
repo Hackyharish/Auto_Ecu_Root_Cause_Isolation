@@ -1,0 +1,297 @@
+/*@!Encoding:1252*/
+/* =========================================================================
+   Node: ECM.can (Engine Control Module)
+   Project: Automated Root Cause Isolation in Multi-ECU Networks
+   Description: Simulates Engine Control Module with periodic CAN broadcasts,
+                sensor fault qualification, secondary symptom logging, and
+                UDS Server (ISO 14229 / ISO 15765-2).
+   Author: IVN Capstone Team | Tata Technologies TechPulse
+   ========================================================================= */
+
+includes
+{
+  #include "Common_UDS.cin"
+}
+
+variables
+{
+  // Timers
+  msTimer t_ECM_10ms;
+  msTimer t_ECM_50ms;
+
+  // CAN Messages
+  message 0x100 msg_ECM_1;
+  message 0x105 msg_ECM_2;
+  message 0x7E8 msg_ECM_DiagResp;
+
+  // Telemetry Variables
+  double g_EngineRPM = 850.0;
+  double g_ThrottlePos = 12.0;
+  double g_EngineTorque = 120.0;
+  byte   g_EngineStatus = 2; // IDLE
+  byte   g_AliveCounter = 0;
+  double g_CoolantTemp = 90.0;
+  double g_FuelFlow = 2.4;
+  byte   g_MILStatus = 0;
+
+  // Subscribed External Data (Dependency: ABS Vehicle Speed)
+  double g_RxVehicleSpeed = 0.0;
+  dword  g_LastABSTimestamp = 0;
+  byte   g_ABS_LostFlag = 0;
+
+  // Diagnostic State & DTC Memory
+  byte g_DiagSession = UDS_SUBF_DEFAULT_SESSION;
+  struct DTCEntry g_ECM_DTCs[MAX_DTCS];
+  int g_NumDTCs = 0;
+
+  // Fault Injection Trackers
+  byte g_Fault_ThrottleActive = 0;
+  byte g_Fault_SpeedLossActive = 0;
+}
+
+on start
+{
+  write("[ECM] Node Started. Initializing 500kbps cyclic transmission...");
+  
+  // Initialize DTC Memory
+  g_NumDTCs = 0;
+
+  // Start cyclic timers
+  setTimer(t_ECM_10ms, 10);
+  setTimer(t_ECM_50ms, 50);
+}
+
+// -----------------------------------------------------------------------------
+// 10ms Cyclic Broadcast: ECM_Data_1 (0x100)
+// -----------------------------------------------------------------------------
+on timer t_ECM_10ms
+{
+  // Dynamic RPM / Throttle behavior based on user panel or idle
+  if (@sysvar::Sim_AcceleratorPedal > 0)
+  {
+    g_ThrottlePos = @sysvar::Sim_AcceleratorPedal;
+    g_EngineRPM = 850.0 + (g_ThrottlePos * 45.0);
+    g_EngineTorque = 50.0 + (g_ThrottlePos * 2.5);
+    g_EngineStatus = 3; // RUNNING
+  }
+  else
+  {
+    g_ThrottlePos = 8.0;
+    g_EngineRPM = 850.0;
+    g_EngineTorque = 40.0;
+    g_EngineStatus = 2; // IDLE
+  }
+
+  // Handle Local Fault Injection: Throttle Position Sensor Failure
+  if (@sysvar::Fault_ECM_ThrottleSensor == 1)
+  {
+    g_ThrottlePos = 0.0; // Sensor pulled to ground
+    g_EngineStatus = 4;   // LIMP_HOME
+    if (g_Fault_ThrottleActive == 0)
+    {
+      g_Fault_ThrottleActive = 1;
+      AddDTC(0x012212, (DTC_STATUS_TEST_FAILED | DTC_STATUS_CONFIRMED_DTC)); // P0122-12
+      g_MILStatus = 1; // Turn ON Check Engine Light
+      write("[ECM] FAULT QUALIFIED: P0122-12 (Throttle Sensor Circuit Low). Status: Confirmed.");
+    }
+  }
+  else if (@sysvar::Fault_ECM_ThrottleSensor == 0 && g_Fault_ThrottleActive == 1)
+  {
+    g_Fault_ThrottleActive = 0;
+  }
+
+  // Check Upstream Dependency: ABS Signal Loss / Invalid Speed
+  if ((timeNow() - g_LastABSTimestamp) > 200000 && g_LastABSTimestamp > 0) // > 200ms timeout
+  {
+    if (g_Fault_SpeedLossActive == 0 && g_EngineRPM > 1200)
+    {
+      g_Fault_SpeedLossActive = 1;
+      AddDTC(0x050000, (DTC_STATUS_TEST_FAILED | DTC_STATUS_CONFIRMED_DTC)); // P0500-00 Secondary Symptom
+      write("[ECM] SECONDARY SYMPTOM QUALIFIED: P0500-00 (Vehicle Speed Signal Missing/Invalid).");
+    }
+  }
+  else
+  {
+    g_Fault_SpeedLossActive = 0;
+  }
+
+  // Populate CAN Payload
+  g_AliveCounter = (g_AliveCounter + 1) & 0x0F;
+
+  msg_ECM_1.byte(0) = (word)(g_EngineRPM / 0.25) & 0xFF;
+  msg_ECM_1.byte(1) = ((word)(g_EngineRPM / 0.25) >> 8) & 0xFF;
+  msg_ECM_1.byte(2) = (byte)(g_ThrottlePos / 0.5);
+  msg_ECM_1.byte(3) = (word)((g_EngineTorque + 500.0) / 0.5) & 0xFF;
+  msg_ECM_1.byte(4) = (((word)((g_EngineTorque + 500.0) / 0.5) >> 8) & 0x0F) | (g_EngineStatus << 4);
+  msg_ECM_1.byte(5) = g_AliveCounter;
+  msg_ECM_1.byte(6) = (msg_ECM_1.byte(0) ^ msg_ECM_1.byte(1) ^ msg_ECM_1.byte(2) ^ msg_ECM_1.byte(3)) & 0xFF; // Checksum
+  msg_ECM_1.byte(7) = 0x00;
+  msg_ECM_1.dlc = 8;
+
+  // Suppress transmission if Node Cutoff fault is active
+  if (@sysvar::Fault_Node_Cutoff_ECM == 0)
+  {
+    output(msg_ECM_1);
+  }
+
+  setTimer(t_ECM_10ms, 10);
+}
+
+// -----------------------------------------------------------------------------
+// 50ms Cyclic Broadcast: ECM_Data_2 (0x105)
+// -----------------------------------------------------------------------------
+on timer t_ECM_50ms
+{
+  msg_ECM_2.byte(0) = (byte)(g_CoolantTemp + 40.0);
+  msg_ECM_2.byte(1) = (word)(g_FuelFlow / 0.1) & 0xFF;
+  msg_ECM_2.byte(2) = (((word)(g_FuelFlow / 0.1) >> 8) & 0x0F) | (g_MILStatus << 4);
+  msg_ECM_2.byte(3) = (g_NumDTCs > 0) ? 0x01 : 0x00;
+  msg_ECM_2.byte(4) = 0x00;
+  msg_ECM_2.byte(5) = 0x00;
+  msg_ECM_2.byte(6) = 0x00;
+  msg_ECM_2.byte(7) = 0x00;
+  msg_ECM_2.dlc = 8;
+
+  if (@sysvar::Fault_Node_Cutoff_ECM == 0)
+  {
+    output(msg_ECM_2);
+  }
+
+  setTimer(t_ECM_50ms, 50);
+}
+
+// -----------------------------------------------------------------------------
+// Subscribed Message: ABS_Dynamics (0x205) -> Track Upstream Dependency
+// -----------------------------------------------------------------------------
+on message 0x205
+{
+  g_RxVehicleSpeed = (this.byte(0) | (this.byte(1) << 8)) * 0.01;
+  g_LastABSTimestamp = timeNow();
+}
+
+// -----------------------------------------------------------------------------
+// UDS Diagnostic Server Request Handler (0x7E0 Physical / 0x7DF Functional)
+// -----------------------------------------------------------------------------
+on message 0x7E0, 0x7DF
+{
+  byte pci;
+  byte sid;
+  byte subf;
+
+  pci = this.byte(0);
+  sid = this.byte(1);
+
+  // Service 0x10: DiagnosticSessionControl
+  if (sid == UDS_SID_DIAGNOSTIC_SESSION_CONTROL)
+  {
+    subf = this.byte(2);
+    g_DiagSession = subf;
+    msg_ECM_DiagResp.byte(0) = 0x06; // PCI length
+    msg_ECM_DiagResp.byte(1) = sid + 0x40; // Positive response 0x50
+    msg_ECM_DiagResp.byte(2) = subf;
+    msg_ECM_DiagResp.byte(3) = 0x00; // P2 Server Max High (50ms)
+    msg_ECM_DiagResp.byte(4) = 0x32; // P2 Server Max Low
+    msg_ECM_DiagResp.byte(5) = 0x01; // P2* Server Max High (5000ms)
+    msg_ECM_DiagResp.byte(6) = 0xF4; // P2* Server Max Low
+    msg_ECM_DiagResp.byte(7) = 0xAA;
+    msg_ECM_DiagResp.dlc = 8;
+    output(msg_ECM_DiagResp);
+    write("[ECM-UDS] Session Transition -> 0x%02X. Response sent.", subf);
+  }
+  // Service 0x14: ClearDiagnosticInformation
+  else if (sid == UDS_SID_CLEAR_DIAGNOSTIC_INFORMATION)
+  {
+    g_NumDTCs = 0;
+    g_MILStatus = 0;
+    msg_ECM_DiagResp.byte(0) = 0x01;
+    msg_ECM_DiagResp.byte(1) = sid + 0x40; // 0x54
+    msg_ECM_DiagResp.byte(2) = 0xAA;
+    msg_ECM_DiagResp.dlc = 8;
+    output(msg_ECM_DiagResp);
+    write("[ECM-UDS] DTCs Cleared by Diagnostic Client.");
+  }
+  // Service 0x19: ReadDTCInformation
+  else if (sid == UDS_SID_READ_DTC_INFORMATION)
+  {
+    subf = this.byte(2);
+    if (subf == UDS_SUBF_REPORT_DTC_BY_STATUS_MASK)
+    {
+      if (g_NumDTCs == 0)
+      {
+        msg_ECM_DiagResp.byte(0) = 0x03;
+        msg_ECM_DiagResp.byte(1) = 0x59;
+        msg_ECM_DiagResp.byte(2) = 0x02;
+        msg_ECM_DiagResp.byte(3) = 0x00; // DTC Status Availability Mask
+        msg_ECM_DiagResp.byte(4) = 0x00;
+        msg_ECM_DiagResp.dlc = 8;
+        output(msg_ECM_DiagResp);
+      }
+      else
+      {
+        // Return first primary active DTC (ISO 14229 single frame)
+        msg_ECM_DiagResp.byte(0) = 0x06; // PCI length 6 bytes
+        msg_ECM_DiagResp.byte(1) = 0x59;
+        msg_ECM_DiagResp.byte(2) = 0x02;
+        msg_ECM_DiagResp.byte(3) = (g_ECM_DTCs[0].dtcNumber >> 16) & 0xFF; // High byte
+        msg_ECM_DiagResp.byte(4) = (g_ECM_DTCs[0].dtcNumber >> 8) & 0xFF;  // Mid byte
+        msg_ECM_DiagResp.byte(5) = (g_ECM_DTCs[0].dtcNumber) & 0xFF;       // Low byte
+        msg_ECM_DiagResp.byte(6) = g_ECM_DTCs[0].statusMask;
+        msg_ECM_DiagResp.byte(7) = 0xAA;
+        msg_ECM_DiagResp.dlc = 8;
+        output(msg_ECM_DiagResp);
+        write("[ECM-UDS] ReadDTC response sent: 0x%06X (Status: 0x%02X)", g_ECM_DTCs[0].dtcNumber, g_ECM_DTCs[0].statusMask);
+      }
+    }
+  }
+  // Service 0x22: ReadDataByIdentifier
+  else if (sid == UDS_SID_READ_DATA_BY_IDENTIFIER)
+  {
+    word did;
+    did = (this.byte(2) << 8) | this.byte(3);
+    
+    if (did == 0x0100) // Engine Speed DID
+    {
+      msg_ECM_DiagResp.byte(0) = 0x05;
+      msg_ECM_DiagResp.byte(1) = 0x62;
+      msg_ECM_DiagResp.byte(2) = 0x01;
+      msg_ECM_DiagResp.byte(3) = 0x00;
+      msg_ECM_DiagResp.byte(4) = ((word)g_EngineRPM >> 8) & 0xFF;
+      msg_ECM_DiagResp.byte(5) = ((word)g_EngineRPM) & 0xFF;
+      msg_ECM_DiagResp.dlc = 8;
+      output(msg_ECM_DiagResp);
+    }
+    else if (did == 0x0101) // Throttle Position DID
+    {
+      msg_ECM_DiagResp.byte(0) = 0x04;
+      msg_ECM_DiagResp.byte(1) = 0x62;
+      msg_ECM_DiagResp.byte(2) = 0x01;
+      msg_ECM_DiagResp.byte(3) = 0x01;
+      msg_ECM_DiagResp.byte(4) = (byte)g_ThrottlePos;
+      msg_ECM_DiagResp.dlc = 8;
+      output(msg_ECM_DiagResp);
+    }
+  }
+}
+
+// -----------------------------------------------------------------------------
+// Helper Function: Add DTC to Memory
+// -----------------------------------------------------------------------------
+void AddDTC(dword dtcCode, byte status)
+{
+  int i;
+  for (i = 0; i < g_NumDTCs; i++)
+  {
+    if (g_ECM_DTCs[i].dtcNumber == dtcCode)
+    {
+      g_ECM_DTCs[i].statusMask = status;
+      return;
+    }
+  }
+  if (g_NumDTCs < MAX_DTCS)
+  {
+    g_ECM_DTCs[g_NumDTCs].dtcNumber = dtcCode;
+    g_ECM_DTCs[g_NumDTCs].statusMask = status;
+    g_ECM_DTCs[g_NumDTCs].snapshotSpeed = (dword)g_EngineRPM;
+    g_NumDTCs++;
+  }
+}
