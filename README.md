@@ -9,7 +9,7 @@
 
 > [!NOTE]
 > 🚧 **Project Status: In Progress / Active Development**  
-> Simulation nodes, CAPL diagnostic handlers, and DBC dependencies are functional. Ongoing work includes advanced fault scenarios, dynamic panel dashboard refinement, and hardware-in-the-loop (HIL) benchmarking.
+> Simulation nodes, CAPL diagnostic handlers, and DBC dependencies are functional. Ongoing work includes extended multi-node fault scenarios, dynamic panel dashboard refinement, and SIL diagnostic latency validation.
 
 ---
 
