@@ -99,8 +99,10 @@ The simulation is deployed on a **500 kbps High-Speed CAN Bus** in Vector CANoe 
 │   ├── Diagnostic_Master_RCA.can          # Diagnostic Master + Automated RCA Isolation Engine
 │   └── Fault_Injector.can                 # Automated & panel fault injection test suite
 ├── Panel/
+│   ├── Diagnostic_RCA_Dashboard.xvp       # Interactive CANoe Panel (8 scenario & control buttons)
 │   └── System_Variables.vsysvar           # CANoe system variables definition file
-├── Logs/                                  # Simulation trace output directory (.blf / .asc)
+├── Logs/                                  # Simulation trace output directory (.asc / .blf)
+├── Project.cfg                            # Vector CANoe project environment configuration
 └── README.md                              # Repository overview and documentation
 ```
 
@@ -131,35 +133,36 @@ The simulation is deployed on a **500 kbps High-Speed CAN Bus** in Vector CANoe 
 
 ---
 
-## 🧪 Demonstration & Test Scenarios
+## 🧪 Demonstration & Multi-ECU Test Scenarios
 
-### Scenario 1: Wheel Speed Sensor Fault Injection
-- **Action:** Press keyboard key **`1`** (or toggle `sysvar::Fault_ABS_WheelSpeedFL = 1`).
-- **Observed Behavior:**
-  - `ABS_ESP` qualifies primary fault **`C0035-13`** (*Left Front Wheel Speed Sensor Open*).
-  - `TCM` detects speed anomaly and qualifies secondary **`U0415-81`** (*Invalid ABS Data*).
-  - `ECM` qualifies secondary **`P0500-00`** (*Vehicle Speed Missing*).
-- **Trigger RCA Scan:** Press keyboard key **`S`** (or click panel button).
-- **Automated Output in CANoe Write Window:**
-  ```text
-  ===================================================================
-                  AUTOMATED ROOT CAUSE ISOLATION REPORT              
-  ===================================================================
-   [ISOLATED ROOT ECU]       : ABS / ESP Control Module
-   [PRIMARY ROOT DTC]        : C0035-13
-   [FAULT MECHANISM]         : Left Front Wheel Speed Sensor Circuit Open
-   [PRUNED SECONDARY SYMPTOMS]: TCM: U0415-81 | ECM: P0500-00
-   [ISOLATION LATENCY]       : 42.10 ms
-   [BENCHMARK COMPARISON]    : Automated (42.10 ms) vs Manual (>15 mins)
-  ===================================================================
-  ```
+The framework implements 6 diverse, cross-subsystem cascading failure scenarios covering every ECU:
 
-### Scenario 2: Throttle Position Sensor Failure
-- **Action:** Press key **`2`** (`sysvar::Fault_ECM_ThrottleSensor = 1`).
-- **RCA Result:**
-  - **Root ECU:** `Engine Control Module (ECM)`
-  - **Root DTC:** `P0122-12` (*Throttle Sensor 'A' Circuit Low*)
-  - **Pruned Symptoms:** `TCM: U0401-86` (*Invalid ECM Data*)
+| Scenario | Trigger / Key | Primary Root Cause (Isolated) | Cascading Symptoms (Pruned) |
+|---|---|---|---|
+| **1. Wheel Speed Sensor Open** | Key **`1`** / Panel Btn 1 | **ABS: `C0035-13`** (FL Speed Sensor Open) | `TCM: U0415-81` (Invalid ABS data)<br>`ECM: P0500-00` (Speed missing) |
+| **2. Throttle Sensor Low** | Key **`2`** / Panel Btn 2 | **ECM: `P0122-12`** (Throttle Circuit Low) | `TCM: U0401-86` (Invalid ECM throttle) |
+| **3. ECM Node Dropout** | Key **`3`** / Panel Btn 3 | **ECM: `U0100-00`** (ECM Complete Bus Timeout) | `TCM: U0100-00` (Lost comm with ECM)<br>`BCM: U0100-00` (Lost comm with ECM) |
+| **4. Coolant Overheat** | Key **`4`** / Panel Btn 7 | **ECM: `P0217-00`** (Engine Overheat $138^\circ\text{C}$) | `TCM: U0401-82` (Invalid engine temp range)<br>`BCM: B10A2-00` (Cluster high temp warning) |
+| **5. Brake Switch Stuck** | Key **`5`** / Panel Btn 8 | **BCM: `B1318-11`** (Brake Switch Stuck Active) | `ECM: P0504-00` (Brake/Throttle plausibility)<br>`TCM: U0422-81` (Invalid BCM data) |
+| **6. ABS Node Dropout** | Key **`6`** / Panel Btn 6 | **ABS: `U0121-00`** (ABS Complete Bus Timeout) | `TCM: U0121-00` (Lost comm with ABS)<br>`ECM: U0121-00` (Lost comm with ABS) |
+
+### Controls:
+- **Trigger RCA Scan:** Press key **`S`** or click **Automated RCA Scan** on panel.
+- **Reset Network & DTCs:** Press key **`0`** or click **Reset All Faults (0)** on panel (clears all fault variables, broadcasts UDS Service `0x14` ClearDiagnosticInformation, restores nominal telemetry).
+
+### Automated Isolation Output (CANoe Write Window Example):
+```text
+===================================================================
+                AUTOMATED ROOT CAUSE ISOLATION REPORT              
+===================================================================
+ [ISOLATED ROOT ECU]       : ABS / ESP Control Module
+ [PRIMARY ROOT DTC]        : C0035-13
+ [FAULT MECHANISM]         : Left Front Wheel Speed Sensor Circuit Open
+ [PRUNED SECONDARY SYMPTOMS]: TCM: U0415-81 | ECM: P0500-00
+ [ISOLATION LATENCY]       : 42.10 ms
+ [BENCHMARK COMPARISON]    : Automated (42.10 ms) vs Manual (>15 mins)
+===================================================================
+```
 
 ---
 

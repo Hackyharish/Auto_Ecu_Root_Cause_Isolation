@@ -29,6 +29,10 @@ variables
   byte g_DiagSession = UDS_SUBF_DEFAULT_SESSION;
   struct DTCEntry g_BCM_DTCs[MAX_DTCS];
   int g_NumDTCs = 0;
+
+  // Fault Tracking Flags
+  byte g_Fault_BrakeActive = 0;
+  byte g_Symptom_Coolant_Active = 0;
 }
 
 on start
@@ -44,6 +48,23 @@ on start
 on timer t_BCM_50ms
 {
   g_AliveCounter = (g_AliveCounter + 1) & 0x0F;
+
+  // Handle Local Fault Injection: Brake Switch Stuck High (Scenario 5)
+  if (@sysvar::Fault_BCM_BrakeSwitch == 1)
+  {
+    g_BrakeSwitch = 1; // Stuck closed
+    if (g_Fault_BrakeActive == 0)
+    {
+      g_Fault_BrakeActive = 1;
+      AddDTC(0x931811, (DTC_STATUS_TEST_FAILED | DTC_STATUS_CONFIRMED_DTC)); // B1318-11
+      write("[BCM] PRIMARY ROOT FAULT QUALIFIED: B1318-11 (Brake Switch Circuit Short/Stuck High).");
+    }
+  }
+  else if (@sysvar::Fault_BCM_BrakeSwitch == 0 && g_Fault_BrakeActive == 1)
+  {
+    g_Fault_BrakeActive = 0;
+    g_BrakeSwitch = 0;
+  }
 
   msg_BCM.byte(0) = (g_IgnitionState & 0x03) | ((g_BrakeSwitch & 0x01) << 2) | ((g_DriverDoor & 0x01) << 3) | ((g_HazardState & 0x01) << 4);
   msg_BCM.byte(1) = 0x00;
@@ -61,6 +82,29 @@ on timer t_BCM_50ms
   }
 
   setTimer(t_BCM_50ms, 50);
+}
+
+// -----------------------------------------------------------------------------
+// Subscribed Message: ECM_Data_2 (0x105) -> Track Engine Overheat Cascade
+// -----------------------------------------------------------------------------
+on message 0x105
+{
+  double rxCoolantTemp;
+  rxCoolantTemp = (double)this.byte(0) - 40.0;
+
+  if (rxCoolantTemp > 125.0)
+  {
+    if (g_Symptom_Coolant_Active == 0)
+    {
+      g_Symptom_Coolant_Active = 1;
+      AddDTC(0x90A200, (DTC_STATUS_TEST_FAILED | DTC_STATUS_CONFIRMED_DTC)); // B10A2-00
+      write("[BCM] SECONDARY SYMPTOM DETECTED: B10A2-00 (Cluster High Coolant Temperature Warning).");
+    }
+  }
+  else if (rxCoolantTemp <= 110.0 && g_Symptom_Coolant_Active == 1)
+  {
+    g_Symptom_Coolant_Active = 0;
+  }
 }
 
 // -----------------------------------------------------------------------------
@@ -89,7 +133,7 @@ on message 0x7E3, 0x7DF
   }
   else if (sid == UDS_SID_CLEAR_DIAGNOSTIC_INFORMATION)
   {
-    g_NumDTCs = 0;
+    Reset_BCM_Node();
     msg_BCM_DiagResp.byte(0) = 0x01;
     msg_BCM_DiagResp.byte(1) = 0x54;
     msg_BCM_DiagResp.byte(2) = 0xAA;
@@ -125,5 +169,41 @@ on message 0x7E3, 0x7DF
         output(msg_BCM_DiagResp);
       }
     }
+  }
+}
+
+void AddDTC(dword dtcCode, byte status)
+{
+  int i;
+  for (i = 0; i < g_NumDTCs; i++)
+  {
+    if (g_BCM_DTCs[i].dtcNumber == dtcCode)
+    {
+      g_BCM_DTCs[i].statusMask = status;
+      return;
+    }
+  }
+  if (g_NumDTCs < MAX_DTCS)
+  {
+    g_BCM_DTCs[g_NumDTCs].dtcNumber = dtcCode;
+    g_BCM_DTCs[g_NumDTCs].statusMask = status;
+    g_NumDTCs++;
+  }
+}
+
+void Reset_BCM_Node()
+{
+  g_NumDTCs = 0;
+  g_BrakeSwitch = 0;
+  g_Fault_BrakeActive = 0;
+  g_Symptom_Coolant_Active = 0;
+  write("[BCM] Reset: All DTCs and fault flags cleared.");
+}
+
+on sysvar sysvar::Fault_Reset_All
+{
+  if (@sysvar::Fault_Reset_All == 1)
+  {
+    Reset_BCM_Node();
   }
 }

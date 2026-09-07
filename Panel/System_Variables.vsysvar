@@ -22,6 +22,12 @@
     <variable anlyzLocal="2" readOnly="false" valueSequence="false" unit="" name="Fault_Node_Cutoff_BCM" comment="Cutoff BCM node communication" bitcount="32" isSigned="true" encoding="65001" type="int">
       <defaultvalue>0</defaultvalue>
     </variable>
+    <variable anlyzLocal="2" readOnly="false" valueSequence="false" unit="" name="Fault_ECM_CoolantTemp" comment="Inject Engine Coolant Over-Temperature Fault" bitcount="32" isSigned="true" encoding="65001" type="int">
+      <defaultvalue>0</defaultvalue>
+    </variable>
+    <variable anlyzLocal="2" readOnly="false" valueSequence="false" unit="" name="Fault_BCM_BrakeSwitch" comment="Inject Brake Pedal Switch Stuck High Fault" bitcount="32" isSigned="true" encoding="65001" type="int">
+      <defaultvalue>0</defaultvalue>
+    </variable>
     <variable anlyzLocal="2" readOnly="false" valueSequence="false" unit="" name="Fault_Reset_All" comment="Reset all injected faults" bitcount="32" isSigned="true" encoding="65001" type="int">
       <defaultvalue>0</defaultvalue>
     </variable>

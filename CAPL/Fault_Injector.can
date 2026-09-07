@@ -3,7 +3,7 @@
    Node: Fault_Injector.can (Automated Test & Fault Injection Suite)
    Project: Automated Root Cause Isolation in Multi-ECU Networks
    Description: Orchestrates fault injection scenarios (WSS failure, TPS failure,
-                ECU node loss, bus-off) for testing the RCA engine.
+                ECU node loss, Coolant Overheat, Brake switch stuck) for testing the RCA engine.
    Author: IVN Capstone Team | Tata Technologies TechPulse
    ========================================================================= */
 
@@ -31,36 +31,65 @@ on sysvar sysvar::Fault_Reset_All
     @sysvar::Fault_Node_Cutoff_ABS = 0;
     @sysvar::Fault_Node_Cutoff_TCM = 0;
     @sysvar::Fault_Node_Cutoff_BCM = 0;
+    @sysvar::Fault_ECM_CoolantTemp = 0;
+    @sysvar::Fault_BCM_BrakeSwitch = 0;
     @sysvar::Fault_Reset_All = 0;
     write("[FAULT INJECTOR] All faults cleared. Network operating nominally.");
   }
 }
 
 // -----------------------------------------------------------------------------
-// Automated Scenario 1: Wheel Speed Sensor Fault Injection
+// Scenario 1: Wheel Speed Sensor Fault Injection (ABS)
 // -----------------------------------------------------------------------------
 on key '1'
 {
-  write("[TEST] Key '1' pressed: Injecting Wheel Speed Sensor FL Open Circuit Fault...");
+  write("[TEST] Key '1' pressed: Injecting Wheel Speed Sensor FL Open Circuit Fault (ABS)...");
   @sysvar::Fault_ABS_WheelSpeedFL = 1;
 }
 
 // -----------------------------------------------------------------------------
-// Automated Scenario 2: Throttle Position Sensor Fault Injection
+// Scenario 2: Throttle Position Sensor Fault Injection (ECM)
 // -----------------------------------------------------------------------------
 on key '2'
 {
-  write("[TEST] Key '2' pressed: Injecting Throttle Position Sensor Low Circuit Fault...");
+  write("[TEST] Key '2' pressed: Injecting Throttle Position Sensor Low Circuit Fault (ECM)...");
   @sysvar::Fault_ECM_ThrottleSensor = 1;
 }
 
 // -----------------------------------------------------------------------------
-// Automated Scenario 3: Complete ECM Node Dropout
+// Scenario 3: Complete ECM Node Dropout
 // -----------------------------------------------------------------------------
 on key '3'
 {
   write("[TEST] Key '3' pressed: Injecting ECM Complete Communication Timeout / Cutoff...");
   @sysvar::Fault_Node_Cutoff_ECM = 1;
+}
+
+// -----------------------------------------------------------------------------
+// Scenario 4: Engine Coolant Over-Temperature Condition (ECM)
+// -----------------------------------------------------------------------------
+on key '4'
+{
+  write("[TEST] Key '4' pressed: Injecting Engine Coolant Over-Temperature Condition (ECM)...");
+  @sysvar::Fault_ECM_CoolantTemp = 1;
+}
+
+// -----------------------------------------------------------------------------
+// Scenario 5: Brake Pedal Switch Stuck High/Active (BCM)
+// -----------------------------------------------------------------------------
+on key '5'
+{
+  write("[TEST] Key '5' pressed: Injecting Brake Switch Stuck Active (BCM)...");
+  @sysvar::Fault_BCM_BrakeSwitch = 1;
+}
+
+// -----------------------------------------------------------------------------
+// Scenario 6: Complete ABS Node Dropout
+// -----------------------------------------------------------------------------
+on key '6'
+{
+  write("[TEST] Key '6' pressed: Injecting ABS Complete Communication Timeout / Cutoff...");
+  @sysvar::Fault_Node_Cutoff_ABS = 1;
 }
 
 // -----------------------------------------------------------------------------

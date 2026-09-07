@@ -47,7 +47,7 @@ BO_ 261 ECM_Data_2: 8 ECM
  SG_ CoolantTemperature : 0|8@1+ (1,-40) [-40|150] "degC" BCM,TCM
  SG_ FuelFlowRate : 8|12@1+ (0.1,0) [0|400] "L/h" BCM
  SG_ CheckEngineMIL : 20|2@1+ (1,0) [0|3] "" BCM
- SG_ ECM_FaultCode : 24|16@1+ (1,0) [0|65535] "" DIAG_TESTER
+ SG_ ECM_FaultCode : 24|8@1+ (1,0) [0|255] "" DIAG_TESTER
 
 BO_ 512 ABS_WheelSpeeds: 8 ABS_ESP
  SG_ WheelSpeed_FL : 0|16@1+ (0.01,0) [0|300] "km/h" ECM,TCM,BCM
@@ -57,8 +57,8 @@ BO_ 512 ABS_WheelSpeeds: 8 ABS_ESP
 
 BO_ 517 ABS_Dynamics: 8 ABS_ESP
  SG_ VehicleSpeed : 0|16@1+ (0.01,0) [0|300] "km/h" ECM,TCM,BCM
- SG_ YawRate : 16|12@1+ (0.05,-100) [-100|100] "deg/s" ECM
- SG_ BrakePressure : 28|12@1+ (0.1,0) [0|250] "bar" ECM,TCM
+ SG_ YawRate : 16|16@1+ (0.05,-100) [-100|100] "deg/s" ECM
+ SG_ BrakePressure : 32|8@1+ (1,0) [0|250] "bar" ECM,TCM
  SG_ ABS_Active : 40|1@1+ (1,0) [0|1] "" BCM,ECM,TCM
  SG_ ESP_Fault : 41|1@1+ (1,0) [0|1] "" BCM,ECM,TCM
  SG_ ABS_AliveCounter : 44|4@1+ (1,0) [0|15] "cnt" ECM,TCM,BCM

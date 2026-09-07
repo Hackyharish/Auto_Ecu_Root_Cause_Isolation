@@ -48,6 +48,9 @@ variables
   byte g_Symptom_U0415_Active = 0;
   byte g_Symptom_U0401_Active = 0;
   byte g_Symptom_U0100_Active = 0;
+  byte g_Symptom_Coolant_Active = 0;
+  byte g_Symptom_Brake_Active = 0;
+  byte g_Symptom_ABS_Lost_Active = 0;
 }
 
 on start
@@ -129,6 +132,22 @@ on timer t_TCM_20ms
     g_Symptom_U0100_Active = 0;
   }
 
+  // Cross-Dependency Check 4: ABS Node Loss (Timeout > 250ms or Fault_Node_Cutoff_ABS == 1)
+  if (@sysvar::Fault_Node_Cutoff_ABS == 1 || ((timeNow() - g_LastABSTimestamp) > 250000 && g_LastABSTimestamp > 0))
+  {
+    if (g_Symptom_ABS_Lost_Active == 0)
+    {
+      g_Symptom_ABS_Lost_Active = 1;
+      g_DegradedMode = 1;
+      AddDTC(0xD12100, (DTC_STATUS_TEST_FAILED | DTC_STATUS_CONFIRMED_DTC)); // U0121-00
+      write("[TCM] SECONDARY SYMPTOM DETECTED: U0121-00 (Lost Comm with ABS Module).");
+    }
+  }
+  else if (@sysvar::Fault_Node_Cutoff_ABS == 0 && g_Symptom_ABS_Lost_Active == 1)
+  {
+    g_Symptom_ABS_Lost_Active = 0;
+  }
+
   // Populate CAN Payload (0x300)
   msg_TCM.byte(0) = g_CurrentGear | (g_TargetGear << 4);
   msg_TCM.byte(1) = g_ClutchStatus;
@@ -149,7 +168,7 @@ on timer t_TCM_20ms
 }
 
 // -----------------------------------------------------------------------------
-// Subscriptions: ECM_Data_1 (0x100) & ABS_WheelSpeeds (0x200)
+// Subscriptions: ECM_Data_1 (0x100), ECM_Data_2 (0x105), ABS (0x200), BCM (0x400)
 // -----------------------------------------------------------------------------
 on message 0x100
 {
@@ -158,12 +177,51 @@ on message 0x100
   g_LastECMTimestamp = timeNow();
 }
 
+on message 0x105
+{
+  double rxCoolantTemp;
+  rxCoolantTemp = (double)this.byte(0) - 40.0;
+  if (rxCoolantTemp > 125.0)
+  {
+    if (g_Symptom_Coolant_Active == 0)
+    {
+      g_Symptom_Coolant_Active = 1;
+      g_DegradedMode = 1;
+      AddDTC(0xD40182, (DTC_STATUS_TEST_FAILED | DTC_STATUS_CONFIRMED_DTC)); // U0401-82
+      write("[TCM] SECONDARY SYMPTOM DETECTED: U0401-82 (Invalid Data from ECM - Engine Temp Range).");
+    }
+  }
+  else if (rxCoolantTemp <= 110.0 && g_Symptom_Coolant_Active == 1)
+  {
+    g_Symptom_Coolant_Active = 0;
+  }
+}
+
 on message 0x200
 {
   g_RxSpeedFL = (this.byte(0) | (this.byte(1) << 8)) * 0.01;
   g_RxSpeedFR = (this.byte(2) | (this.byte(3) << 8)) * 0.01;
   g_RxVehicleSpeed = (g_RxSpeedFL + g_RxSpeedFR) / 2.0;
   g_LastABSTimestamp = timeNow();
+}
+
+on message 0x400
+{
+  byte brakePressed;
+  brakePressed = (this.byte(0) >> 2) & 0x01;
+  if (brakePressed == 1 && g_RxVehicleSpeed > 40.0)
+  {
+    if (g_Symptom_Brake_Active == 0)
+    {
+      g_Symptom_Brake_Active = 1;
+      AddDTC(0xD42281, (DTC_STATUS_TEST_FAILED | DTC_STATUS_CONFIRMED_DTC)); // U0422-81
+      write("[TCM] SECONDARY SYMPTOM DETECTED: U0422-81 (Invalid Data from BCM - Brake Switch Conflict).");
+    }
+  }
+  else if (brakePressed == 0 && g_Symptom_Brake_Active == 1)
+  {
+    g_Symptom_Brake_Active = 0;
+  }
 }
 
 // -----------------------------------------------------------------------------
@@ -192,8 +250,7 @@ on message 0x7E1, 0x7DF
   }
   else if (sid == UDS_SID_CLEAR_DIAGNOSTIC_INFORMATION)
   {
-    g_NumDTCs = 0;
-    g_DegradedMode = 0;
+    Reset_TCM_Node();
     msg_TCM_DiagResp.byte(0) = 0x01;
     msg_TCM_DiagResp.byte(1) = 0x54;
     msg_TCM_DiagResp.byte(2) = 0xAA;
@@ -264,5 +321,28 @@ void AddDTC(dword dtcCode, byte status)
     g_TCM_DTCs[g_NumDTCs].dtcNumber = dtcCode;
     g_TCM_DTCs[g_NumDTCs].statusMask = status;
     g_NumDTCs++;
+  }
+}
+
+void Reset_TCM_Node()
+{
+  g_NumDTCs = 0;
+  g_Symptom_U0415_Active = 0;
+  g_Symptom_U0401_Active = 0;
+  g_Symptom_U0100_Active = 0;
+  g_Symptom_Coolant_Active = 0;
+  g_Symptom_Brake_Active = 0;
+  g_Symptom_ABS_Lost_Active = 0;
+  g_DegradedMode = 0;
+  g_CurrentGear = 3;
+  g_TargetGear = 3;
+  write("[TCM] Reset: All DTCs and secondary symptom flags cleared.");
+}
+
+on sysvar sysvar::Fault_Reset_All
+{
+  if (@sysvar::Fault_Reset_All == 1)
+  {
+    Reset_TCM_Node();
   }
 }

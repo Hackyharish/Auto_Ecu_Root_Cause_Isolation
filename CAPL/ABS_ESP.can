@@ -89,6 +89,7 @@ on timer t_ABS_10ms
   {
     g_Fault_WSS_FL_Active = 0;
     g_ESP_Fault = 0;
+    g_SpeedFL = 60.0;
   }
 
   // Populate CAN Payload (0x200)
@@ -126,8 +127,8 @@ on timer t_ABS_20ms
   msg_ABS_Dyn.byte(0) = (word)(g_VehicleSpeed / 0.01) & 0xFF;
   msg_ABS_Dyn.byte(1) = ((word)(g_VehicleSpeed / 0.01) >> 8) & 0xFF;
   msg_ABS_Dyn.byte(2) = (word)((g_YawRate + 100.0) / 0.05) & 0xFF;
-  msg_ABS_Dyn.byte(3) = (((word)((g_YawRate + 100.0) / 0.05) >> 8) & 0x0F) | ((word)(g_BrakePressure / 0.1) << 4);
-  msg_ABS_Dyn.byte(4) = (((word)(g_BrakePressure / 0.1) >> 4) & 0xFF);
+  msg_ABS_Dyn.byte(3) = ((word)((g_YawRate + 100.0) / 0.05) >> 8) & 0xFF;
+  msg_ABS_Dyn.byte(4) = (byte)g_BrakePressure;
   msg_ABS_Dyn.byte(5) = (g_ABS_Active & 0x01) | ((g_ESP_Fault & 0x01) << 1) | (g_AliveCounter << 4);
   msg_ABS_Dyn.byte(6) = (msg_ABS_Dyn.byte(0) ^ msg_ABS_Dyn.byte(1) ^ msg_ABS_Dyn.byte(5)) & 0xFF;
   msg_ABS_Dyn.byte(7) = 0x00;
@@ -167,7 +168,7 @@ on message 0x7E2, 0x7DF
   }
   else if (sid == UDS_SID_CLEAR_DIAGNOSTIC_INFORMATION)
   {
-    g_NumDTCs = 0;
+    Reset_ABS_Node();
     msg_ABS_DiagResp.byte(0) = 0x01;
     msg_ABS_DiagResp.byte(1) = 0x54;
     msg_ABS_DiagResp.byte(2) = 0xAA;
@@ -241,5 +242,29 @@ void AddDTC(dword dtcCode, byte status)
     g_ABS_DTCs[g_NumDTCs].dtcNumber = dtcCode;
     g_ABS_DTCs[g_NumDTCs].statusMask = status;
     g_NumDTCs++;
+  }
+}
+
+void Reset_ABS_Node()
+{
+  g_NumDTCs = 0;
+  g_Fault_WSS_FL_Active = 0;
+  g_ESP_Fault = 0;
+  g_ABS_Active = 0;
+  g_SpeedFL = 60.0;
+  g_SpeedFR = 60.0;
+  g_SpeedRL = 60.0;
+  g_SpeedRR = 60.0;
+  g_VehicleSpeed = 60.0;
+  g_YawRate = 0.0;
+  g_BrakePressure = 0.0;
+  write("[ABS_ESP] Reset: All faults cleared, nominal telemetry restored.");
+}
+
+on sysvar sysvar::Fault_Reset_All
+{
+  if (@sysvar::Fault_Reset_All == 1)
+  {
+    Reset_ABS_Node();
   }
 }

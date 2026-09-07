@@ -47,6 +47,9 @@ variables
   // Fault Injection Trackers
   byte g_Fault_ThrottleActive = 0;
   byte g_Fault_SpeedLossActive = 0;
+  byte g_Fault_CoolantActive = 0;
+  byte g_Fault_BrakeConflictActive = 0;
+  byte g_Fault_ABSCutoffActive = 0;
 }
 
 on start
@@ -115,6 +118,21 @@ on timer t_ECM_10ms
     g_Fault_SpeedLossActive = 0;
   }
 
+  // Check Complete ABS Node Cutoff
+  if (@sysvar::Fault_Node_Cutoff_ABS == 1)
+  {
+    if (g_Fault_ABSCutoffActive == 0)
+    {
+      g_Fault_ABSCutoffActive = 1;
+      AddDTC(0xD12100, (DTC_STATUS_TEST_FAILED | DTC_STATUS_CONFIRMED_DTC)); // U0121-00
+      write("[ECM] SECONDARY SYMPTOM QUALIFIED: U0121-00 (Lost Communication With ABS Control Module).");
+    }
+  }
+  else if (@sysvar::Fault_Node_Cutoff_ABS == 0 && g_Fault_ABSCutoffActive == 1)
+  {
+    g_Fault_ABSCutoffActive = 0;
+  }
+
   // Populate CAN Payload
   g_AliveCounter = (g_AliveCounter + 1) & 0x0F;
 
@@ -142,6 +160,24 @@ on timer t_ECM_10ms
 // -----------------------------------------------------------------------------
 on timer t_ECM_50ms
 {
+  // Handle Local Fault Injection: Engine Coolant Over-Temperature
+  if (@sysvar::Fault_ECM_CoolantTemp == 1)
+  {
+    g_CoolantTemp = 138.0; // Overheat condition
+    if (g_Fault_CoolantActive == 0)
+    {
+      g_Fault_CoolantActive = 1;
+      AddDTC(0x021700, (DTC_STATUS_TEST_FAILED | DTC_STATUS_CONFIRMED_DTC)); // P0217-00
+      g_MILStatus = 2; // Critical Flashing MIL
+      write("[ECM] PRIMARY ROOT FAULT QUALIFIED: P0217-00 (Engine Coolant Over-Temperature Condition).");
+    }
+  }
+  else if (@sysvar::Fault_ECM_CoolantTemp == 0 && g_Fault_CoolantActive == 1)
+  {
+    g_Fault_CoolantActive = 0;
+    g_CoolantTemp = 90.0;
+  }
+
   msg_ECM_2.byte(0) = (byte)(g_CoolantTemp + 40.0);
   msg_ECM_2.byte(1) = (word)(g_FuelFlow / 0.1) & 0xFF;
   msg_ECM_2.byte(2) = (((word)(g_FuelFlow / 0.1) >> 8) & 0x0F) | (g_MILStatus << 4);
@@ -201,8 +237,7 @@ on message 0x7E0, 0x7DF
   // Service 0x14: ClearDiagnosticInformation
   else if (sid == UDS_SID_CLEAR_DIAGNOSTIC_INFORMATION)
   {
-    g_NumDTCs = 0;
-    g_MILStatus = 0;
+    Reset_ECM_Node();
     msg_ECM_DiagResp.byte(0) = 0x01;
     msg_ECM_DiagResp.byte(1) = sid + 0x40; // 0x54
     msg_ECM_DiagResp.byte(2) = 0xAA;
@@ -293,5 +328,53 @@ void AddDTC(dword dtcCode, byte status)
     g_ECM_DTCs[g_NumDTCs].statusMask = status;
     g_ECM_DTCs[g_NumDTCs].snapshotSpeed = (dword)g_EngineRPM;
     g_NumDTCs++;
+  }
+}
+
+// -----------------------------------------------------------------------------
+// Subscribed Message: BCM_Status (0x400) -> Plausibility Correlation
+// -----------------------------------------------------------------------------
+on message 0x400
+{
+  byte brakePressed;
+  brakePressed = (this.byte(0) >> 2) & 0x01; // BrakeSwitchStatus bit 2
+
+  if (brakePressed == 1 && g_ThrottlePos > 25.0)
+  {
+    if (g_Fault_BrakeConflictActive == 0)
+    {
+      g_Fault_BrakeConflictActive = 1;
+      AddDTC(0x050400, (DTC_STATUS_TEST_FAILED | DTC_STATUS_CONFIRMED_DTC)); // P0504-00
+      write("[ECM] SECONDARY SYMPTOM QUALIFIED: P0504-00 (Brake Switch / Throttle Correlation Conflict).");
+    }
+  }
+  else if (brakePressed == 0 && g_Fault_BrakeConflictActive == 1)
+  {
+    g_Fault_BrakeConflictActive = 0;
+  }
+}
+
+void Reset_ECM_Node()
+{
+  g_NumDTCs = 0;
+  g_Fault_ThrottleActive = 0;
+  g_Fault_SpeedLossActive = 0;
+  g_Fault_CoolantActive = 0;
+  g_Fault_BrakeConflictActive = 0;
+  g_Fault_ABSCutoffActive = 0;
+  g_MILStatus = 0;
+  g_CoolantTemp = 90.0;
+  g_ThrottlePos = 12.0;
+  g_EngineRPM = 850.0;
+  g_EngineTorque = 120.0;
+  g_EngineStatus = 2; // IDLE
+  write("[ECM] Reset: All DTCs and fault flags cleared. Nominal operation restored.");
+}
+
+on sysvar sysvar::Fault_Reset_All
+{
+  if (@sysvar::Fault_Reset_All == 1)
+  {
+    Reset_ECM_Node();
   }
 }
