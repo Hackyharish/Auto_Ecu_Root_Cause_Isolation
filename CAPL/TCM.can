@@ -157,7 +157,17 @@ on timer t_TCM_20ms
   msg_TCM.byte(5) = 0x00;
   msg_TCM.byte(6) = g_AliveCounter;
   msg_TCM.byte(7) = (msg_TCM.byte(0) ^ msg_TCM.byte(1) ^ msg_TCM.byte(2) ^ msg_TCM.byte(6)) & 0xFF;
-  msg_TCM.dlc = 8;
+  // Update Panel Telemetry & Node Health
+  @sysvar::Disp_CurrentGear = g_CurrentGear;
+
+  if (g_Symptom_U0415_Active == 1 || g_Symptom_U0401_Active == 1 || g_Symptom_U0100_Active == 1 || g_Symptom_Coolant_Active == 1 || g_Symptom_Brake_Active == 1 || g_Symptom_ABS_Lost_Active == 1 || g_DegradedMode == 1)
+  {
+    @sysvar::Node_Health_TCM = 1; // Yellow (Degraded / Secondary Symptom)
+  }
+  else
+  {
+    @sysvar::Node_Health_TCM = 0; // Green (Healthy)
+  }
 
   if (@sysvar::Fault_Node_Cutoff_TCM == 0)
   {

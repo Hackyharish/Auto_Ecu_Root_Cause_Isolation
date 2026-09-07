@@ -146,6 +146,23 @@ on timer t_ECM_10ms
   msg_ECM_1.byte(7) = 0x00;
   msg_ECM_1.dlc = 8;
 
+  // Update Panel Telemetry & Node Health
+  @sysvar::Disp_EngineRPM = g_EngineRPM;
+  @sysvar::Disp_MIL = g_MILStatus;
+
+  if (g_Fault_ThrottleActive == 1 || g_Fault_CoolantActive == 1 || @sysvar::Fault_Node_Cutoff_ECM == 1)
+  {
+    @sysvar::Node_Health_ECM = 2; // Red (Root Cause)
+  }
+  else if (g_Fault_SpeedLossActive == 1 || g_Fault_BrakeConflictActive == 1 || g_Fault_ABSCutoffActive == 1)
+  {
+    @sysvar::Node_Health_ECM = 1; // Yellow (Secondary Cascade)
+  }
+  else
+  {
+    @sysvar::Node_Health_ECM = 0; // Green (Healthy)
+  }
+
   // Suppress transmission if Node Cutoff fault is active
   if (@sysvar::Fault_Node_Cutoff_ECM == 0)
   {
@@ -187,6 +204,9 @@ on timer t_ECM_50ms
   msg_ECM_2.byte(6) = 0x00;
   msg_ECM_2.byte(7) = 0x00;
   msg_ECM_2.dlc = 8;
+
+  // Update Panel Telemetry
+  @sysvar::Disp_CoolantTemp = g_CoolantTemp;
 
   if (@sysvar::Fault_Node_Cutoff_ECM == 0)
   {

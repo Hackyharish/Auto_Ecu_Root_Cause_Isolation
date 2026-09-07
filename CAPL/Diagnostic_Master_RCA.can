@@ -414,6 +414,9 @@ void DisplayDiagnosticReport()
 
   // Update System Variables for CANoe Panel
   @sysvar::RCA_Result_Latency = g_IsolationLatencyMs;
+  sysSetVariableString(sysvar::RCA_Output_RootECU, g_RootECU);
+  sysSetVariableString(sysvar::RCA_Output_RootDTC, g_RootDTC);
+  sysSetVariableString(sysvar::RCA_Output_PrunedSymptoms, g_PrunedSymptoms);
 }
 
 // -----------------------------------------------------------------------------
@@ -446,6 +449,17 @@ void ResetEntireNetwork()
   strncpy(g_PrunedSymptoms, "None", elCount(g_PrunedSymptoms));
   @sysvar::RCA_Result_Latency = 0.0;
   g_ScanState = STATE_IDLE;
+
+  // Clear Panel String Outputs
+  sysSetVariableString(sysvar::RCA_Output_RootECU, "None (Network Healthy)");
+  sysSetVariableString(sysvar::RCA_Output_RootDTC, "No Faults");
+  sysSetVariableString(sysvar::RCA_Output_PrunedSymptoms, "None");
+
+  // Reset Node Health LEDs
+  @sysvar::Node_Health_ABS = 0;
+  @sysvar::Node_Health_ECM = 0;
+  @sysvar::Node_Health_TCM = 0;
+  @sysvar::Node_Health_BCM = 0;
 
   // 3. Broadcast UDS Service 0x14 (ClearDiagnosticInformation) via 0x7DF
   msg_Req_Func.byte(0) = 0x04; // Single Frame length 4

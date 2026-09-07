@@ -76,6 +76,20 @@ on timer t_BCM_50ms
   msg_BCM.byte(7) = (msg_BCM.byte(0) ^ msg_BCM.byte(6)) & 0xFF;
   msg_BCM.dlc = 8;
 
+  // Update Panel Node Health
+  if (g_Fault_BrakeActive == 1 || @sysvar::Fault_Node_Cutoff_BCM == 1)
+  {
+    @sysvar::Node_Health_BCM = 2; // Red (Root Cause)
+  }
+  else if (g_Symptom_Coolant_Active == 1)
+  {
+    @sysvar::Node_Health_BCM = 1; // Yellow (Secondary Cascade)
+  }
+  else
+  {
+    @sysvar::Node_Health_BCM = 0; // Green (Healthy)
+  }
+
   if (@sysvar::Fault_Node_Cutoff_BCM == 0)
   {
     output(msg_BCM);

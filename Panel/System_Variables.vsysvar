@@ -1,9 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <systemvariables version="4">
   <namespace name="" comment="" interface="">
+    <!-- Simulation & Controls -->
     <variable anlyzLocal="2" readOnly="false" valueSequence="false" unit="%" name="Sim_AcceleratorPedal" comment="Pedal position in percent" bitcount="32" isSigned="true" encoding="65001" type="float">
       <defaultvalue>0</defaultvalue>
     </variable>
+
+    <!-- Fault Triggers -->
     <variable anlyzLocal="2" readOnly="false" valueSequence="false" unit="" name="Fault_ABS_WheelSpeedFL" comment="Inject Left Front Wheel Speed Sensor Fault" bitcount="32" isSigned="true" encoding="65001" type="int">
       <defaultvalue>0</defaultvalue>
     </variable>
@@ -34,7 +37,52 @@
     <variable anlyzLocal="2" readOnly="false" valueSequence="false" unit="" name="Trigger_RCA_Scan" comment="Trigger Automated Root Cause Isolation Diagnostic Scan" bitcount="32" isSigned="true" encoding="65001" type="int">
       <defaultvalue>0</defaultvalue>
     </variable>
+
+    <!-- RCA Outputs -->
+    <variable anlyzLocal="2" readOnly="false" valueSequence="false" unit="" name="RCA_Output_RootECU" comment="Isolated Root Cause ECU Name" bitcount="32" isSigned="true" encoding="65001" type="string">
+      <defaultvalue>None (Network Healthy)</defaultvalue>
+    </variable>
+    <variable anlyzLocal="2" readOnly="false" valueSequence="false" unit="" name="RCA_Output_RootDTC" comment="Primary Isolated DTC" bitcount="32" isSigned="true" encoding="65001" type="string">
+      <defaultvalue>No Faults</defaultvalue>
+    </variable>
+    <variable anlyzLocal="2" readOnly="false" valueSequence="false" unit="" name="RCA_Output_PrunedSymptoms" comment="Suppressed Secondary Symptoms" bitcount="32" isSigned="true" encoding="65001" type="string">
+      <defaultvalue>None</defaultvalue>
+    </variable>
     <variable anlyzLocal="2" readOnly="false" valueSequence="false" unit="ms" name="RCA_Result_Latency" comment="Execution latency of RCA scan" bitcount="32" isSigned="true" encoding="65001" type="float">
+      <defaultvalue>0</defaultvalue>
+    </variable>
+
+    <!-- Multi-ECU Health Indicators (0=Green/Nominal, 1=Yellow/Degraded, 2=Red/RootFault) -->
+    <variable anlyzLocal="2" readOnly="false" valueSequence="false" unit="" name="Node_Health_ABS" comment="ABS Health: 0=OK, 1=Degraded, 2=Fault" bitcount="32" isSigned="true" encoding="65001" type="int">
+      <defaultvalue>0</defaultvalue>
+    </variable>
+    <variable anlyzLocal="2" readOnly="false" valueSequence="false" unit="" name="Node_Health_ECM" comment="ECM Health: 0=OK, 1=Degraded, 2=Fault" bitcount="32" isSigned="true" encoding="65001" type="int">
+      <defaultvalue>0</defaultvalue>
+    </variable>
+    <variable anlyzLocal="2" readOnly="false" valueSequence="false" unit="" name="Node_Health_TCM" comment="TCM Health: 0=OK, 1=Degraded, 2=Fault" bitcount="32" isSigned="true" encoding="65001" type="int">
+      <defaultvalue>0</defaultvalue>
+    </variable>
+    <variable anlyzLocal="2" readOnly="false" valueSequence="false" unit="" name="Node_Health_BCM" comment="BCM Health: 0=OK, 1=Degraded, 2=Fault" bitcount="32" isSigned="true" encoding="65001" type="int">
+      <defaultvalue>0</defaultvalue>
+    </variable>
+
+    <!-- Telemetry Displays -->
+    <variable anlyzLocal="2" readOnly="false" valueSequence="false" unit="rpm" name="Disp_EngineRPM" comment="Live Engine RPM" bitcount="32" isSigned="true" encoding="65001" type="float">
+      <defaultvalue>850</defaultvalue>
+    </variable>
+    <variable anlyzLocal="2" readOnly="false" valueSequence="false" unit="km/h" name="Disp_VehicleSpeed" comment="Live Vehicle Speed" bitcount="32" isSigned="true" encoding="65001" type="float">
+      <defaultvalue>60</defaultvalue>
+    </variable>
+    <variable anlyzLocal="2" readOnly="false" valueSequence="false" unit="degC" name="Disp_CoolantTemp" comment="Live Coolant Temp" bitcount="32" isSigned="true" encoding="65001" type="float">
+      <defaultvalue>90</defaultvalue>
+    </variable>
+    <variable anlyzLocal="2" readOnly="false" valueSequence="false" unit="" name="Disp_CurrentGear" comment="Current Transmission Gear" bitcount="32" isSigned="true" encoding="65001" type="int">
+      <defaultvalue>3</defaultvalue>
+    </variable>
+    <variable anlyzLocal="2" readOnly="false" valueSequence="false" unit="" name="Disp_MIL" comment="Check Engine MIL (0=Off, 1=On, 2=Flashing)" bitcount="32" isSigned="true" encoding="65001" type="int">
+      <defaultvalue>0</defaultvalue>
+    </variable>
+    <variable anlyzLocal="2" readOnly="false" valueSequence="false" unit="" name="Disp_ESP_Fault" comment="ESP Fault Light (0=Off, 1=On)" bitcount="32" isSigned="true" encoding="65001" type="int">
       <defaultvalue>0</defaultvalue>
     </variable>
   </namespace>

@@ -134,6 +134,19 @@ on timer t_ABS_20ms
   msg_ABS_Dyn.byte(7) = 0x00;
   msg_ABS_Dyn.dlc = 8;
 
+  // Update Panel Telemetry & Node Health
+  @sysvar::Disp_VehicleSpeed = g_VehicleSpeed;
+  @sysvar::Disp_ESP_Fault = g_ESP_Fault;
+
+  if (g_Fault_WSS_FL_Active == 1 || @sysvar::Fault_Node_Cutoff_ABS == 1)
+  {
+    @sysvar::Node_Health_ABS = 2; // Red (Root Cause)
+  }
+  else
+  {
+    @sysvar::Node_Health_ABS = 0; // Green (Healthy)
+  }
+
   if (@sysvar::Fault_Node_Cutoff_ABS == 0)
   {
     output(msg_ABS_Dyn);
