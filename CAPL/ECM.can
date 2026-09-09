@@ -221,7 +221,9 @@ on timer t_ECM_50ms
 // -----------------------------------------------------------------------------
 on message 0x205
 {
-  g_RxVehicleSpeed = (this.byte(0) | (this.byte(1) << 8)) * 0.01;
+  word rawSpeed;
+  rawSpeed = (word)(this.byte(0) | ((word)this.byte(1) << 8));
+  g_RxVehicleSpeed = (double)rawSpeed * 0.01;
   g_LastABSTimestamp = timeNow();
 }
 

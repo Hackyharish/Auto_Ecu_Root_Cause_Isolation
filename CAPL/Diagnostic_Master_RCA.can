@@ -461,6 +461,15 @@ void ResetEntireNetwork()
   @sysvar::Node_Health_TCM = 0;
   @sysvar::Node_Health_BCM = 0;
 
+  // Reset Cluster Telemetry Displays
+  @sysvar::Sim_AcceleratorPedal = 0.0;
+  @sysvar::Disp_VehicleSpeed = 0.0;
+  @sysvar::Disp_EngineRPM = 850.0;
+  @sysvar::Disp_CoolantTemp = 90.0;
+  @sysvar::Disp_CurrentGear = 1;
+  @sysvar::Disp_MIL = 0;
+  @sysvar::Disp_ESP_Fault = 0;
+
   // 3. Broadcast UDS Service 0x14 (ClearDiagnosticInformation) via 0x7DF
   msg_Req_Func.byte(0) = 0x04; // Single Frame length 4
   msg_Req_Func.byte(1) = UDS_SID_CLEAR_DIAGNOSTIC_INFORMATION;

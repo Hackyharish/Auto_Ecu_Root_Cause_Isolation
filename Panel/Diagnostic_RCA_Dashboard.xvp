@@ -99,10 +99,17 @@
     </Object>
 
     <!-- Accelerator Pedal Slider -->
+    <Object Type="Vector.CANalyzer.Panels.Design.StaticTextControl, Vector.CANalyzer.Panels.CommonControls, Version=18.0.150.0, Culture=neutral, PublicKeyToken=null" Name="Lbl_Pedal" ControlName="Static Text Pedal">
+      <Property Name="Name">Lbl_Pedal</Property>
+      <Property Name="Size">260, 16</Property>
+      <Property Name="Location">255, 34</Property>
+      <Property Name="Font">Microsoft Sans Serif, 8.25pt, style=Bold</Property>
+      <Property Name="Text">Accelerator / Speed Demand (0 - 100%):</Property>
+    </Object>
     <Object Type="Vector.CANalyzer.Panels.Design.TrackBarControl, Vector.CANalyzer.Panels.CommonControls, Version=18.0.150.0, Culture=neutral, PublicKeyToken=null" Name="TrackBar_Pedal" ControlName="Track Bar 1">
       <Property Name="Name">TrackBar_Pedal</Property>
-      <Property Name="Size">260, 45</Property>
-      <Property Name="Location">255, 40</Property>
+      <Property Name="Size">260, 40</Property>
+      <Property Name="Location">255, 50</Property>
       <Property Name="DisplayMinMax">True</Property>
       <Property Name="TabIndex">9</Property>
       <Property Name="MaximumDouble">100</Property>

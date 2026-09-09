@@ -25,11 +25,11 @@ variables
   message 0x7EA msg_ABS_DiagResp;
 
   // Physical State Variables
-  double g_SpeedFL = 60.0;
-  double g_SpeedFR = 60.0;
-  double g_SpeedRL = 60.0;
-  double g_SpeedRR = 60.0;
-  double g_VehicleSpeed = 60.0;
+  double g_SpeedFL = 0.0;
+  double g_SpeedFR = 0.0;
+  double g_SpeedRL = 0.0;
+  double g_SpeedRR = 0.0;
+  double g_VehicleSpeed = 0.0;
   double g_YawRate = 0.0;
   double g_BrakePressure = 0.0;
   byte   g_ABS_Active = 0;
@@ -58,14 +58,14 @@ on start
 // -----------------------------------------------------------------------------
 on timer t_ABS_10ms
 {
-  // Update base vehicle speed from accelerator or default driving model
+  // Update base vehicle speed from accelerator pedal (0..100% -> 0..160 km/h)
   if (@sysvar::Sim_AcceleratorPedal > 0)
   {
-    g_VehicleSpeed = 30.0 + (@sysvar::Sim_AcceleratorPedal * 0.9);
+    g_VehicleSpeed = @sysvar::Sim_AcceleratorPedal * 1.6;
   }
   else
   {
-    g_VehicleSpeed = 45.0; // Cruise state
+    g_VehicleSpeed = 0.0; // Idle / standstill
   }
 
   g_SpeedFL = g_VehicleSpeed;
@@ -89,7 +89,7 @@ on timer t_ABS_10ms
   {
     g_Fault_WSS_FL_Active = 0;
     g_ESP_Fault = 0;
-    g_SpeedFL = 60.0;
+    g_SpeedFL = g_VehicleSpeed;
   }
 
   // Populate CAN Payload (0x200)
@@ -264,11 +264,11 @@ void Reset_ABS_Node()
   g_Fault_WSS_FL_Active = 0;
   g_ESP_Fault = 0;
   g_ABS_Active = 0;
-  g_SpeedFL = 60.0;
-  g_SpeedFR = 60.0;
-  g_SpeedRL = 60.0;
-  g_SpeedRR = 60.0;
-  g_VehicleSpeed = 60.0;
+  g_VehicleSpeed = @sysvar::Sim_AcceleratorPedal * 1.6;
+  g_SpeedFL = g_VehicleSpeed;
+  g_SpeedFR = g_VehicleSpeed;
+  g_SpeedRL = g_VehicleSpeed;
+  g_SpeedRR = g_VehicleSpeed;
   g_YawRate = 0.0;
   g_BrakePressure = 0.0;
   write("[ABS_ESP] Reset: All faults cleared, nominal telemetry restored.");

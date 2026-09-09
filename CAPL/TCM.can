@@ -67,19 +67,25 @@ on timer t_TCM_20ms
 {
   g_AliveCounter = (g_AliveCounter + 1) & 0x0F;
 
-  // Shift Logic (Dependent on Vehicle Speed & Throttle)
+  // Check if any secondary symptom is active
+  g_DegradedMode = (g_Symptom_U0415_Active == 1 || g_Symptom_U0401_Active == 1 || g_Symptom_U0100_Active == 1 || g_Symptom_Coolant_Active == 1 || g_Symptom_Brake_Active == 1 || g_Symptom_ABS_Lost_Active == 1) ? 1 : 0;
+
+  // Shift Logic (Dependent on Vehicle Speed & Degradation)
   if (g_DegradedMode == 1)
   {
-    g_CurrentGear = 5; // Limp-home 3rd gear lock
+    g_CurrentGear = 5; // DBC enum D3
     g_TargetGear = 5;
+    @sysvar::Disp_CurrentGear = 3; // Lock display to 3rd gear limp mode
   }
   else
   {
-    if (g_RxVehicleSpeed < 20.0)      { g_CurrentGear = 3; g_TargetGear = 3; } // D1
-    else if (g_RxVehicleSpeed < 40.0) { g_CurrentGear = 4; g_TargetGear = 4; } // D2
-    else if (g_RxVehicleSpeed < 65.0) { g_CurrentGear = 5; g_TargetGear = 5; } // D3
-    else if (g_RxVehicleSpeed < 90.0) { g_CurrentGear = 6; g_TargetGear = 6; } // D4
-    else                              { g_CurrentGear = 7; g_TargetGear = 7; } // D5
+    // Normal Automatic Transmission Shift Schedule
+    if (g_RxVehicleSpeed < 1.0)        { g_CurrentGear = 3; g_TargetGear = 3; @sysvar::Disp_CurrentGear = 1; } // Idle / 1st gear
+    else if (g_RxVehicleSpeed < 25.0)  { g_CurrentGear = 3; g_TargetGear = 3; @sysvar::Disp_CurrentGear = 1; } // 1st gear
+    else if (g_RxVehicleSpeed < 50.0)  { g_CurrentGear = 4; g_TargetGear = 4; @sysvar::Disp_CurrentGear = 2; } // 2nd gear
+    else if (g_RxVehicleSpeed < 75.0)  { g_CurrentGear = 5; g_TargetGear = 5; @sysvar::Disp_CurrentGear = 3; } // 3rd gear
+    else if (g_RxVehicleSpeed < 100.0) { g_CurrentGear = 6; g_TargetGear = 6; @sysvar::Disp_CurrentGear = 4; } // 4th gear
+    else                               { g_CurrentGear = 7; g_TargetGear = 7; @sysvar::Disp_CurrentGear = 5; } // 5th gear
   }
 
   // Cross-Dependency Check 1: ABS Wheel Speed Anomaly (C0035 propagation)
@@ -89,7 +95,6 @@ on timer t_TCM_20ms
     if (g_Symptom_U0415_Active == 0)
     {
       g_Symptom_U0415_Active = 1;
-      g_DegradedMode = 1;
       AddDTC(0xD41581, (DTC_STATUS_TEST_FAILED | DTC_STATUS_CONFIRMED_DTC)); // U0415-81
       write("[TCM] SECONDARY SYMPTOM DETECTED: U0415-81 (Invalid Data From ABS Module). Entering Degraded Shift Mode.");
     }
@@ -97,7 +102,6 @@ on timer t_TCM_20ms
   else if (g_RxSpeedFL >= 5.0 && g_Symptom_U0415_Active == 1)
   {
     g_Symptom_U0415_Active = 0;
-    g_DegradedMode = 0;
   }
 
   // Cross-Dependency Check 2: ECM Throttle Sensor Failure (P0122 propagation)
@@ -122,7 +126,6 @@ on timer t_TCM_20ms
     if (g_Symptom_U0100_Active == 0)
     {
       g_Symptom_U0100_Active = 1;
-      g_DegradedMode = 1;
       AddDTC(0xD10000, (DTC_STATUS_TEST_FAILED | DTC_STATUS_CONFIRMED_DTC)); // U0100-00
       write("[TCM] SECONDARY SYMPTOM DETECTED: U0100-00 (Lost Comm with ECM/PCM).");
     }
@@ -138,7 +141,6 @@ on timer t_TCM_20ms
     if (g_Symptom_ABS_Lost_Active == 0)
     {
       g_Symptom_ABS_Lost_Active = 1;
-      g_DegradedMode = 1;
       AddDTC(0xD12100, (DTC_STATUS_TEST_FAILED | DTC_STATUS_CONFIRMED_DTC)); // U0121-00
       write("[TCM] SECONDARY SYMPTOM DETECTED: U0121-00 (Lost Comm with ABS Module).");
     }
@@ -157,10 +159,9 @@ on timer t_TCM_20ms
   msg_TCM.byte(5) = 0x00;
   msg_TCM.byte(6) = g_AliveCounter;
   msg_TCM.byte(7) = (msg_TCM.byte(0) ^ msg_TCM.byte(1) ^ msg_TCM.byte(2) ^ msg_TCM.byte(6)) & 0xFF;
-  // Update Panel Telemetry & Node Health
-  @sysvar::Disp_CurrentGear = g_CurrentGear;
 
-  if (g_Symptom_U0415_Active == 1 || g_Symptom_U0401_Active == 1 || g_Symptom_U0100_Active == 1 || g_Symptom_Coolant_Active == 1 || g_Symptom_Brake_Active == 1 || g_Symptom_ABS_Lost_Active == 1 || g_DegradedMode == 1)
+  // Node Health State
+  if (g_DegradedMode == 1)
   {
     @sysvar::Node_Health_TCM = 1; // Yellow (Degraded / Secondary Symptom)
   }
@@ -182,7 +183,9 @@ on timer t_TCM_20ms
 // -----------------------------------------------------------------------------
 on message 0x100
 {
-  g_RxEngineRPM = (this.byte(0) | (this.byte(1) << 8)) * 0.25;
+  word rawRPM;
+  rawRPM = (word)(this.byte(0) | ((word)this.byte(1) << 8));
+  g_RxEngineRPM = (double)rawRPM * 0.25;
   g_RxThrottlePos = this.byte(2) * 0.5;
   g_LastECMTimestamp = timeNow();
 }
@@ -196,7 +199,6 @@ on message 0x105
     if (g_Symptom_Coolant_Active == 0)
     {
       g_Symptom_Coolant_Active = 1;
-      g_DegradedMode = 1;
       AddDTC(0xD40182, (DTC_STATUS_TEST_FAILED | DTC_STATUS_CONFIRMED_DTC)); // U0401-82
       write("[TCM] SECONDARY SYMPTOM DETECTED: U0401-82 (Invalid Data from ECM - Engine Temp Range).");
     }
@@ -209,9 +211,21 @@ on message 0x105
 
 on message 0x200
 {
-  g_RxSpeedFL = (this.byte(0) | (this.byte(1) << 8)) * 0.01;
-  g_RxSpeedFR = (this.byte(2) | (this.byte(3) << 8)) * 0.01;
+  word rawFL;
+  word rawFR;
+  rawFL = (word)(this.byte(0) | ((word)this.byte(1) << 8));
+  rawFR = (word)(this.byte(2) | ((word)this.byte(3) << 8));
+  g_RxSpeedFL = (double)rawFL * 0.01;
+  g_RxSpeedFR = (double)rawFR * 0.01;
   g_RxVehicleSpeed = (g_RxSpeedFL + g_RxSpeedFR) / 2.0;
+  g_LastABSTimestamp = timeNow();
+}
+
+on message 0x205
+{
+  word rawSpeed;
+  rawSpeed = (word)(this.byte(0) | ((word)this.byte(1) << 8));
+  g_RxVehicleSpeed = (double)rawSpeed * 0.01;
   g_LastABSTimestamp = timeNow();
 }
 
@@ -344,8 +358,12 @@ void Reset_TCM_Node()
   g_Symptom_Brake_Active = 0;
   g_Symptom_ABS_Lost_Active = 0;
   g_DegradedMode = 0;
+  g_RxVehicleSpeed = 0.0;
+  g_RxSpeedFL = 0.0;
+  g_RxSpeedFR = 0.0;
   g_CurrentGear = 3;
   g_TargetGear = 3;
+  @sysvar::Disp_CurrentGear = 1;
   write("[TCM] Reset: All DTCs and secondary symptom flags cleared.");
 }
 
