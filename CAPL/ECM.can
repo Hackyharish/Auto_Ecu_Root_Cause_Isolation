@@ -95,17 +95,33 @@ on timer t_ECM_10ms
   if (isAsilDSafeStop == 1)
   {
     g_ThrottlePos = 0.0;
-    g_EngineRPM = 0.0;
     g_EngineTorque = 0.0;
     g_EngineStatus = 4; // SAFE STOP
+    if (@sysvar::Disp_VehicleSpeed <= 1.0)
+    {
+      g_EngineRPM = 0.0;
+    }
+    else
+    {
+      // Gradual RPM wind-down following deceleration to stop
+      g_EngineRPM = 850.0 + (@sysvar::Disp_VehicleSpeed * 10.0);
+    }
   }
   else if (@sysvar::Sim_AcceleratorPedal <= 0.0)
   {
-    // Standstill / start: 0 RPM at 0 speed and 0 pedal
     g_ThrottlePos = 0.0;
-    g_EngineRPM = 0.0;
     g_EngineTorque = 0.0;
-    g_EngineStatus = 1; // STOPPED
+    if (@sysvar::Disp_VehicleSpeed <= 1.0)
+    {
+      g_EngineRPM = 0.0;
+      g_EngineStatus = 1; // STOPPED at standstill
+    }
+    else
+    {
+      g_EngineStatus = 2; // COASTING
+      // Gradual RPM wind-down following vehicle coast-down
+      g_EngineRPM = 850.0 + (@sysvar::Disp_VehicleSpeed * 10.0);
+    }
   }
   else
   {

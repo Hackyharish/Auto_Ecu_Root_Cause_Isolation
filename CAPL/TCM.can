@@ -52,6 +52,8 @@ variables
   byte g_Symptom_Brake_Active = 0;
   byte g_Symptom_ABS_Lost_Active = 0;
   byte g_Fault_Cutoff_TCM_Active = 0;
+  byte g_Fault_ECM_Throttle_Active = 0;
+  byte g_Fault_ECM_Cutoff_Active = 0;
 }
 
 on start
@@ -71,10 +73,18 @@ on timer t_TCM_20ms
 
   g_AliveCounter = (g_AliveCounter + 1) & 0x0F;
 
-  // Latch TCM cutoff trigger pulse
+  // Latch incoming fault trigger pulses
   if (@sysvar::Fault_Node_Cutoff_TCM == 1)
   {
     g_Fault_Cutoff_TCM_Active = 1;
+  }
+  if (@sysvar::Fault_ECM_ThrottleSensor == 1)
+  {
+    g_Fault_ECM_Throttle_Active = 1;
+  }
+  if (@sysvar::Fault_Node_Cutoff_ECM == 1)
+  {
+    g_Fault_ECM_Cutoff_Active = 1;
   }
 
   // Authoritative vehicle speed sync from cluster telemetry
@@ -84,7 +94,7 @@ on timer t_TCM_20ms
   }
 
   // Check for ASIL-D High-Severity Safe Stop (Chassis / Powertrain Hazard)
-  if (@sysvar::Fault_ABS_WheelSpeedFL == 1 || @sysvar::Fault_Node_Cutoff_ABS == 1 || @sysvar::Fault_ECM_ThrottleSensor == 1 || @sysvar::Fault_Node_Cutoff_ECM == 1 || @sysvar::Node_Health_ABS == 2 || @sysvar::Node_Health_ECM == 2)
+  if (@sysvar::Fault_ABS_WheelSpeedFL == 1 || @sysvar::Fault_Node_Cutoff_ABS == 1 || g_Fault_ECM_Throttle_Active == 1 || g_Fault_ECM_Cutoff_Active == 1 || @sysvar::Node_Health_ABS == 2)
   {
     isAsilDSafeStop = 1;
   }
@@ -137,11 +147,20 @@ on timer t_TCM_20ms
   g_DegradedMode = (g_Symptom_U0415_Active == 1 || g_Symptom_U0401_Active == 1 || g_Symptom_U0100_Active == 1 || g_Symptom_Coolant_Active == 1 || g_Symptom_Brake_Active == 1 || g_Symptom_ABS_Lost_Active == 1) ? 1 : 0;
 
   // Shift Logic (Dependent on Vehicle Speed & Degradation)
-  if (isAsilDSafeStop == 1 || g_RxVehicleSpeed < 1.0)
+  if (g_RxVehicleSpeed < 1.0)
   {
     g_CurrentGear = 3; // DBC enum D1
     g_TargetGear = 3;
     @sysvar::Disp_CurrentGear = 1; // Standstill 1st gear
+  }
+  else if (isAsilDSafeStop == 1)
+  {
+    // During ASIL-D safe stop deceleration, smoothly downshift through gears down to standstill
+    if (g_RxVehicleSpeed < 25.0)       { g_CurrentGear = 3; g_TargetGear = 3; @sysvar::Disp_CurrentGear = 1; } // 1st gear (0 - 25 km/h)
+    else if (g_RxVehicleSpeed < 50.0)  { g_CurrentGear = 4; g_TargetGear = 4; @sysvar::Disp_CurrentGear = 2; } // 2nd gear (25 - 50 km/h)
+    else if (g_RxVehicleSpeed < 75.0)  { g_CurrentGear = 5; g_TargetGear = 5; @sysvar::Disp_CurrentGear = 3; } // 3rd gear (50 - 75 km/h)
+    else if (g_RxVehicleSpeed < 100.0) { g_CurrentGear = 6; g_TargetGear = 6; @sysvar::Disp_CurrentGear = 4; } // 4th gear (75 - 100 km/h)
+    else                               { g_CurrentGear = 7; g_TargetGear = 7; @sysvar::Disp_CurrentGear = 5; } // 5th gear (> 100 km/h)
   }
   else if (g_DegradedMode == 1)
   {
@@ -365,6 +384,8 @@ void Reset_TCM_Node()
 {
   g_NumDTCs = 0;
   g_Fault_Cutoff_TCM_Active = 0;
+  g_Fault_ECM_Throttle_Active = 0;
+  g_Fault_ECM_Cutoff_Active = 0;
   g_Symptom_U0415_Active = 0;
   g_Symptom_U0401_Active = 0;
   g_Symptom_U0100_Active = 0;

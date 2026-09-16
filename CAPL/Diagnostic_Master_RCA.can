@@ -464,7 +464,7 @@ void ResetEntireNetwork()
   // Reset Cluster Telemetry Displays
   @sysvar::Sim_AcceleratorPedal = 0.0;
   @sysvar::Disp_VehicleSpeed = 0.0;
-  @sysvar::Disp_EngineRPM = 850.0;
+  @sysvar::Disp_EngineRPM = 0.0;
   @sysvar::Disp_CoolantTemp = 90.0;
   @sysvar::Disp_CurrentGear = 1;
   @sysvar::Disp_MIL = 0;

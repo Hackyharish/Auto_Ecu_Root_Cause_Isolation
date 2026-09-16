@@ -45,6 +45,8 @@ variables
   byte g_Fault_WSS_FL_Active = 0;
   byte g_Fault_WSS_DTCAdded = 0;
   byte g_Fault_Cutoff_ABS_Active = 0;
+  byte g_Fault_ECM_Throttle_Active = 0;
+  byte g_Fault_ECM_Cutoff_Active = 0;
 }
 
 on start
@@ -72,25 +74,58 @@ on timer t_ABS_10ms
   {
     g_Fault_Cutoff_ABS_Active = 1;
   }
+  if (@sysvar::Fault_ECM_ThrottleSensor == 1)
+  {
+    g_Fault_ECM_Throttle_Active = 1;
+  }
+  if (@sysvar::Fault_Node_Cutoff_ECM == 1)
+  {
+    g_Fault_ECM_Cutoff_Active = 1;
+  }
 
   // Check for ASIL-D High Severity Hazards (ABS WSS, ABS Node Cutoff, ECM Throttle, ECM Node Cutoff)
-  if (g_Fault_WSS_FL_Active == 1 || g_Fault_Cutoff_ABS_Active == 1 || @sysvar::Fault_ECM_ThrottleSensor == 1 || @sysvar::Fault_Node_Cutoff_ECM == 1 || @sysvar::Node_Health_ECM == 2)
+  if (g_Fault_WSS_FL_Active == 1 || g_Fault_Cutoff_ABS_Active == 1 || g_Fault_ECM_Throttle_Active == 1 || g_Fault_ECM_Cutoff_Active == 1)
   {
     isAsilDSafeStop = 1;
   }
 
-  // Update base vehicle speed: bring to 0 km/h standstill on ASIL-D safe stop
-  if (isAsilDSafeStop == 1)
+  // Calculate Target Speed: Safe stop brings target to 0, pedal demands 0..160 km/h
   {
-    g_VehicleSpeed = 0.0;
-  }
-  else if (@sysvar::Sim_AcceleratorPedal > 0)
-  {
-    g_VehicleSpeed = @sysvar::Sim_AcceleratorPedal * 1.6; // 0..100% -> 0..160 km/h
-  }
-  else
-  {
-    g_VehicleSpeed = 0.0; // Idle / standstill
+    double targetSpeed;
+    targetSpeed = 0.0;
+
+    if (isAsilDSafeStop == 1)
+    {
+      targetSpeed = 0.0; // Emergency Safe Stop target
+    }
+    else if (@sysvar::Sim_AcceleratorPedal > 0.0)
+    {
+      targetSpeed = @sysvar::Sim_AcceleratorPedal * 1.6; // Demand target speed
+    }
+    else
+    {
+      targetSpeed = 0.0;
+    }
+
+    // Gradual Acceleration & Deceleration Dynamics (10ms cycle)
+    if (g_VehicleSpeed < targetSpeed)
+    {
+      // Gradual acceleration ramp (+0.8 km/h per 10ms = 80 km/h/s)
+      g_VehicleSpeed = g_VehicleSpeed + 0.8;
+      if (g_VehicleSpeed > targetSpeed)
+      {
+        g_VehicleSpeed = targetSpeed;
+      }
+    }
+    else if (g_VehicleSpeed > targetSpeed)
+    {
+      // Gradual deceleration ramp (-0.5 km/h per 10ms = 50 km/h/s, ~2.0s from 100 to 0)
+      g_VehicleSpeed = g_VehicleSpeed - 0.5;
+      if (g_VehicleSpeed < targetSpeed)
+      {
+        g_VehicleSpeed = targetSpeed;
+      }
+    }
   }
 
   g_SpeedFR = g_VehicleSpeed;
@@ -287,6 +322,8 @@ void Reset_ABS_Node()
   g_Fault_WSS_FL_Active = 0;
   g_Fault_WSS_DTCAdded = 0;
   g_Fault_Cutoff_ABS_Active = 0;
+  g_Fault_ECM_Throttle_Active = 0;
+  g_Fault_ECM_Cutoff_Active = 0;
   g_ESP_Fault = 0;
   g_ABS_Active = 0;
   g_VehicleSpeed = @sysvar::Sim_AcceleratorPedal * 1.6;
