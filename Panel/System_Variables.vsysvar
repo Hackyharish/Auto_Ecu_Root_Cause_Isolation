@@ -68,7 +68,7 @@
 
     <!-- Telemetry Displays -->
     <variable anlyzLocal="2" readOnly="false" valueSequence="false" unit="rpm" name="Disp_EngineRPM" comment="Live Engine RPM" bitcount="32" isSigned="true" encoding="65001" type="float">
-      <defaultvalue>850</defaultvalue>
+      <defaultvalue>0</defaultvalue>
     </variable>
     <variable anlyzLocal="2" readOnly="false" valueSequence="false" unit="km/h" name="Disp_VehicleSpeed" comment="Live Vehicle Speed" bitcount="32" isSigned="true" encoding="65001" type="float">
       <defaultvalue>0</defaultvalue>

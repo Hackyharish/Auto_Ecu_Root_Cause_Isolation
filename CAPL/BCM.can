@@ -32,6 +32,7 @@ variables
 
   // Fault Tracking Flags
   byte g_Fault_BrakeActive = 0;
+  byte g_Fault_Cutoff_BCM_Active = 0;
   byte g_Symptom_Coolant_Active = 0;
 }
 
@@ -49,20 +50,28 @@ on timer t_BCM_50ms
 {
   g_AliveCounter = (g_AliveCounter + 1) & 0x0F;
 
-  // Handle Local Fault Injection: Brake Switch Stuck High (Scenario 5)
+  // Latch incoming fault trigger pulses
   if (@sysvar::Fault_BCM_BrakeSwitch == 1)
   {
+    g_Fault_BrakeActive = 1;
+  }
+  if (@sysvar::Fault_Node_Cutoff_BCM == 1)
+  {
+    g_Fault_Cutoff_BCM_Active = 1;
+  }
+
+  // Handle Latched Fault Injection: Brake Switch Stuck High (Scenario 5)
+  if (g_Fault_BrakeActive == 1)
+  {
     g_BrakeSwitch = 1; // Stuck closed
-    if (g_Fault_BrakeActive == 0)
+    if (g_NumDTCs == 0)
     {
-      g_Fault_BrakeActive = 1;
       AddDTC(0x931811, (DTC_STATUS_TEST_FAILED | DTC_STATUS_CONFIRMED_DTC)); // B1318-11
       write("[BCM] PRIMARY ROOT FAULT QUALIFIED: B1318-11 (Brake Switch Circuit Short/Stuck High).");
     }
   }
-  else if (@sysvar::Fault_BCM_BrakeSwitch == 0 && g_Fault_BrakeActive == 1)
+  else
   {
-    g_Fault_BrakeActive = 0;
     g_BrakeSwitch = 0;
   }
 
@@ -76,8 +85,8 @@ on timer t_BCM_50ms
   msg_BCM.byte(7) = (msg_BCM.byte(0) ^ msg_BCM.byte(6)) & 0xFF;
   msg_BCM.dlc = 8;
 
-  // Update Panel Node Health
-  if (g_Fault_BrakeActive == 1 || @sysvar::Fault_Node_Cutoff_BCM == 1)
+  // Update Panel Node Health: LATCHED until Reset_BCM_Node()!
+  if (g_Fault_BrakeActive == 1 || g_Fault_Cutoff_BCM_Active == 1 || @sysvar::Fault_Node_Cutoff_BCM == 1)
   {
     @sysvar::Node_Health_BCM = 2; // Red (Root Cause)
   }
@@ -90,7 +99,7 @@ on timer t_BCM_50ms
     @sysvar::Node_Health_BCM = 0; // Green (Healthy)
   }
 
-  if (@sysvar::Fault_Node_Cutoff_BCM == 0)
+  if (@sysvar::Fault_Node_Cutoff_BCM == 0 && g_Fault_Cutoff_BCM_Active == 0)
   {
     output(msg_BCM);
   }
@@ -210,7 +219,9 @@ void Reset_BCM_Node()
   g_NumDTCs = 0;
   g_BrakeSwitch = 0;
   g_Fault_BrakeActive = 0;
+  g_Fault_Cutoff_BCM_Active = 0;
   g_Symptom_Coolant_Active = 0;
+  @sysvar::Node_Health_BCM = 0;
   write("[BCM] Reset: All DTCs and fault flags cleared.");
 }
 

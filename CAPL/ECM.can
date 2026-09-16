@@ -25,13 +25,13 @@ variables
   message 0x7E8 msg_ECM_DiagResp;
 
   // Telemetry Variables
-  double g_EngineRPM = 850.0;
-  double g_ThrottlePos = 12.0;
-  double g_EngineTorque = 120.0;
-  byte   g_EngineStatus = 2; // IDLE
+  double g_EngineRPM = 0.0;
+  double g_ThrottlePos = 0.0;
+  double g_EngineTorque = 0.0;
+  byte   g_EngineStatus = 1; // STOPPED
   byte   g_AliveCounter = 0;
   double g_CoolantTemp = 90.0;
-  double g_FuelFlow = 2.4;
+  double g_FuelFlow = 0.0;
   byte   g_MILStatus = 0;
 
   // Subscribed External Data (Dependency: ABS Vehicle Speed)
@@ -46,10 +46,13 @@ variables
 
   // Fault Injection Trackers
   byte g_Fault_ThrottleActive = 0;
+  byte g_Fault_ThrottleDTCAdded = 0;
   byte g_Fault_SpeedLossActive = 0;
   byte g_Fault_CoolantActive = 0;
+  byte g_Fault_CoolantDTCAdded = 0;
   byte g_Fault_BrakeConflictActive = 0;
   byte g_Fault_ABSCutoffActive = 0;
+  byte g_Fault_Cutoff_ECM_Active = 0;
 }
 
 on start
@@ -69,38 +72,94 @@ on start
 // -----------------------------------------------------------------------------
 on timer t_ECM_10ms
 {
-  // Dynamic RPM / Throttle behavior based on user panel or idle
-  if (@sysvar::Sim_AcceleratorPedal > 0)
+  byte isAsilDSafeStop;
+  isAsilDSafeStop = 0;
+
+  // Latch incoming fault trigger pulses
+  if (@sysvar::Fault_ECM_ThrottleSensor == 1)
   {
-    g_ThrottlePos = @sysvar::Sim_AcceleratorPedal;
-    g_EngineRPM = 850.0 + (g_ThrottlePos * 45.0);
-    g_EngineTorque = 50.0 + (g_ThrottlePos * 2.5);
-    g_EngineStatus = 3; // RUNNING
+    g_Fault_ThrottleActive = 1;
+  }
+  if (@sysvar::Fault_Node_Cutoff_ECM == 1)
+  {
+    g_Fault_Cutoff_ECM_Active = 1;
+  }
+
+  // Check for ASIL-D High Severity Hazards (ECM Throttle, ECM Cutoff, ABS WSS, ABS Cutoff)
+  if (g_Fault_ThrottleActive == 1 || g_Fault_Cutoff_ECM_Active == 1 || @sysvar::Fault_ABS_WheelSpeedFL == 1 || @sysvar::Fault_Node_Cutoff_ABS == 1 || @sysvar::Node_Health_ABS == 2)
+  {
+    isAsilDSafeStop = 1;
+  }
+
+  // Handle ASIL-D Safe-State or Normal Driving RPM
+  if (isAsilDSafeStop == 1)
+  {
+    g_ThrottlePos = 0.0;
+    g_EngineRPM = 0.0;
+    g_EngineTorque = 0.0;
+    g_EngineStatus = 4; // SAFE STOP
+  }
+  else if (@sysvar::Sim_AcceleratorPedal <= 0.0)
+  {
+    // Standstill / start: 0 RPM at 0 speed and 0 pedal
+    g_ThrottlePos = 0.0;
+    g_EngineRPM = 0.0;
+    g_EngineTorque = 0.0;
+    g_EngineStatus = 1; // STOPPED
   }
   else
   {
-    g_ThrottlePos = 8.0;
-    g_EngineRPM = 850.0;
-    g_EngineTorque = 40.0;
-    g_EngineStatus = 2; // IDLE
+    double currentSpeed;
+    byte currentGear;
+
+    g_ThrottlePos = @sysvar::Sim_AcceleratorPedal;
+    g_EngineTorque = 50.0 + (g_ThrottlePos * 2.5);
+    g_EngineStatus = 3; // RUNNING
+
+    currentSpeed = @sysvar::Disp_VehicleSpeed;
+    currentGear = @sysvar::Disp_CurrentGear;
+
+    // Realistic multi-gear RPM curve (RPM drops and raises across gears)
+    if (currentGear <= 1)
+    {
+      // Gear 1: 0 - 25 km/h -> climbs from 850 to 3200 RPM
+      g_EngineRPM = 850.0 + (currentSpeed / 25.0) * (3200.0 - 850.0);
+    }
+    else if (currentGear == 2)
+    {
+      // Gear 2: 25 - 50 km/h -> drops to 1800 RPM, climbs to 3200 RPM
+      g_EngineRPM = 1800.0 + ((currentSpeed - 25.0) / 25.0) * (3200.0 - 1800.0);
+    }
+    else if (currentGear == 3)
+    {
+      // Gear 3: 50 - 75 km/h -> drops to 1950 RPM, climbs to 3250 RPM
+      g_EngineRPM = 1950.0 + ((currentSpeed - 50.0) / 25.0) * (3250.0 - 1950.0);
+    }
+    else if (currentGear == 4)
+    {
+      // Gear 4: 75 - 100 km/h -> drops to 2100 RPM, climbs to 3300 RPM
+      g_EngineRPM = 2100.0 + ((currentSpeed - 75.0) / 25.0) * (3300.0 - 2100.0);
+    }
+    else
+    {
+      // Gear 5: > 100 km/h -> drops to 2200 RPM, climbs to 4200 RPM
+      g_EngineRPM = 2200.0 + ((currentSpeed - 100.0) / 60.0) * (4200.0 - 2200.0);
+    }
+
+    if (g_EngineRPM > 6500.0) g_EngineRPM = 6500.0;
+    if (g_EngineRPM < 850.0 && currentSpeed > 0.0) g_EngineRPM = 850.0;
   }
 
-  // Handle Local Fault Injection: Throttle Position Sensor Failure
-  if (@sysvar::Fault_ECM_ThrottleSensor == 1)
+  // Handle Latched Throttle Position Sensor Failure Qualification
+  if (g_Fault_ThrottleActive == 1)
   {
-    g_ThrottlePos = 0.0; // Sensor pulled to ground
-    g_EngineStatus = 4;   // LIMP_HOME
-    if (g_Fault_ThrottleActive == 0)
+    if (g_Fault_ThrottleDTCAdded == 0)
     {
-      g_Fault_ThrottleActive = 1;
+      g_Fault_ThrottleDTCAdded = 1;
       AddDTC(0x012212, (DTC_STATUS_TEST_FAILED | DTC_STATUS_CONFIRMED_DTC)); // P0122-12
       g_MILStatus = 1; // Turn ON Check Engine Light
-      write("[ECM] FAULT QUALIFIED: P0122-12 (Throttle Sensor Circuit Low). Status: Confirmed.");
+      write("[ECM] FAULT QUALIFIED: P0122-12 (Throttle Sensor Circuit Low - ASIL D). Executing Safe Stop.");
     }
-  }
-  else if (@sysvar::Fault_ECM_ThrottleSensor == 0 && g_Fault_ThrottleActive == 1)
-  {
-    g_Fault_ThrottleActive = 0;
   }
 
   // Check Upstream Dependency: ABS Signal Loss / Invalid Speed
@@ -150,9 +209,9 @@ on timer t_ECM_10ms
   @sysvar::Disp_EngineRPM = g_EngineRPM;
   @sysvar::Disp_MIL = g_MILStatus;
 
-  if (g_Fault_ThrottleActive == 1 || g_Fault_CoolantActive == 1 || @sysvar::Fault_Node_Cutoff_ECM == 1)
+  if (g_Fault_ThrottleActive == 1 || g_Fault_CoolantActive == 1 || g_Fault_Cutoff_ECM_Active == 1 || @sysvar::Fault_Node_Cutoff_ECM == 1)
   {
-    @sysvar::Node_Health_ECM = 2; // Red (Root Cause)
+    @sysvar::Node_Health_ECM = 2; // Red (Root Cause) - LATCHED until Reset!
   }
   else if (g_Fault_SpeedLossActive == 1 || g_Fault_BrakeConflictActive == 1 || g_Fault_ABSCutoffActive == 1)
   {
@@ -164,7 +223,7 @@ on timer t_ECM_10ms
   }
 
   // Suppress transmission if Node Cutoff fault is active
-  if (@sysvar::Fault_Node_Cutoff_ECM == 0)
+  if (@sysvar::Fault_Node_Cutoff_ECM == 0 && g_Fault_Cutoff_ECM_Active == 0)
   {
     output(msg_ECM_1);
   }
@@ -177,21 +236,25 @@ on timer t_ECM_10ms
 // -----------------------------------------------------------------------------
 on timer t_ECM_50ms
 {
-  // Handle Local Fault Injection: Engine Coolant Over-Temperature
+  // Handle Latched Fault Injection: Engine Coolant Over-Temperature
   if (@sysvar::Fault_ECM_CoolantTemp == 1)
   {
+    g_Fault_CoolantActive = 1;
+  }
+
+  if (g_Fault_CoolantActive == 1)
+  {
     g_CoolantTemp = 138.0; // Overheat condition
-    if (g_Fault_CoolantActive == 0)
+    if (g_Fault_CoolantDTCAdded == 0)
     {
-      g_Fault_CoolantActive = 1;
+      g_Fault_CoolantDTCAdded = 1;
       AddDTC(0x021700, (DTC_STATUS_TEST_FAILED | DTC_STATUS_CONFIRMED_DTC)); // P0217-00
       g_MILStatus = 2; // Critical Flashing MIL
       write("[ECM] PRIMARY ROOT FAULT QUALIFIED: P0217-00 (Engine Coolant Over-Temperature Condition).");
     }
   }
-  else if (@sysvar::Fault_ECM_CoolantTemp == 0 && g_Fault_CoolantActive == 1)
+  else
   {
-    g_Fault_CoolantActive = 0;
     g_CoolantTemp = 90.0;
   }
 
@@ -380,16 +443,23 @@ void Reset_ECM_Node()
 {
   g_NumDTCs = 0;
   g_Fault_ThrottleActive = 0;
+  g_Fault_ThrottleDTCAdded = 0;
   g_Fault_SpeedLossActive = 0;
   g_Fault_CoolantActive = 0;
+  g_Fault_CoolantDTCAdded = 0;
+  g_Fault_Cutoff_ECM_Active = 0;
   g_Fault_BrakeConflictActive = 0;
   g_Fault_ABSCutoffActive = 0;
   g_MILStatus = 0;
   g_CoolantTemp = 90.0;
-  g_ThrottlePos = 12.0;
-  g_EngineRPM = 850.0;
-  g_EngineTorque = 120.0;
-  g_EngineStatus = 2; // IDLE
+  g_ThrottlePos = 0.0;
+  g_EngineRPM = 0.0;
+  g_EngineTorque = 0.0;
+  g_EngineStatus = 1; // STOPPED
+  @sysvar::Disp_EngineRPM = 0.0;
+  @sysvar::Disp_MIL = 0;
+  @sysvar::Disp_CoolantTemp = 90.0;
+  @sysvar::Node_Health_ECM = 0;
   write("[ECM] Reset: All DTCs and fault flags cleared. Nominal operation restored.");
 }
 

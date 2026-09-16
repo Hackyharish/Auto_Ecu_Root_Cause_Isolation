@@ -51,6 +51,7 @@ variables
   byte g_Symptom_Coolant_Active = 0;
   byte g_Symptom_Brake_Active = 0;
   byte g_Symptom_ABS_Lost_Active = 0;
+  byte g_Fault_Cutoff_TCM_Active = 0;
 }
 
 on start
@@ -65,31 +66,30 @@ on start
 // -----------------------------------------------------------------------------
 on timer t_TCM_20ms
 {
+  byte isAsilDSafeStop;
+  isAsilDSafeStop = 0;
+
   g_AliveCounter = (g_AliveCounter + 1) & 0x0F;
 
-  // Check if any secondary symptom is active
-  g_DegradedMode = (g_Symptom_U0415_Active == 1 || g_Symptom_U0401_Active == 1 || g_Symptom_U0100_Active == 1 || g_Symptom_Coolant_Active == 1 || g_Symptom_Brake_Active == 1 || g_Symptom_ABS_Lost_Active == 1) ? 1 : 0;
-
-  // Shift Logic (Dependent on Vehicle Speed & Degradation)
-  if (g_DegradedMode == 1)
+  // Latch TCM cutoff trigger pulse
+  if (@sysvar::Fault_Node_Cutoff_TCM == 1)
   {
-    g_CurrentGear = 5; // DBC enum D3
-    g_TargetGear = 5;
-    @sysvar::Disp_CurrentGear = 3; // Lock display to 3rd gear limp mode
+    g_Fault_Cutoff_TCM_Active = 1;
   }
-  else
+
+  // Authoritative vehicle speed sync from cluster telemetry
+  if (@sysvar::Disp_VehicleSpeed >= 0.0)
   {
-    // Normal Automatic Transmission Shift Schedule
-    if (g_RxVehicleSpeed < 1.0)        { g_CurrentGear = 3; g_TargetGear = 3; @sysvar::Disp_CurrentGear = 1; } // Idle / 1st gear
-    else if (g_RxVehicleSpeed < 25.0)  { g_CurrentGear = 3; g_TargetGear = 3; @sysvar::Disp_CurrentGear = 1; } // 1st gear
-    else if (g_RxVehicleSpeed < 50.0)  { g_CurrentGear = 4; g_TargetGear = 4; @sysvar::Disp_CurrentGear = 2; } // 2nd gear
-    else if (g_RxVehicleSpeed < 75.0)  { g_CurrentGear = 5; g_TargetGear = 5; @sysvar::Disp_CurrentGear = 3; } // 3rd gear
-    else if (g_RxVehicleSpeed < 100.0) { g_CurrentGear = 6; g_TargetGear = 6; @sysvar::Disp_CurrentGear = 4; } // 4th gear
-    else                               { g_CurrentGear = 7; g_TargetGear = 7; @sysvar::Disp_CurrentGear = 5; } // 5th gear
+    g_RxVehicleSpeed = @sysvar::Disp_VehicleSpeed;
+  }
+
+  // Check for ASIL-D High-Severity Safe Stop (Chassis / Powertrain Hazard)
+  if (@sysvar::Fault_ABS_WheelSpeedFL == 1 || @sysvar::Fault_Node_Cutoff_ABS == 1 || @sysvar::Fault_ECM_ThrottleSensor == 1 || @sysvar::Fault_Node_Cutoff_ECM == 1 || @sysvar::Node_Health_ABS == 2 || @sysvar::Node_Health_ECM == 2)
+  {
+    isAsilDSafeStop = 1;
   }
 
   // Cross-Dependency Check 1: ABS Wheel Speed Anomaly (C0035 propagation)
-  // If FL is 0 while FR > 25 km/h, TCM registers U0415-81 (Invalid Data from ABS)
   if (g_RxSpeedFL < 5.0 && g_RxSpeedFR > 25.0)
   {
     if (g_Symptom_U0415_Active == 0)
@@ -99,13 +99,8 @@ on timer t_TCM_20ms
       write("[TCM] SECONDARY SYMPTOM DETECTED: U0415-81 (Invalid Data From ABS Module). Entering Degraded Shift Mode.");
     }
   }
-  else if (g_RxSpeedFL >= 5.0 && g_Symptom_U0415_Active == 1)
-  {
-    g_Symptom_U0415_Active = 0;
-  }
 
   // Cross-Dependency Check 2: ECM Throttle Sensor Failure (P0122 propagation)
-  // If Throttle is 0 while Engine RPM > 2000, TCM registers U0401-86 (Invalid Data from ECM)
   if (g_RxThrottlePos < 1.0 && g_RxEngineRPM > 2000.0)
   {
     if (g_Symptom_U0401_Active == 0)
@@ -114,10 +109,6 @@ on timer t_TCM_20ms
       AddDTC(0xD40186, (DTC_STATUS_TEST_FAILED | DTC_STATUS_CONFIRMED_DTC)); // U0401-86
       write("[TCM] SECONDARY SYMPTOM DETECTED: U0401-86 (Invalid Data From ECM).");
     }
-  }
-  else if (g_RxThrottlePos >= 1.0 && g_Symptom_U0401_Active == 1)
-  {
-    g_Symptom_U0401_Active = 0;
   }
 
   // Cross-Dependency Check 3: ECM Node Loss (Timeout > 250ms)
@@ -130,10 +121,6 @@ on timer t_TCM_20ms
       write("[TCM] SECONDARY SYMPTOM DETECTED: U0100-00 (Lost Comm with ECM/PCM).");
     }
   }
-  else
-  {
-    g_Symptom_U0100_Active = 0;
-  }
 
   // Cross-Dependency Check 4: ABS Node Loss (Timeout > 250ms or Fault_Node_Cutoff_ABS == 1)
   if (@sysvar::Fault_Node_Cutoff_ABS == 1 || ((timeNow() - g_LastABSTimestamp) > 250000 && g_LastABSTimestamp > 0))
@@ -145,9 +132,31 @@ on timer t_TCM_20ms
       write("[TCM] SECONDARY SYMPTOM DETECTED: U0121-00 (Lost Comm with ABS Module).");
     }
   }
-  else if (@sysvar::Fault_Node_Cutoff_ABS == 0 && g_Symptom_ABS_Lost_Active == 1)
+
+  // Latched Degraded Mode Evaluation
+  g_DegradedMode = (g_Symptom_U0415_Active == 1 || g_Symptom_U0401_Active == 1 || g_Symptom_U0100_Active == 1 || g_Symptom_Coolant_Active == 1 || g_Symptom_Brake_Active == 1 || g_Symptom_ABS_Lost_Active == 1) ? 1 : 0;
+
+  // Shift Logic (Dependent on Vehicle Speed & Degradation)
+  if (isAsilDSafeStop == 1 || g_RxVehicleSpeed < 1.0)
   {
-    g_Symptom_ABS_Lost_Active = 0;
+    g_CurrentGear = 3; // DBC enum D1
+    g_TargetGear = 3;
+    @sysvar::Disp_CurrentGear = 1; // Standstill 1st gear
+  }
+  else if (g_DegradedMode == 1)
+  {
+    g_CurrentGear = 5; // DBC enum D3
+    g_TargetGear = 5;
+    @sysvar::Disp_CurrentGear = 3; // Lock display to 3rd gear limp mode
+  }
+  else
+  {
+    // Normal Automatic Transmission Shift Schedule
+    if (g_RxVehicleSpeed < 25.0)       { g_CurrentGear = 3; g_TargetGear = 3; @sysvar::Disp_CurrentGear = 1; } // 1st gear (0 - 25 km/h)
+    else if (g_RxVehicleSpeed < 50.0)  { g_CurrentGear = 4; g_TargetGear = 4; @sysvar::Disp_CurrentGear = 2; } // 2nd gear (25 - 50 km/h)
+    else if (g_RxVehicleSpeed < 75.0)  { g_CurrentGear = 5; g_TargetGear = 5; @sysvar::Disp_CurrentGear = 3; } // 3rd gear (50 - 75 km/h)
+    else if (g_RxVehicleSpeed < 100.0) { g_CurrentGear = 6; g_TargetGear = 6; @sysvar::Disp_CurrentGear = 4; } // 4th gear (75 - 100 km/h)
+    else                               { g_CurrentGear = 7; g_TargetGear = 7; @sysvar::Disp_CurrentGear = 5; } // 5th gear (> 100 km/h)
   }
 
   // Populate CAN Payload (0x300)
@@ -160,17 +169,21 @@ on timer t_TCM_20ms
   msg_TCM.byte(6) = g_AliveCounter;
   msg_TCM.byte(7) = (msg_TCM.byte(0) ^ msg_TCM.byte(1) ^ msg_TCM.byte(2) ^ msg_TCM.byte(6)) & 0xFF;
 
-  // Node Health State
-  if (g_DegradedMode == 1)
+  // Node Health State: LATCHED until Reset_TCM_Node()!
+  if (g_Fault_Cutoff_TCM_Active == 1 || @sysvar::Fault_Node_Cutoff_TCM == 1)
   {
-    @sysvar::Node_Health_TCM = 1; // Yellow (Degraded / Secondary Symptom)
+    @sysvar::Node_Health_TCM = 2; // Red (Root Cause Cutoff)
+  }
+  else if (g_DegradedMode == 1)
+  {
+    @sysvar::Node_Health_TCM = 1; // Yellow (Degraded / Secondary Symptom) - LATCHED until Reset!
   }
   else
   {
     @sysvar::Node_Health_TCM = 0; // Green (Healthy)
   }
 
-  if (@sysvar::Fault_Node_Cutoff_TCM == 0)
+  if (@sysvar::Fault_Node_Cutoff_TCM == 0 && g_Fault_Cutoff_TCM_Active == 0)
   {
     output(msg_TCM);
   }
@@ -351,6 +364,7 @@ void AddDTC(dword dtcCode, byte status)
 void Reset_TCM_Node()
 {
   g_NumDTCs = 0;
+  g_Fault_Cutoff_TCM_Active = 0;
   g_Symptom_U0415_Active = 0;
   g_Symptom_U0401_Active = 0;
   g_Symptom_U0100_Active = 0;
@@ -364,6 +378,7 @@ void Reset_TCM_Node()
   g_CurrentGear = 3;
   g_TargetGear = 3;
   @sysvar::Disp_CurrentGear = 1;
+  @sysvar::Node_Health_TCM = 0;
   write("[TCM] Reset: All DTCs and secondary symptom flags cleared.");
 }
 

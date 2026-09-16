@@ -43,6 +43,8 @@ variables
 
   // Fault State Tracker
   byte g_Fault_WSS_FL_Active = 0;
+  byte g_Fault_WSS_DTCAdded = 0;
+  byte g_Fault_Cutoff_ABS_Active = 0;
 }
 
 on start
@@ -58,38 +60,59 @@ on start
 // -----------------------------------------------------------------------------
 on timer t_ABS_10ms
 {
-  // Update base vehicle speed from accelerator pedal (0..100% -> 0..160 km/h)
-  if (@sysvar::Sim_AcceleratorPedal > 0)
+  byte isAsilDSafeStop;
+  isAsilDSafeStop = 0;
+
+  // Latch incoming fault trigger pulses
+  if (@sysvar::Fault_ABS_WheelSpeedFL == 1)
   {
-    g_VehicleSpeed = @sysvar::Sim_AcceleratorPedal * 1.6;
+    g_Fault_WSS_FL_Active = 1;
+  }
+  if (@sysvar::Fault_Node_Cutoff_ABS == 1)
+  {
+    g_Fault_Cutoff_ABS_Active = 1;
+  }
+
+  // Check for ASIL-D High Severity Hazards (ABS WSS, ABS Node Cutoff, ECM Throttle, ECM Node Cutoff)
+  if (g_Fault_WSS_FL_Active == 1 || g_Fault_Cutoff_ABS_Active == 1 || @sysvar::Fault_ECM_ThrottleSensor == 1 || @sysvar::Fault_Node_Cutoff_ECM == 1 || @sysvar::Node_Health_ECM == 2)
+  {
+    isAsilDSafeStop = 1;
+  }
+
+  // Update base vehicle speed: bring to 0 km/h standstill on ASIL-D safe stop
+  if (isAsilDSafeStop == 1)
+  {
+    g_VehicleSpeed = 0.0;
+  }
+  else if (@sysvar::Sim_AcceleratorPedal > 0)
+  {
+    g_VehicleSpeed = @sysvar::Sim_AcceleratorPedal * 1.6; // 0..100% -> 0..160 km/h
   }
   else
   {
     g_VehicleSpeed = 0.0; // Idle / standstill
   }
 
-  g_SpeedFL = g_VehicleSpeed;
   g_SpeedFR = g_VehicleSpeed;
   g_SpeedRL = g_VehicleSpeed;
   g_SpeedRR = g_VehicleSpeed;
 
-  // Handle Primary Fault Injection: Front-Left Wheel Speed Sensor Failure
-  if (@sysvar::Fault_ABS_WheelSpeedFL == 1)
+  // Handle Latched Primary Fault Injection: Front-Left Wheel Speed Sensor Failure
+  if (g_Fault_WSS_FL_Active == 1)
   {
     g_SpeedFL = 0.0; // Sensor signal dropped to 0 km/h
     g_ESP_Fault = 1;
-    if (g_Fault_WSS_FL_Active == 0)
+    if (g_Fault_WSS_DTCAdded == 0)
     {
-      g_Fault_WSS_FL_Active = 1;
+      g_Fault_WSS_DTCAdded = 1;
       AddDTC(0xC00351, (DTC_STATUS_TEST_FAILED | DTC_STATUS_CONFIRMED_DTC)); // C0035-13
-      write("[ABS_ESP] PRIMARY ROOT FAULT QUALIFIED: C0035-13 (Left Front Wheel Speed Sensor Circuit Open).");
+      write("[ABS_ESP] PRIMARY ROOT FAULT QUALIFIED: C0035-13 (Left Front Wheel Speed Sensor Circuit Open - ASIL D). Executing Safe Stop.");
     }
   }
-  else if (@sysvar::Fault_ABS_WheelSpeedFL == 0 && g_Fault_WSS_FL_Active == 1)
+  else
   {
-    g_Fault_WSS_FL_Active = 0;
-    g_ESP_Fault = 0;
     g_SpeedFL = g_VehicleSpeed;
+    g_ESP_Fault = 0;
   }
 
   // Populate CAN Payload (0x200)
@@ -138,9 +161,9 @@ on timer t_ABS_20ms
   @sysvar::Disp_VehicleSpeed = g_VehicleSpeed;
   @sysvar::Disp_ESP_Fault = g_ESP_Fault;
 
-  if (g_Fault_WSS_FL_Active == 1 || @sysvar::Fault_Node_Cutoff_ABS == 1)
+  if (g_Fault_WSS_FL_Active == 1 || g_Fault_Cutoff_ABS_Active == 1)
   {
-    @sysvar::Node_Health_ABS = 2; // Red (Root Cause)
+    @sysvar::Node_Health_ABS = 2; // Red (Root Cause) - LATCHED until Reset!
   }
   else
   {
@@ -262,6 +285,8 @@ void Reset_ABS_Node()
 {
   g_NumDTCs = 0;
   g_Fault_WSS_FL_Active = 0;
+  g_Fault_WSS_DTCAdded = 0;
+  g_Fault_Cutoff_ABS_Active = 0;
   g_ESP_Fault = 0;
   g_ABS_Active = 0;
   g_VehicleSpeed = @sysvar::Sim_AcceleratorPedal * 1.6;
@@ -271,6 +296,7 @@ void Reset_ABS_Node()
   g_SpeedRR = g_VehicleSpeed;
   g_YawRate = 0.0;
   g_BrakePressure = 0.0;
+  @sysvar::Node_Health_ABS = 0;
   write("[ABS_ESP] Reset: All faults cleared, nominal telemetry restored.");
 }
 
