@@ -123,12 +123,12 @@ CM_ BO_ 1024 "Chassis power mode and switch status from Body Control Module";
 CM_ BO_ 2015 "UDS Functional Diagnostic Request broadcast (ISO 15765-2 / ISO 14229)";
 
 BA_DEF_ BO_  "GenMsgCycleTime" INT 0 10000;
-BA_DEF_ BO_  "GenMsgSendType" ENUM  "Cyclic","Event","CyclicAndEvent";
+BA_DEF_ BO_  "GenMsgSendType" ENUM  "Cyclic","Event","CyclicAndEvent","NoMsgSendType";
 BA_DEF_ SG_  "GenSigStartValue" FLOAT 0 100000;
 BA_DEF_  "BusType" STRING ;
 
 BA_DEF_DEF_  "GenMsgCycleTime" 100;
-BA_DEF_DEF_  "GenMsgSendType" "Cyclic";
+BA_DEF_DEF_  "GenMsgSendType" "NoMsgSendType";
 BA_DEF_DEF_  "GenSigStartValue" 0;
 BA_DEF_DEF_  "BusType" "CAN";
 
