@@ -107,7 +107,7 @@ on timer t_ECM_10ms
       g_EngineRPM = 850.0 + (@sysvar::Disp_VehicleSpeed * 10.0);
     }
   }
-  else if (@sysvar::Sim_AcceleratorPedal <= 0.0)
+  else if (@sysvar::Sim_BrakePedal == 1 || @sysvar::Sim_AcceleratorPedal <= 0.0)
   {
     g_ThrottlePos = 0.0;
     g_EngineTorque = 0.0;
