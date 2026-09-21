@@ -82,6 +82,20 @@ on key 's'
   StartAutomatedRCA();
 }
 
+on key 'b'
+{
+  if (@sysvar::Sim_BrakePedal == 0)
+  {
+    @sysvar::Sim_BrakePedal = 1;
+    write("[PANEL] Brake Pedal APPLIED via key 'B'.");
+  }
+  else
+  {
+    @sysvar::Sim_BrakePedal = 0;
+    write("[PANEL] Brake Pedal RELEASED via key 'B'.");
+  }
+}
+
 on sysvar sysvar::Trigger_RCA_Scan
 {
   if (@sysvar::Trigger_RCA_Scan == 1)
@@ -463,8 +477,10 @@ void ResetEntireNetwork()
 
   // Reset Cluster Telemetry Displays
   @sysvar::Sim_AcceleratorPedal = 0.0;
+  @sysvar::Sim_BrakePedal = 0;
   @sysvar::Disp_VehicleSpeed = 0.0;
   @sysvar::Disp_EngineRPM = 0.0;
+  @sysvar::Disp_BrakePressure = 0.0;
   @sysvar::Disp_CoolantTemp = 90.0;
   @sysvar::Disp_CurrentGear = 1;
   @sysvar::Disp_MIL = 0;

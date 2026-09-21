@@ -5,6 +5,9 @@
     <variable anlyzLocal="2" readOnly="false" valueSequence="false" unit="%" name="Sim_AcceleratorPedal" comment="Pedal position in percent" bitcount="32" isSigned="true" encoding="65001" type="float">
       <defaultvalue>0</defaultvalue>
     </variable>
+    <variable anlyzLocal="2" readOnly="false" valueSequence="false" unit="" name="Sim_BrakePedal" comment="Brake Pedal State (0=Released, 1=Pressed)" bitcount="32" isSigned="true" encoding="65001" type="int">
+      <defaultvalue>0</defaultvalue>
+    </variable>
 
     <!-- Fault Triggers -->
     <variable anlyzLocal="2" readOnly="false" valueSequence="false" unit="" name="Fault_ABS_WheelSpeedFL" comment="Inject Left Front Wheel Speed Sensor Fault" bitcount="32" isSigned="true" encoding="65001" type="int">
@@ -83,6 +86,9 @@
       <defaultvalue>0</defaultvalue>
     </variable>
     <variable anlyzLocal="2" readOnly="false" valueSequence="false" unit="" name="Disp_ESP_Fault" comment="ESP Fault Light (0=Off, 1=On)" bitcount="32" isSigned="true" encoding="65001" type="int">
+      <defaultvalue>0</defaultvalue>
+    </variable>
+    <variable anlyzLocal="2" readOnly="false" valueSequence="false" unit="bar" name="Disp_BrakePressure" comment="Live Brake Pressure" bitcount="32" isSigned="true" encoding="65001" type="float">
       <defaultvalue>0</defaultvalue>
     </variable>
   </namespace>

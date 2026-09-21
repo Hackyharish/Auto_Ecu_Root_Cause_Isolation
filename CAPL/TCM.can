@@ -110,8 +110,8 @@ on timer t_TCM_20ms
     }
   }
 
-  // Cross-Dependency Check 2: ECM Throttle Sensor Failure (P0122 propagation)
-  if (g_RxThrottlePos < 1.0 && g_RxEngineRPM > 2000.0)
+  // Cross-Dependency Check 2: ECM Throttle Sensor Failure (P0122 propagation -> U0401-86)
+  if (g_Fault_ECM_Throttle_Active == 1 || @sysvar::Fault_ECM_ThrottleSensor == 1)
   {
     if (g_Symptom_U0401_Active == 0)
     {
@@ -265,7 +265,8 @@ on message 0x400
 {
   byte brakePressed;
   brakePressed = (this.byte(0) >> 2) & 0x01;
-  if (brakePressed == 1 && g_RxVehicleSpeed > 40.0)
+  // Qualify conflict only if brake switch is stuck high while throttle is demanded (>25%) or fault injected
+  if (brakePressed == 1 && (g_RxThrottlePos > 25.0 || @sysvar::Fault_BCM_BrakeSwitch == 1))
   {
     if (g_Symptom_Brake_Active == 0)
     {
@@ -274,9 +275,12 @@ on message 0x400
       write("[TCM] SECONDARY SYMPTOM DETECTED: U0422-81 (Invalid Data from BCM - Brake Switch Conflict).");
     }
   }
-  else if (brakePressed == 0 && g_Symptom_Brake_Active == 1)
+  else if (brakePressed == 0 || (g_RxThrottlePos <= 25.0 && @sysvar::Fault_BCM_BrakeSwitch == 0))
   {
-    g_Symptom_Brake_Active = 0;
+    if (g_Symptom_Brake_Active == 1 && @sysvar::Fault_BCM_BrakeSwitch == 0)
+    {
+      g_Symptom_Brake_Active = 0;
+    }
   }
 }
 

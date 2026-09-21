@@ -60,11 +60,11 @@ on timer t_BCM_50ms
     g_Fault_Cutoff_BCM_Active = 1;
   }
 
-  // Handle Latched Fault Injection: Brake Switch Stuck High (Scenario 5)
-  if (g_Fault_BrakeActive == 1)
+  // Handle Latched Fault Injection: Brake Switch Stuck High (Scenario 5) or Normal Brake Pedal
+  if (g_Fault_BrakeActive == 1 || @sysvar::Sim_BrakePedal == 1 || @sysvar::Fault_BCM_BrakeSwitch == 1)
   {
-    g_BrakeSwitch = 1; // Stuck closed
-    if (g_NumDTCs == 0)
+    g_BrakeSwitch = 1;
+    if (g_Fault_BrakeActive == 1 && g_NumDTCs == 0)
     {
       AddDTC(0x931811, (DTC_STATUS_TEST_FAILED | DTC_STATUS_CONFIRMED_DTC)); // B1318-11
       write("[BCM] PRIMARY ROOT FAULT QUALIFIED: B1318-11 (Brake Switch Circuit Short/Stuck High).");

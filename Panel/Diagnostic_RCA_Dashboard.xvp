@@ -228,6 +228,37 @@
       <Property Name="ReadOnly">True</Property>
     </Object>
 
+    <!-- Brake Pressure Telemetry Display -->
+    <Object Type="Vector.CANalyzer.Panels.Design.TextBoxControl, Vector.CANalyzer.Panels.CommonControls, Version=18.0.150.0, Culture=neutral, PublicKeyToken=null" Name="Txt_BrakePress" ControlName="Txt_BrakePress">
+      <Property Name="Name">Txt_BrakePress</Property>
+      <Property Name="Size">120, 24</Property>
+      <Property Name="Location">255, 275</Property>
+      <Property Name="AlarmUpperTextColor">WindowText</Property>
+      <Property Name="ValueDecimalPlaces">1</Property>
+      <Property Name="AlarmLowerBkgColor">Salmon</Property>
+      <Property Name="TextBackColor">240, 240, 240</Property>
+      <Property Name="ValueDisplay">Decimal</Property>
+      <Property Name="AlarmUpperBkgColor">IndianRed</Property>
+      <Property Name="AlarmLowerTextColor">WindowText</Property>
+      <Property Name="AlarmGeneralSettings">1;0;0;100</Property>
+      <Property Name="DisplayLabel">Left</Property>
+      <Property Name="DescriptionText">Brake (bar):</Property>
+      <Property Name="DescriptionSize">65, 24</Property>
+      <Property Name="SymbolConfiguration">8;16;;;;Disp_BrakePressure;2;;;-1;;;Value;;;0</Property>
+      <Property Name="ReadOnly">True</Property>
+    </Object>
+
+    <!-- Brake Pedal Control -->
+    <Object Type="Vector.CANalyzer.Panels.Design.ButtonControl, Vector.CANalyzer.Panels.CommonControls, Version=18.0.150.0, Culture=neutral, PublicKeyToken=null" Name="Btn_BrakePedal" ControlName="Button Brake">
+      <Property Name="Name">Btn_BrakePedal</Property>
+      <Property Name="Size">260, 36</Property>
+      <Property Name="Location">255, 315</Property>
+      <Property Name="TabIndex">10</Property>
+      <Property Name="Font">Microsoft Sans Serif, 9pt, style=Bold</Property>
+      <Property Name="Text">BRAKE PEDAL (Hold / Key B)</Property>
+      <Property Name="SymbolConfiguration">8;16;;;;Sim_BrakePedal;1;;;-1;;;Value;;;0</Property>
+    </Object>
+
     <!-- =================================================================== -->
     <!-- COLUMN 3: MULTI-ECU HEALTH & RCA RESULTS (Right)                    -->
     <!-- =================================================================== -->

@@ -89,7 +89,7 @@ on timer t_ABS_10ms
     isAsilDSafeStop = 1;
   }
 
-  // Calculate Target Speed: Safe stop brings target to 0, pedal demands 0..160 km/h
+  // Calculate Target Speed and Brake Dynamics: Safe stop/Brake brings target to 0, pedal demands 0..160 km/h
   {
     double targetSpeed;
     targetSpeed = 0.0;
@@ -97,17 +97,39 @@ on timer t_ABS_10ms
     if (isAsilDSafeStop == 1)
     {
       targetSpeed = 0.0; // Emergency Safe Stop target
+      if (g_VehicleSpeed > 0.5)
+      {
+        g_BrakePressure = 65.0; // Active emergency hydraulic braking (bar)
+      }
+      else
+      {
+        g_BrakePressure = 20.0; // Standstill hill-hold pressure (bar)
+      }
+    }
+    else if (@sysvar::Sim_BrakePedal == 1)
+    {
+      targetSpeed = 0.0; // Service brake pedal overrides accelerator demand
+      if (g_VehicleSpeed > 0.5)
+      {
+        g_BrakePressure = 50.0; // Service brake hydraulic pressure (bar)
+      }
+      else
+      {
+        g_BrakePressure = 15.0; // Standstill brake hold (bar)
+      }
     }
     else if (@sysvar::Sim_AcceleratorPedal > 0.0)
     {
       targetSpeed = @sysvar::Sim_AcceleratorPedal * 1.6; // Demand target speed
+      g_BrakePressure = 0.0; // Brakes released under throttle
     }
     else
     {
-      targetSpeed = 0.0;
+      targetSpeed = 0.0; // Idle coasting
+      g_BrakePressure = 0.0;
     }
 
-    // Gradual Acceleration & Deceleration Dynamics (10ms cycle)
+    // Dynamic Speed Ramp (10ms cycle)
     if (g_VehicleSpeed < targetSpeed)
     {
       // Gradual acceleration ramp (+0.8 km/h per 10ms = 80 km/h/s)
@@ -119,8 +141,17 @@ on timer t_ABS_10ms
     }
     else if (g_VehicleSpeed > targetSpeed)
     {
-      // Gradual deceleration ramp (-0.5 km/h per 10ms = 50 km/h/s, ~2.0s from 100 to 0)
-      g_VehicleSpeed = g_VehicleSpeed - 0.5;
+      if (@sysvar::Sim_BrakePedal == 1 || isAsilDSafeStop == 1)
+      {
+        // Active hydraulic braking deceleration (-1.0 km/h per 10ms = 100 km/h/s)
+        g_VehicleSpeed = g_VehicleSpeed - 1.0;
+      }
+      else
+      {
+        // Gentle engine overrun coasting (-0.4 km/h per 10ms = 40 km/h/s)
+        g_VehicleSpeed = g_VehicleSpeed - 0.4;
+      }
+
       if (g_VehicleSpeed < targetSpeed)
       {
         g_VehicleSpeed = targetSpeed;
@@ -195,6 +226,7 @@ on timer t_ABS_20ms
   // Update Panel Telemetry & Node Health
   @sysvar::Disp_VehicleSpeed = g_VehicleSpeed;
   @sysvar::Disp_ESP_Fault = g_ESP_Fault;
+  @sysvar::Disp_BrakePressure = g_BrakePressure;
 
   if (g_Fault_WSS_FL_Active == 1 || g_Fault_Cutoff_ABS_Active == 1)
   {
@@ -333,6 +365,7 @@ void Reset_ABS_Node()
   g_SpeedRR = g_VehicleSpeed;
   g_YawRate = 0.0;
   g_BrakePressure = 0.0;
+  @sysvar::Disp_BrakePressure = 0.0;
   @sysvar::Node_Health_ABS = 0;
   write("[ABS_ESP] Reset: All faults cleared, nominal telemetry restored.");
 }
