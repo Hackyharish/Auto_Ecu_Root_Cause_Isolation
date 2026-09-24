@@ -1,0 +1,244 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- =========================================================================
+     ASAM MCD-2D (ODX 2.2.0) Diagnostic Description File
+     Project: Automated Root Cause Isolation in Multi-ECU In-Vehicle Networks
+     Specification: ISO 22901-1 (ODX) / ISO 14229-1:2013 (UDS) / ISO 15765-2 (DoCAN)
+     Author: IVN Capstone Team | Tata Technologies TechPulse
+     ========================================================================= -->
+<ODX xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" MODEL-VERSION="2.2.0">
+  <DIAG-LAYER-CONTAINER ID="DLC_MultiECU_Diagnostics">
+    <SHORT-NAME>MultiECU_Diagnostics_Container</SHORT-NAME>
+    <LONG-NAME>In-Vehicle Multi-ECU Diagnostic Description</LONG-NAME>
+    <DESC>ASAM MCD-2D ODX description for ECM, TCM, ABS, and BCM diagnostic services.</DESC>
+
+    <!-- Base Diagnostic Layer defining Protocols & Common Services -->
+    <BASE-VARIANTS>
+      <BASE-VARIANT ID="BV_UDS_Base">
+        <SHORT-NAME>UDS_Base_Protocol</SHORT-NAME>
+        <LONG-NAME>ISO 14229-1:2013 Unified Diagnostic Services on CAN</LONG-NAME>
+
+        <DIAG-DATA-DICTIONARY-SPEC>
+          <DATA-OBJECT-PROPS>
+            <DATA-OBJECT-PROP ID="DOP_VehicleSpeed">
+              <SHORT-NAME>DOP_VehicleSpeed</SHORT-NAME>
+              <COMPU-METHOD>
+                <CATEGORY>LINEAR</CATEGORY>
+                <COMPU-INTERNAL-TO-PHYS>
+                  <COMPU-SCALES>
+                    <COMPU-SCALE>
+                      <COMPU-RATIONAL-COEFFS>
+                        <COMPU-NUMERATOR>
+                          <V>0</V>
+                          <V>0.01</V>
+                        </COMPU-NUMERATOR>
+                        <COMPU-DENOMINATOR>
+                          <V>1</V>
+                        </COMPU-DENOMINATOR>
+                      </COMPU-RATIONAL-COEFFS>
+                    </COMPU-SCALE>
+                  </COMPU-SCALES>
+                </COMPU-INTERNAL-TO-PHYS>
+              </COMPU-METHOD>
+              <UNIT-REF ID-REF="UNIT_km_h"/>
+            </DATA-OBJECT-PROP>
+
+            <DATA-OBJECT-PROP ID="DOP_EngineSpeed">
+              <SHORT-NAME>DOP_EngineSpeed</SHORT-NAME>
+              <COMPU-METHOD>
+                <CATEGORY>LINEAR</CATEGORY>
+                <COMPU-INTERNAL-TO-PHYS>
+                  <COMPU-SCALES>
+                    <COMPU-SCALE>
+                      <COMPU-RATIONAL-COEFFS>
+                        <COMPU-NUMERATOR>
+                          <V>0</V>
+                          <V>0.25</V>
+                        </COMPU-NUMERATOR>
+                        <COMPU-DENOMINATOR>
+                          <V>1</V>
+                        </COMPU-DENOMINATOR>
+                      </COMPU-RATIONAL-COEFFS>
+                    </COMPU-SCALE>
+                  </COMPU-SCALES>
+                </COMPU-INTERNAL-TO-PHYS>
+              </COMPU-METHOD>
+              <UNIT-REF ID-REF="UNIT_rpm"/>
+            </DATA-OBJECT-PROP>
+
+            <DATA-OBJECT-PROP ID="DOP_CoolantTemp">
+              <SHORT-NAME>DOP_CoolantTemp</SHORT-NAME>
+              <COMPU-METHOD>
+                <CATEGORY>LINEAR</CATEGORY>
+                <COMPU-INTERNAL-TO-PHYS>
+                  <COMPU-SCALES>
+                    <COMPU-SCALE>
+                      <COMPU-RATIONAL-COEFFS>
+                        <COMPU-NUMERATOR>
+                          <V>-40</V>
+                          <V>1.0</V>
+                        </COMPU-NUMERATOR>
+                        <COMPU-DENOMINATOR>
+                          <V>1</V>
+                        </COMPU-DENOMINATOR>
+                      </COMPU-RATIONAL-COEFFS>
+                    </COMPU-SCALE>
+                  </COMPU-SCALES>
+                </COMPU-INTERNAL-TO-PHYS>
+              </COMPU-METHOD>
+              <UNIT-REF ID-REF="UNIT_degC"/>
+            </DATA-OBJECT-PROP>
+          </DATA-OBJECT-PROPS>
+
+          <UNITS>
+            <UNIT ID="UNIT_km_h"><SHORT-NAME>km_h</SHORT-NAME><DISPLAY-NAME>km/h</DISPLAY-NAME></UNIT>
+            <UNIT ID="UNIT_rpm"><SHORT-NAME>rpm</SHORT-NAME><DISPLAY-NAME>rpm</DISPLAY-NAME></UNIT>
+            <UNIT ID="UNIT_degC"><SHORT-NAME>degC</SHORT-NAME><DISPLAY-NAME>°C</DISPLAY-NAME></UNIT>
+            <UNIT ID="UNIT_bar"><SHORT-NAME>bar</SHORT-NAME><DISPLAY-NAME>bar</DISPLAY-NAME></UNIT>
+            <UNIT ID="UNIT_V"><SHORT-NAME>Volt</SHORT-NAME><DISPLAY-NAME>V</DISPLAY-NAME></UNIT>
+          </UNITS>
+        </DIAG-DATA-DICTIONARY-SPEC>
+
+        <!-- Standard Diagnostic Services -->
+        <DIAG-SERVICES>
+          <DIAG-SERVICE ID="DS_DiagnosticSessionControl" SEMANTIC="SESSION">
+            <SHORT-NAME>DiagnosticSessionControl</SHORT-NAME>
+            <REQUEST-REF ID-REF="REQ_DiagnosticSessionControl"/>
+            <POS-RESPONSE-REFS><POS-RESPONSE-REF ID-REF="POS_DiagnosticSessionControl"/></POS-RESPONSE-REFS>
+            <NEG-RESPONSE-REFS><NEG-RESPONSE-REF ID-REF="NEG_DiagnosticSessionControl"/></NEG-RESPONSE-REFS>
+          </DIAG-SERVICE>
+
+          <DIAG-SERVICE ID="DS_ClearDiagnosticInformation" SEMANTIC="FAULTMEMORY">
+            <SHORT-NAME>ClearDiagnosticInformation</SHORT-NAME>
+            <REQUEST-REF ID-REF="REQ_ClearDiagnosticInformation"/>
+            <POS-RESPONSE-REFS><POS-RESPONSE-REF ID-REF="POS_ClearDiagnosticInformation"/></POS-RESPONSE-REFS>
+          </DIAG-SERVICE>
+
+          <DIAG-SERVICE ID="DS_ReadDTCInformation" SEMANTIC="FAULTMEMORY">
+            <SHORT-NAME>ReadDTCInformation</SHORT-NAME>
+            <REQUEST-REF ID-REF="REQ_ReadDTCInformation"/>
+            <POS-RESPONSE-REFS><POS-RESPONSE-REF ID-REF="POS_ReadDTCInformation"/></POS-RESPONSE-REFS>
+          </DIAG-SERVICE>
+
+          <DIAG-SERVICE ID="DS_ReadDataByIdentifier" SEMANTIC="DATA">
+            <SHORT-NAME>ReadDataByIdentifier</SHORT-NAME>
+            <REQUEST-REF ID-REF="REQ_ReadDataByIdentifier"/>
+            <POS-RESPONSE-REFS><POS-RESPONSE-REF ID-REF="POS_ReadDataByIdentifier"/></POS-RESPONSE-REFS>
+          </DIAG-SERVICE>
+        </DIAG-SERVICES>
+      </BASE-VARIANT>
+    </BASE-VARIANTS>
+
+    <!-- =================================================================== -->
+    <!-- ECU VARIANTS                                                        -->
+    <!-- =================================================================== -->
+    <ECU-VARIANTS>
+
+      <!-- 1. ABS / ESP ECU Variant -->
+      <ECU-VARIANT ID="ECU_ABS">
+        <SHORT-NAME>ABS_ESP_ECU</SHORT-NAME>
+        <LONG-NAME>Anti-Lock Braking System / Electronic Stability Program</LONG-NAME>
+        <DIAG-COMMS>
+          <DIAG-COMM ID="COMM_ABS_Physical">
+            <SHORT-NAME>ABS_Physical_Addressing</SHORT-NAME>
+            <PHYSICAL-REQUEST-ID>0x7E2</PHYSICAL-REQUEST-ID>
+            <PHYSICAL-RESPONSE-ID>0x7EA</PHYSICAL-RESPONSE-ID>
+            <FUNCTIONAL-REQUEST-ID>0x7DF</FUNCTIONAL-REQUEST-ID>
+          </DIAG-COMMS>
+        </DIAG-COMMS>
+        <DTC-LIST>
+          <DTC ID="DTC_C003513">
+            <SHORT-NAME>C0035_13</SHORT-NAME>
+            <TROUBLE-CODE>0xC00351</TROUBLE-CODE>
+            <DISPLAY-TROUBLE-CODE>C0035-13</DISPLAY-TROUBLE-CODE>
+            <TEXT>Left Front Wheel Speed Sensor Circuit Open</TEXT>
+            <SEVERITY>ASIL D (High Severity Hazard)</SEVERITY>
+          </DTC>
+        </DTC-LIST>
+      </ECU-VARIANT>
+
+      <!-- 2. ECM ECU Variant -->
+      <ECU-VARIANT ID="ECU_ECM">
+        <SHORT-NAME>ECM_ECU</SHORT-NAME>
+        <LONG-NAME>Engine Control Module / Powertrain Controller</LONG-NAME>
+        <DIAG-COMMS>
+          <DIAG-COMM ID="COMM_ECM_Physical">
+            <SHORT-NAME>ECM_Physical_Addressing</SHORT-NAME>
+            <PHYSICAL-REQUEST-ID>0x7E0</PHYSICAL-REQUEST-ID>
+            <PHYSICAL-RESPONSE-ID>0x7E8</PHYSICAL-RESPONSE-ID>
+            <FUNCTIONAL-REQUEST-ID>0x7DF</FUNCTIONAL-REQUEST-ID>
+          </DIAG-COMMS>
+        </DIAG-COMMS>
+        <DTC-LIST>
+          <DTC ID="DTC_P012212">
+            <SHORT-NAME>P0122_12</SHORT-NAME>
+            <TROUBLE-CODE>0x012212</TROUBLE-CODE>
+            <DISPLAY-TROUBLE-CODE>P0122-12</DISPLAY-TROUBLE-CODE>
+            <TEXT>Throttle Position Sensor 'A' Circuit Low Input</TEXT>
+            <SEVERITY>ASIL D (High Severity Hazard)</SEVERITY>
+          </DTC>
+          <DTC ID="DTC_P021700">
+            <SHORT-NAME>P0217_00</SHORT-NAME>
+            <TROUBLE-CODE>0x021700</TROUBLE-CODE>
+            <DISPLAY-TROUBLE-CODE>P0217-00</DISPLAY-TROUBLE-CODE>
+            <TEXT>Engine Coolant Over-Temperature Condition</TEXT>
+            <SEVERITY>ASIL B (Engine Thermal Hazard)</SEVERITY>
+          </DTC>
+        </DTC-LIST>
+      </ECU-VARIANT>
+
+      <!-- 3. TCM ECU Variant -->
+      <ECU-VARIANT ID="ECU_TCM">
+        <SHORT-NAME>TCM_ECU</SHORT-NAME>
+        <LONG-NAME>Transmission Control Module</LONG-NAME>
+        <DIAG-COMMS>
+          <DIAG-COMM ID="COMM_TCM_Physical">
+            <SHORT-NAME>TCM_Physical_Addressing</SHORT-NAME>
+            <PHYSICAL-REQUEST-ID>0x7E1</PHYSICAL-REQUEST-ID>
+            <PHYSICAL-RESPONSE-ID>0x7E9</PHYSICAL-RESPONSE-ID>
+            <FUNCTIONAL-REQUEST-ID>0x7DF</FUNCTIONAL-REQUEST-ID>
+          </DIAG-COMMS>
+        </DIAG-COMMS>
+        <DTC-LIST>
+          <DTC ID="DTC_U041581">
+            <SHORT-NAME>U0415_81</SHORT-NAME>
+            <TROUBLE-CODE>0xD41581</TROUBLE-CODE>
+            <DISPLAY-TROUBLE-CODE>U0415-81</DISPLAY-TROUBLE-CODE>
+            <TEXT>Invalid Data Received from ABS Module (Secondary Cascade)</TEXT>
+            <SEVERITY>QM</SEVERITY>
+          </DTC>
+          <DTC ID="DTC_U040186">
+            <SHORT-NAME>U0401_86</SHORT-NAME>
+            <TROUBLE-CODE>0xD40186</TROUBLE-CODE>
+            <DISPLAY-TROUBLE-CODE>U0401-86</DISPLAY-TROUBLE-CODE>
+            <TEXT>Invalid Data Received from ECM (Throttle Signal)</TEXT>
+            <SEVERITY>QM</SEVERITY>
+          </DTC>
+        </DTC-LIST>
+      </ECU-VARIANT>
+
+      <!-- 4. BCM ECU Variant -->
+      <ECU-VARIANT ID="ECU_BCM">
+        <SHORT-NAME>BCM_ECU</SHORT-NAME>
+        <LONG-NAME>Body Control Module</LONG-NAME>
+        <DIAG-COMMS>
+          <DIAG-COMM ID="COMM_BCM_Physical">
+            <SHORT-NAME>BCM_Physical_Addressing</SHORT-NAME>
+            <PHYSICAL-REQUEST-ID>0x7E3</PHYSICAL-REQUEST-ID>
+            <PHYSICAL-RESPONSE-ID>0x7EB</PHYSICAL-RESPONSE-ID>
+            <FUNCTIONAL-REQUEST-ID>0x7DF</FUNCTIONAL-REQUEST-ID>
+          </DIAG-COMMS>
+        </DIAG-COMMS>
+        <DTC-LIST>
+          <DTC ID="DTC_B131811">
+            <SHORT-NAME>B1318_11</SHORT-NAME>
+            <TROUBLE-CODE>0x931811</TROUBLE-CODE>
+            <DISPLAY-TROUBLE-CODE>B1318-11</DISPLAY-TROUBLE-CODE>
+            <TEXT>Brake Pedal Switch Stuck Active / Circuit Short to Power</TEXT>
+            <SEVERITY>ASIL B (Braking Plausibility Hazard)</SEVERITY>
+          </DTC>
+        </DTC-LIST>
+      </ECU-VARIANT>
+
+    </ECU-VARIANTS>
+  </DIAG-LAYER-CONTAINER>
+</ODX>

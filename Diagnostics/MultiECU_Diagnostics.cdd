@@ -1,0 +1,330 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- =========================================================================
+     Vector CANdela Diagnostic Description (CDD) File
+     Project: Automated Root Cause Isolation in Multi-ECU In-Vehicle Networks
+     Specification: ISO 14229-1:2013 (UDS) / ISO 15765-2 (DoCAN) / ISO 26262 ASIL-D
+     Author: IVN Capstone Team | Tata Technologies TechPulse
+     Target Environment: Vector CANoe 18 / 19 Diagnostic Configuration
+     ========================================================================= -->
+<candela version="7.0" date="2026-09-24" xmlns="http://www.vector-informatik.de/CANdela/CDD">
+  <document-info>
+    <title>Multi-ECU In-Vehicle Network Diagnostic Description</title>
+    <author>IVN Capstone Team</author>
+    <organization>Tata Technologies TechPulse</organization>
+    <version>2.0.0</version>
+    <standard>ISO 14229-1:2013</standard>
+    <transport-layer>ISO 15765-2 (CAN 500 kbps, 11-bit Standard IDs)</transport-layer>
+  </document-info>
+
+  <!-- ===================================================================== -->
+  <!-- COMMUNICATION & PROTOCOL CONFIGURATION                                 -->
+  <!-- ===================================================================== -->
+  <protocol-stack name="UDS_on_CAN">
+    <bus-type>CAN</bus-type>
+    <baudrate>500000</baudrate>
+    <addressing-mode>Standard_11Bit</addressing-mode>
+    <functional-request-id>0x7DF</functional-request-id>
+    
+    <timing-parameters>
+      <param name="P2_Server_Max" unit="ms">50</param>
+      <param name="P2_Star_Server_Max" unit="ms">5000</param>
+      <param name="S3_Client_Timer" unit="ms">2000</param>
+    </timing-parameters>
+
+    <!-- Supported Diagnostic Sessions (Clause 9.2) -->
+    <sessions>
+      <session id="0x01" name="DefaultSession" comment="Default operational session on ECU boot"/>
+      <session id="0x02" name="ProgrammingSession" comment="Flash bootloader re-programming"/>
+      <session id="0x03" name="ExtendedDiagnosticSession" comment="Unlocks full multi-ECU sensor polling &amp; automated RCA"/>
+    </sessions>
+
+    <!-- Supported Security Levels (Clause 9.4) -->
+    <security-levels>
+      <level id="0x01" seed-subf="0x01" key-subf="0x02" name="Level_1_OEM_Diagnostics" comment="Unlocks protected dynamic actuator &amp; routine control"/>
+    </security-levels>
+  </protocol-stack>
+
+  <!-- ===================================================================== -->
+  <!-- DATA IDENTIFIERS (DIDs) CATALOG (Clause 10.2 Service 0x22)            -->
+  <!-- ===================================================================== -->
+  <did-catalog>
+    <!-- Standard Identification DIDs -->
+    <did id="0xF190" name="VIN_DataIdentifier" length="17" type="ASCII" comment="Vehicle Identification Number (17 chars)"/>
+    <did id="0xF187" name="VehicleManufacturerSparePartNumber" length="10" type="ASCII" comment="ECU Hardware Part Number"/>
+    <did id="0xF189" name="VehicleManufacturerECUSoftwareVersionNumber" length="8" type="ASCII" comment="ECU Application Software Version"/>
+
+    <!-- Dynamic Telemetry & Snapshot Freeze Frame DIDs -->
+    <did id="0x0100" name="LiveVehicleSpeed" length="2" type="Unsigned" resolution="0.01" unit="km/h" min="0.0" max="250.0" comment="Reference Vehicle Speed"/>
+    <did id="0x0101" name="LiveEngineSpeed" length="2" type="Unsigned" resolution="0.25" unit="rpm" min="0" max="8000" comment="Live Powertrain RPM"/>
+    <did id="0x0102" name="LiveEngineCoolantTemperature" length="1" type="Signed" offset="-40" resolution="1.0" unit="degC" min="-40" max="215" comment="ECT Sensor Value"/>
+    <did id="0x0103" name="LiveBrakeSystemHydraulicPressure" length="2" type="Unsigned" resolution="0.1" unit="bar" min="0.0" max="200.0" comment="Active Master Cylinder Pressure"/>
+    <did id="0x0104" name="LiveThrottlePedalPosition" length="1" type="Unsigned" resolution="0.392" unit="%" min="0.0" max="100.0" comment="Accelerator Throttle Position"/>
+    <did id="0x0105" name="LiveTransmissionCurrentGear" length="1" type="Enum" comment="Current Engaged Gear (1=1st, 2=2nd, 3=3rd, 4=4th, 5=5th)"/>
+    <did id="0x0106" name="LiveSystemBatteryVoltage" length="2" type="Unsigned" resolution="0.01" unit="V" min="0.0" max="24.0" comment="ECU Supply Voltage (KL30/KL15)"/>
+  </did-catalog>
+
+  <!-- ===================================================================== -->
+  <!-- DIAGNOSTIC SERVICE SPECIFICATION (ISO 14229-1:2013)                   -->
+  <!-- ===================================================================== -->
+  <service-catalog>
+    <!-- Service 0x10: DiagnosticSessionControl -->
+    <service sid="0x10" name="DiagnosticSessionControl" functional-allowed="true">
+      <subfunctions>
+        <subfunction id="0x01" name="defaultSession"/>
+        <subfunction id="0x02" name="programmingSession"/>
+        <subfunction id="0x03" name="extendedDiagnosticSession"/>
+      </subfunctions>
+    </service>
+
+    <!-- Service 0x11: ECUReset -->
+    <service sid="0x11" name="ECUReset" functional-allowed="true">
+      <subfunctions>
+        <subfunction id="0x01" name="hardReset"/>
+        <subfunction id="0x03" name="softReset"/>
+      </subfunctions>
+    </service>
+
+    <!-- Service 0x14: ClearDiagnosticInformation -->
+    <service sid="0x14" name="ClearDiagnosticInformation" functional-allowed="true">
+      <parameter name="groupOfDTC" length="3" comment="0xFFFFFF clears all DTC memory"/>
+    </service>
+
+    <!-- Service 0x19: ReadDTCInformation -->
+    <service sid="0x19" name="ReadDTCInformation" functional-allowed="true">
+      <subfunctions>
+        <subfunction id="0x01" name="reportNumberOfDTCByStatusMask"/>
+        <subfunction id="0x02" name="reportDTCByStatusMask"/>
+        <subfunction id="0x04" name="reportDTCSnapshotRecordByDTCNumber"/>
+        <subfunction id="0x0A" name="reportSupportedDTC"/>
+      </subfunctions>
+      <status-mask-definition>
+        <bit pos="0" name="testFailed" hex="0x01"/>
+        <bit pos="1" name="testFailedThisOperationCycle" hex="0x02"/>
+        <bit pos="2" name="pendingDTC" hex="0x04"/>
+        <bit pos="3" name="confirmedDTC" hex="0x08"/>
+        <bit pos="4" name="testNotCompletedSinceLastClear" hex="0x10"/>
+        <bit pos="5" name="testFailedSinceLastClear" hex="0x20"/>
+        <bit pos="6" name="testNotCompletedThisOperationCycle" hex="0x40"/>
+        <bit pos="7" name="warningIndicatorRequested" hex="0x80"/>
+      </status-mask-definition>
+    </service>
+
+    <!-- Service 0x22: ReadDataByIdentifier -->
+    <service sid="0x22" name="ReadDataByIdentifier" functional-allowed="true">
+      <parameter name="dataIdentifier" length="2" comment="Reference DID from catalog"/>
+    </service>
+
+    <!-- Service 0x27: SecurityAccess -->
+    <service sid="0x27" name="SecurityAccess" functional-allowed="false">
+      <subfunctions>
+        <subfunction id="0x01" name="requestSeed"/>
+        <subfunction id="0x02" name="sendKey"/>
+      </subfunctions>
+    </service>
+
+    <!-- Service 0x3E: TesterPresent -->
+    <service sid="0x3E" name="TesterPresent" functional-allowed="true">
+      <subfunctions>
+        <subfunction id="0x00" name="zeroSubFunction"/>
+        <subfunction id="0x80" name="suppressPosRspMsgIndicationBit"/>
+      </subfunctions>
+    </service>
+  </service-catalog>
+
+  <!-- ===================================================================== -->
+  <!-- NEGATIVE RESPONSE CODES (Table A.1)                                   -->
+  <!-- ===================================================================== -->
+  <negative-response-codes>
+    <nrc code="0x10" name="generalReject"/>
+    <nrc code="0x11" name="serviceNotSupported"/>
+    <nrc code="0x12" name="subFunctionNotSupported"/>
+    <nrc code="0x13" name="incorrectMessageLengthOrInvalidFormat"/>
+    <nrc code="0x22" name="conditionsNotCorrect" comment="Vehicle OFF (KL15 inactive) or Battery Undervoltage"/>
+    <nrc code="0x31" name="requestOutOfRange"/>
+    <nrc code="0x33" name="securityAccessDenied"/>
+    <nrc code="0x78" name="requestCorrectlyReceived-ResponsePending"/>
+  </negative-response-codes>
+
+  <!-- ===================================================================== -->
+  <!-- ECU INSTANCES & FAULT MEMORY CATALOG                                  -->
+  <!-- ===================================================================== -->
+  <ecu-instances>
+
+    <!-- =================================================================== -->
+    <!-- 1. ABS / ESP CONTROL MODULE                                         -->
+    <!-- =================================================================== -->
+    <ecu id="ABS_ESP" name="Anti-lock Braking / Stability Control Module">
+      <addressing>
+        <rx-id-physical>0x7E2</rx-id-physical>
+        <tx-id-physical>0x7EA</tx-id-physical>
+      </addressing>
+
+      <dtc-catalog>
+        <!-- SCENARIO 1 (PRIMARY ROOT CAUSE) -->
+        <dtc code="0xC00351" display-code="C0035-13" asil="ASIL D" category="PrimaryRootCause">
+          <text>Left Front Wheel Speed Sensor - Circuit Open</text>
+          <symptom-classification>Chassis Functional Safety Critical</symptom-classification>
+          <downstream-cascades>
+            <cascade target-ecu="TCM" dtc="U0415-81" description="Invalid Data From ABS"/>
+            <cascade target-ecu="ECM" dtc="P0500-00" description="Vehicle Speed Signal Missing"/>
+          </downstream-cascades>
+          <freeze-frame-dids>
+            <did-ref id="0x0100"/>
+            <did-ref id="0x0103"/>
+            <did-ref id="0x0106"/>
+          </freeze-frame-dids>
+        </dtc>
+
+        <!-- SCENARIO 3 (SECONDARY CASCADE SYMPTOM OF ECM CUTOFF) -->
+        <dtc code="0xD10000" display-code="U0100-00" asil="QM" category="SecondarySymptom">
+          <text>Lost Communication with Engine Control Module (ECM/PCM)</text>
+          <pruning-rule>Suppressed when ECM Cutoff / Bus Off is active</pruning-rule>
+        </dtc>
+      </dtc-catalog>
+    </ecu>
+
+    <!-- =================================================================== -->
+    <!-- 2. ENGINE CONTROL MODULE (ECM)                                      -->
+    <!-- =================================================================== -->
+    <ecu id="ECM" name="Engine Control Module / Powertrain Control Module">
+      <addressing>
+        <rx-id-physical>0x7E0</rx-id-physical>
+        <tx-id-physical>0x7E8</tx-id-physical>
+      </addressing>
+
+      <dtc-catalog>
+        <!-- SCENARIO 2 (PRIMARY ROOT CAUSE) -->
+        <dtc code="0x012212" display-code="P0122-12" asil="ASIL D" category="PrimaryRootCause">
+          <text>Throttle / Pedal Position Sensor 'A' Circuit Low Input</text>
+          <downstream-cascades>
+            <cascade target-ecu="TCM" dtc="U0401-86" description="Invalid Throttle Data From ECM"/>
+          </downstream-cascades>
+          <freeze-frame-dids>
+            <did-ref id="0x0101"/>
+            <did-ref id="0x0104"/>
+            <did-ref id="0x0106"/>
+          </freeze-frame-dids>
+        </dtc>
+
+        <!-- SCENARIO 4 (PRIMARY ROOT CAUSE) -->
+        <dtc code="0x021700" display-code="P0217-00" asil="ASIL B" category="PrimaryRootCause">
+          <text>Engine Coolant Over-Temperature Condition</text>
+          <downstream-cascades>
+            <cascade target-ecu="TCM" dtc="U0401-82" description="Engine Temp Out of Range"/>
+            <cascade target-ecu="BCM" dtc="B10A2-00" description="High Temp Warning Alert"/>
+          </downstream-cascades>
+          <freeze-frame-dids>
+            <did-ref id="0x0102"/>
+            <did-ref id="0x0101"/>
+            <did-ref id="0x0106"/>
+          </freeze-frame-dids>
+        </dtc>
+
+        <!-- SCENARIO 1 (SECONDARY CASCADE SYMPTOM OF ABS WSS) -->
+        <dtc code="0x050000" display-code="P0500-00" asil="QM" category="SecondarySymptom">
+          <text>Vehicle Speed Sensor 'A' Signal Range / Missing Data</text>
+          <pruning-rule>Suppressed when C0035-13 is active on ABS</pruning-rule>
+        </dtc>
+
+        <!-- SCENARIO 5 (SECONDARY CASCADE SYMPTOM OF BCM BRAKE SWITCH) -->
+        <dtc code="0x050400" display-code="P0504-00" asil="QM" category="SecondarySymptom">
+          <text>Brake Switch 'A' / 'B' Correlation Plausibility Conflict</text>
+          <pruning-rule>Suppressed when B1318-11 is active on BCM</pruning-rule>
+        </dtc>
+
+        <!-- SCENARIO 6 (SECONDARY CASCADE SYMPTOM OF ABS CUTOFF) -->
+        <dtc code="0xD12100" display-code="U0121-00" asil="QM" category="SecondarySymptom">
+          <text>Lost Communication with Anti-Lock Brake System (ABS) Module</text>
+          <pruning-rule>Suppressed when ABS Node Cutoff is active</pruning-rule>
+        </dtc>
+      </dtc-catalog>
+    </ecu>
+
+    <!-- =================================================================== -->
+    <!-- 3. TRANSMISSION CONTROL MODULE (TCM)                                -->
+    <!-- =================================================================== -->
+    <ecu id="TCM" name="Transmission Control Module">
+      <addressing>
+        <rx-id-physical>0x7E1</rx-id-physical>
+        <tx-id-physical>0x7E9</tx-id-physical>
+      </addressing>
+
+      <dtc-catalog>
+        <!-- SCENARIO 1 (SECONDARY CASCADE SYMPTOM) -->
+        <dtc code="0xD41581" display-code="U0415-81" asil="QM" category="SecondarySymptom">
+          <text>Invalid Data Received From Anti-Lock Brake System (ABS) Control Module</text>
+          <pruning-rule>Suppressed when C0035-13 is active on ABS</pruning-rule>
+        </dtc>
+
+        <!-- SCENARIO 2 (SECONDARY CASCADE SYMPTOM) -->
+        <dtc code="0xD40186" display-code="U0401-86" asil="QM" category="SecondarySymptom">
+          <text>Invalid Data Received From ECM/PCM - Throttle Sensor Signal Invalid</text>
+          <pruning-rule>Suppressed when P0122-12 is active on ECM</pruning-rule>
+        </dtc>
+
+        <!-- SCENARIO 4 (SECONDARY CASCADE SYMPTOM) -->
+        <dtc code="0xD40182" display-code="U0401-82" asil="QM" category="SecondarySymptom">
+          <text>Invalid Data Received From ECM/PCM - Coolant Temperature Plausibility</text>
+          <pruning-rule>Suppressed when P0217-00 is active on ECM</pruning-rule>
+        </dtc>
+
+        <!-- SCENARIO 5 (SECONDARY CASCADE SYMPTOM) -->
+        <dtc code="0xD42281" display-code="U0422-81" asil="QM" category="SecondarySymptom">
+          <text>Invalid Data Received From Body Control Module (BCM) - Brake Signal Conflict</text>
+          <pruning-rule>Suppressed when B1318-11 is active on BCM</pruning-rule>
+        </dtc>
+
+        <!-- SCENARIO 3 (SECONDARY CASCADE SYMPTOM OF ECM DROPOUT) -->
+        <dtc code="0xD10000" display-code="U0100-00" asil="QM" category="SecondarySymptom">
+          <text>Lost Communication with ECM/PCM</text>
+          <pruning-rule>Suppressed when ECM Cutoff / Bus Off is active</pruning-rule>
+        </dtc>
+
+        <!-- SCENARIO 6 (SECONDARY CASCADE SYMPTOM OF ABS DROPOUT) -->
+        <dtc code="0xD12100" display-code="U0121-00" asil="QM" category="SecondarySymptom">
+          <text>Lost Communication with ABS Control Module</text>
+          <pruning-rule>Suppressed when ABS Cutoff is active</pruning-rule>
+        </dtc>
+      </dtc-catalog>
+    </ecu>
+
+    <!-- =================================================================== -->
+    <!-- 4. BODY CONTROL MODULE (BCM)                                        -->
+    <!-- =================================================================== -->
+    <ecu id="BCM" name="Body Control Module / Gateway">
+      <addressing>
+        <rx-id-physical>0x7E3</rx-id-physical>
+        <tx-id-physical>0x7EB</tx-id-physical>
+      </addressing>
+
+      <dtc-catalog>
+        <!-- SCENARIO 5 (PRIMARY ROOT CAUSE) -->
+        <dtc code="0x931811" display-code="B1318-11" asil="ASIL B" category="PrimaryRootCause">
+          <text>Brake Pedal Switch Circuit Short to Battery / Stuck Active</text>
+          <downstream-cascades>
+            <cascade target-ecu="ECM" dtc="P0504-00" description="Brake/Throttle Plausibility Conflict"/>
+            <cascade target-ecu="TCM" dtc="U0422-81" description="Invalid Brake Switch Data"/>
+          </downstream-cascades>
+          <freeze-frame-dids>
+            <did-ref id="0x0100"/>
+            <did-ref id="0x0103"/>
+            <did-ref id="0x0106"/>
+          </freeze-frame-dids>
+        </dtc>
+
+        <!-- SCENARIO 4 (SECONDARY CASCADE SYMPTOM) -->
+        <dtc code="0x90A200" display-code="B10A2-00" asil="QM" category="SecondarySymptom">
+          <text>High Engine Coolant Temperature Warning Light Request Failed</text>
+          <pruning-rule>Suppressed when P0217-00 is active on ECM</pruning-rule>
+        </dtc>
+
+        <!-- SCENARIO 3 (SECONDARY CASCADE SYMPTOM OF ECM DROPOUT) -->
+        <dtc code="0xD10000" display-code="U0100-00" asil="QM" category="SecondarySymptom">
+          <text>Lost Communication with Engine Control Module (ECM/PCM)</text>
+          <pruning-rule>Suppressed when ECM Cutoff / Bus Off is active</pruning-rule>
+        </dtc>
+      </dtc-catalog>
+    </ecu>
+
+  </ecu-instances>
+</candela>
