@@ -268,6 +268,11 @@ on message 0x7E2, 0x7DF
 {
   byte sid;
   byte subf;
+
+  if (@sysvar::Fault_Node_Cutoff_ABS == 1 || g_Fault_Cutoff_ABS_Active == 1)
+  {
+    return; // Node is cut off / bus-off; cannot transmit diagnostic response
+  }
   sid = this.byte(1);
 
   if (sid == UDS_SID_DIAGNOSTIC_SESSION_CONTROL)

@@ -330,6 +330,11 @@ on message 0x7E0, 0x7DF
   byte sid;
   byte subf;
 
+  if (@sysvar::Fault_Node_Cutoff_ECM == 1 || g_Fault_Cutoff_ECM_Active == 1)
+  {
+    return; // Node is cut off / bus-off; cannot transmit diagnostic response
+  }
+
   pci = this.byte(0);
   sid = this.byte(1);
 

@@ -154,6 +154,7 @@ testcase TC_02_Scenario1_ABS_WSS()
     LogHtmlRow(2, "Scenario 1: Left Front Wheel Speed Sensor Open", "ABS/ESP", "C0035-13", @sysvar::RCA_Result_Latency, 0);
   }
 
+  @sysvar::Fault_ABS_WheelSpeedFL = 0;
   @sysvar::Fault_Reset_All = 1;
   testWaitForTimeout(250);
 }
@@ -180,6 +181,7 @@ testcase TC_03_Scenario2_ECM_TPS()
     LogHtmlRow(3, "Scenario 2: Throttle Position Sensor Low Circuit", "ECM", "P0122-12", @sysvar::RCA_Result_Latency, 0);
   }
 
+  @sysvar::Fault_ECM_ThrottleSensor = 0;
   @sysvar::Fault_Reset_All = 1;
   testWaitForTimeout(250);
 }
@@ -206,6 +208,7 @@ testcase TC_04_Scenario3_ECM_Node_Dropout()
     LogHtmlRow(4, "Scenario 3: Complete ECM Node Loss / Bus Dropout", "ECM", "U0100-00", @sysvar::RCA_Result_Latency, 0);
   }
 
+  @sysvar::Fault_Node_Cutoff_ECM = 0;
   @sysvar::Fault_Reset_All = 1;
   testWaitForTimeout(250);
 }
@@ -232,6 +235,7 @@ testcase TC_05_Scenario4_Coolant_Overheat()
     LogHtmlRow(5, "Scenario 4: Engine Coolant Over-Temperature", "ECM", "P0217-00", @sysvar::RCA_Result_Latency, 0);
   }
 
+  @sysvar::Fault_ECM_CoolantTemp = 0;
   @sysvar::Fault_Reset_All = 1;
   testWaitForTimeout(250);
 }
@@ -258,6 +262,7 @@ testcase TC_06_Scenario5_BCM_Brake_Switch()
     LogHtmlRow(6, "Scenario 5: Brake Pedal Switch Stuck High", "BCM", "B1318-11", @sysvar::RCA_Result_Latency, 0);
   }
 
+  @sysvar::Fault_BCM_BrakeSwitch = 0;
   @sysvar::Fault_Reset_All = 1;
   testWaitForTimeout(250);
 }
@@ -284,6 +289,7 @@ testcase TC_07_Scenario6_ABS_Node_Dropout()
     LogHtmlRow(7, "Scenario 6: Complete ABS Node Dropout / Bus Loss", "ABS/ESP", "U0121-00", @sysvar::RCA_Result_Latency, 0);
   }
 
+  @sysvar::Fault_Node_Cutoff_ABS = 0;
   @sysvar::Fault_Reset_All = 1;
   testWaitForTimeout(250);
 }

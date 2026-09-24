@@ -138,8 +138,8 @@ on timer t_TCM_20ms
       }
     }
 
-    // Cross-Dependency Check 3: ECM Node Loss (Timeout > 250ms)
-    if ((timeNow() - g_LastECMTimestamp) > 250000 && g_LastECMTimestamp > 0)
+    // Cross-Dependency Check 3: ECM Node Loss (Timeout > 250ms or Fault_Node_Cutoff_ECM == 1)
+    if (@sysvar::Fault_Node_Cutoff_ECM == 1 || ((timeNow() - g_LastECMTimestamp) > 250000 && g_LastECMTimestamp > 0))
     {
       if (g_Symptom_U0100_Active == 0)
       {
