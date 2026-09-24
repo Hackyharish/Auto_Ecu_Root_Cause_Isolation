@@ -1,0 +1,328 @@
+/*@!Encoding:1252*/
+/* =========================================================================
+   Include File: Test_RCA_Automation.cin
+   Project: Automated Root Cause Isolation in Multi-ECU Networks
+   Description: Included test automation engine for DIAG_TESTER node.
+                Sequentially validates Pre-condition rejection, Scenarios 1 to 6,
+                pruning accuracy, execution latency (<50ms), and writes
+                formatted HTML Test Report without needing a separate node.
+   ========================================================================= */
+
+variables
+{
+  msTimer t_TestStep;
+  int g_CurrentTestCase = 0;
+  dword g_ReportFile;
+  int g_PassCount = 0;
+  int g_FailCount = 0;
+}
+
+void LogHtmlHeader()
+{
+  writeLineFile(g_ReportFile, "<!DOCTYPE html>");
+  writeLineFile(g_ReportFile, "<html><head><meta charset='utf-8'>");
+  writeLineFile(g_ReportFile, "<title>Automated RCA Test Execution Report</title>");
+  writeLineFile(g_ReportFile, "<style>");
+  writeLineFile(g_ReportFile, "body { font-family: 'Segoe UI', Arial, sans-serif; margin: 20px; background: #f4f6f9; color: #333; }");
+  writeLineFile(g_ReportFile, ".container { max-width: 1000px; margin: auto; background: #fff; padding: 25px; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); }");
+  writeLineFile(g_ReportFile, "h1 { color: #1a365d; border-bottom: 2px solid #2b6cb0; padding-bottom: 10px; }");
+  writeLineFile(g_ReportFile, ".summary { display: flex; gap: 20px; margin-bottom: 20px; }");
+  writeLineFile(g_ReportFile, ".badge { padding: 10px 20px; border-radius: 6px; font-weight: bold; font-size: 16px; }");
+  writeLineFile(g_ReportFile, ".pass { background: #c6f6d5; color: #22543d; border: 1px solid #38a169; }");
+  writeLineFile(g_ReportFile, ".fail { background: #fed7d7; color: #742a2a; border: 1px solid #e53e3e; }");
+  writeLineFile(g_ReportFile, "table { width: 100%; border-collapse: collapse; margin-top: 15px; }");
+  writeLineFile(g_ReportFile, "th, td { border: 1px solid #e2e8f0; padding: 12px; text-align: left; }");
+  writeLineFile(g_ReportFile, "th { background: #2b6cb0; color: #fff; }");
+  writeLineFile(g_ReportFile, "tr:nth-child(even) { background: #f8fafc; }");
+  writeLineFile(g_ReportFile, ".status-pass { color: #2e8540; font-weight: bold; }");
+  writeLineFile(g_ReportFile, ".status-fail { color: #d9381e; font-weight: bold; }");
+  writeLineFile(g_ReportFile, "</style></head><body>");
+  writeLineFile(g_ReportFile, "<div class='container'>");
+  writeLineFile(g_ReportFile, "<h1>Automated Multi-ECU Root Cause Isolation: Test Execution Report</h1>");
+  writeLineFile(g_ReportFile, "<p><b>Standard:</b> ISO 14229 / ISO 26262 ASIL-D | <b>ECU Target:</b> Central Diagnostic Gateway</p>");
+  writeLineFile(g_ReportFile, "<table><thead><tr>");
+  writeLineFile(g_ReportFile, "<th>TC #</th><th>Test Scenario Description</th><th>Target ECU</th><th>Expected Root DTC</th><th>Latency</th><th>Verdict</th>");
+  writeLineFile(g_ReportFile, "</tr></thead><tbody>");
+}
+
+void LogHtmlRow(int tcNum, char desc[], char ecu[], char dtc[], double lat, byte isPass)
+{
+  char row[512];
+  char verdict[64];
+  if (isPass == 1)
+  {
+    snprintf(verdict, elCount(verdict), "<span class='status-pass'>PASSED</span>");
+    g_PassCount++;
+  }
+  else
+  {
+    snprintf(verdict, elCount(verdict), "<span class='status-fail'>FAILED</span>");
+    g_FailCount++;
+  }
+
+  snprintf(row, elCount(row), "<tr><td>TC_%02d</td><td>%s</td><td>%s</td><td><b>%s</b></td><td>%.2f ms</td><td>%s</td></tr>",
+    tcNum, desc, ecu, dtc, lat, verdict);
+  writeLineFile(g_ReportFile, row);
+}
+
+void LogHtmlFooter()
+{
+  char summary[512];
+  writeLineFile(g_ReportFile, "</tbody></table><br>");
+  writeLineFile(g_ReportFile, "<div class='summary'>");
+  snprintf(summary, elCount(summary), "<div class='badge pass'>Total Passed: %d</div><div class='badge fail'>Total Failed: %d</div>", g_PassCount, g_FailCount);
+  writeLineFile(g_ReportFile, summary);
+  writeLineFile(g_ReportFile, "</div>");
+  writeLineFile(g_ReportFile, "<p><i>Generated automatically by CANoe CAPL Automated Test Module.</i></p>");
+  writeLineFile(g_ReportFile, "</div></body></html>");
+  fileClose(g_ReportFile);
+  write("\n===================================================================");
+  write(" [TEST SUITE COMPLETED] Total Tests: %d | Passed: %d | Failed: %d", g_PassCount + g_FailCount, g_PassCount, g_FailCount);
+  write(" Test Report saved to Logs/RCA_Automated_Test_Report.html");
+  write("===================================================================\n");
+}
+
+on key 't', 'T'
+{
+  write("\n===================================================================");
+  write(" [TEST SUITE] Starting Automated Multi-ECU RCA Regression Test Suite...");
+  write("===================================================================");
+  
+  g_ReportFile = openFileWrite("Logs/RCA_Automated_Test_Report.html", 2); // Overwrite mode
+  if (g_ReportFile == 0)
+  {
+    g_ReportFile = openFileWrite("RCA_Automated_Test_Report.html", 2);
+  }
+  LogHtmlHeader();
+
+  g_PassCount = 0;
+  g_FailCount = 0;
+  g_CurrentTestCase = 1;
+  setTimer(t_TestStep, 100);
+}
+
+on timer t_TestStep
+{
+  switch (g_CurrentTestCase)
+  {
+    case 1:
+      // Test Case 1: Pre-condition Rejection (Ignition OFF)
+      @sysvar::Sim_IgnitionState = 0; // Turn OFF
+      @sysvar::Trigger_RCA_Scan = 1;
+      setTimer(t_TestStep, 100);
+      g_CurrentTestCase = 2;
+      break;
+
+    case 2:
+      // Verify TC1 Result
+      {
+        char resDTC[32];
+        sysGetVariableString(sysvar::RCA_Output_RootDTC, resDTC, elCount(resDTC));
+        if (strncmp(resDTC, "Pre-conditions", 14) == 0)
+        {
+          LogHtmlRow(1, "Pre-condition Rejection: Vehicle Ignition OFF", "N/A (Inhibited)", "Pre-conditions Failed", 0.0, 1);
+        }
+        else
+        {
+          LogHtmlRow(1, "Pre-condition Rejection: Vehicle Ignition OFF", "N/A (Inhibited)", "Pre-conditions Failed", 0.0, 0);
+        }
+      }
+      // Prepare TC 2: Scenario 1 (ABS WSS FL Open)
+      @sysvar::Sim_IgnitionState = 2;
+      @sysvar::Sim_BatteryVoltage = 13.8;
+      @sysvar::Fault_Reset_All = 1;
+      setTimer(t_TestStep, 200);
+      g_CurrentTestCase = 3;
+      break;
+
+    case 3:
+      @sysvar::Fault_ABS_WheelSpeedFL = 1;
+      setTimer(t_TestStep, 150); // Propagation delay
+      g_CurrentTestCase = 4;
+      break;
+
+    case 4:
+      @sysvar::Trigger_RCA_Scan = 1;
+      setTimer(t_TestStep, 150); // Execution delay
+      g_CurrentTestCase = 5;
+      break;
+
+    case 5:
+      // Verify TC 2 (Scenario 1)
+      {
+        char resDTC[32];
+        sysGetVariableString(sysvar::RCA_Output_RootDTC, resDTC, elCount(resDTC));
+        if (strncmp(resDTC, "C0035-13", 8) == 0 && @sysvar::RCA_Result_Latency < 50.0)
+        {
+          LogHtmlRow(2, "Scenario 1: Left Front Wheel Speed Sensor Open", "ABS/ESP", "C0035-13", @sysvar::RCA_Result_Latency, 1);
+        }
+        else
+        {
+          LogHtmlRow(2, "Scenario 1: Left Front Wheel Speed Sensor Open", "ABS/ESP", "C0035-13", @sysvar::RCA_Result_Latency, 0);
+        }
+      }
+      // Prepare TC 3: Scenario 2 (ECM Throttle Sensor Low)
+      @sysvar::Fault_Reset_All = 1;
+      setTimer(t_TestStep, 200);
+      g_CurrentTestCase = 6;
+      break;
+
+    case 6:
+      @sysvar::Fault_ECM_ThrottleSensor = 1;
+      setTimer(t_TestStep, 150);
+      g_CurrentTestCase = 7;
+      break;
+
+    case 7:
+      @sysvar::Trigger_RCA_Scan = 1;
+      setTimer(t_TestStep, 150);
+      g_CurrentTestCase = 8;
+      break;
+
+    case 8:
+      // Verify TC 3 (Scenario 2)
+      {
+        char resDTC[32];
+        sysGetVariableString(sysvar::RCA_Output_RootDTC, resDTC, elCount(resDTC));
+        if (strncmp(resDTC, "P0122-12", 8) == 0 && @sysvar::RCA_Result_Latency < 50.0)
+        {
+          LogHtmlRow(3, "Scenario 2: Throttle Position Sensor Low Circuit", "ECM", "P0122-12", @sysvar::RCA_Result_Latency, 1);
+        }
+        else
+        {
+          LogHtmlRow(3, "Scenario 2: Throttle Position Sensor Low Circuit", "ECM", "P0122-12", @sysvar::RCA_Result_Latency, 0);
+        }
+      }
+      // Prepare TC 4: Scenario 3 (ECM Node Cutoff)
+      @sysvar::Fault_Reset_All = 1;
+      setTimer(t_TestStep, 200);
+      g_CurrentTestCase = 9;
+      break;
+
+    case 9:
+      @sysvar::Fault_Node_Cutoff_ECM = 1;
+      setTimer(t_TestStep, 300); // Wait for timeout
+      g_CurrentTestCase = 10;
+      break;
+
+    case 10:
+      @sysvar::Trigger_RCA_Scan = 1;
+      setTimer(t_TestStep, 150);
+      g_CurrentTestCase = 11;
+      break;
+
+    case 11:
+      // Verify TC 4 (Scenario 3)
+      {
+        char resDTC[32];
+        sysGetVariableString(sysvar::RCA_Output_RootDTC, resDTC, elCount(resDTC));
+        if (strncmp(resDTC, "U0100-00", 8) == 0)
+        {
+          LogHtmlRow(4, "Scenario 3: Complete ECM Node Loss / Bus Dropout", "ECM", "U0100-00", @sysvar::RCA_Result_Latency, 1);
+        }
+        else
+        {
+          LogHtmlRow(4, "Scenario 3: Complete ECM Node Loss / Bus Dropout", "ECM", "U0100-00", @sysvar::RCA_Result_Latency, 0);
+        }
+      }
+      // Prepare TC 5: Scenario 4 (Engine Coolant Overheat)
+      @sysvar::Fault_Reset_All = 1;
+      setTimer(t_TestStep, 200);
+      g_CurrentTestCase = 12;
+      break;
+
+    case 12:
+      @sysvar::Fault_ECM_CoolantTemp = 1;
+      setTimer(t_TestStep, 150);
+      g_CurrentTestCase = 13;
+      break;
+
+    case 13:
+      @sysvar::Trigger_RCA_Scan = 1;
+      setTimer(t_TestStep, 150);
+      g_CurrentTestCase = 14;
+      break;
+
+    case 14:
+      // Verify TC 5 (Scenario 4)
+      {
+        char resDTC[32];
+        sysGetVariableString(sysvar::RCA_Output_RootDTC, resDTC, elCount(resDTC));
+        if (strncmp(resDTC, "P0217-00", 8) == 0)
+        {
+          LogHtmlRow(5, "Scenario 4: Engine Coolant Over-Temperature", "ECM", "P0217-00", @sysvar::RCA_Result_Latency, 1);
+        }
+        else
+        {
+          LogHtmlRow(5, "Scenario 4: Engine Coolant Over-Temperature", "ECM", "P0217-00", @sysvar::RCA_Result_Latency, 0);
+        }
+      }
+      // Prepare TC 6: Scenario 5 (Brake Switch Short)
+      @sysvar::Fault_Reset_All = 1;
+      setTimer(t_TestStep, 200);
+      g_CurrentTestCase = 15;
+      break;
+
+    case 15:
+      @sysvar::Fault_BCM_BrakeSwitch = 1;
+      setTimer(t_TestStep, 150);
+      g_CurrentTestCase = 16;
+      break;
+
+    case 16:
+      @sysvar::Trigger_RCA_Scan = 1;
+      setTimer(t_TestStep, 150);
+      g_CurrentTestCase = 17;
+      break;
+
+    case 17:
+      // Verify TC 6 (Scenario 5)
+      {
+        char resDTC[32];
+        sysGetVariableString(sysvar::RCA_Output_RootDTC, resDTC, elCount(resDTC));
+        if (strncmp(resDTC, "B1318-11", 8) == 0)
+        {
+          LogHtmlRow(6, "Scenario 5: Brake Pedal Switch Stuck High", "BCM", "B1318-11", @sysvar::RCA_Result_Latency, 1);
+        }
+        else
+        {
+          LogHtmlRow(6, "Scenario 5: Brake Pedal Switch Stuck High", "BCM", "B1318-11", @sysvar::RCA_Result_Latency, 0);
+        }
+      }
+      // Prepare TC 7: Scenario 6 (ABS Node Loss)
+      @sysvar::Fault_Reset_All = 1;
+      setTimer(t_TestStep, 200);
+      g_CurrentTestCase = 18;
+      break;
+
+    case 18:
+      @sysvar::Fault_Node_Cutoff_ABS = 1;
+      setTimer(t_TestStep, 300);
+      g_CurrentTestCase = 19;
+      break;
+
+    case 19:
+      @sysvar::Trigger_RCA_Scan = 1;
+      setTimer(t_TestStep, 150);
+      g_CurrentTestCase = 20;
+      break;
+
+    case 20:
+      // Verify TC 7 (Scenario 6)
+      {
+        char resDTC[32];
+        sysGetVariableString(sysvar::RCA_Output_RootDTC, resDTC, elCount(resDTC));
+        if (strncmp(resDTC, "U0121-00", 8) == 0)
+        {
+          LogHtmlRow(7, "Scenario 6: Complete ABS Node Dropout / Bus Loss", "ABS/ESP", "U0121-00", @sysvar::RCA_Result_Latency, 1);
+        }
+        else
+        {
+          LogHtmlRow(7, "Scenario 6: Complete ABS Node Dropout / Bus Loss", "ABS/ESP", "U0121-00", @sysvar::RCA_Result_Latency, 0);
+        }
+      }
+      @sysvar::Fault_Reset_All = 1;
+      LogHtmlFooter();
+      break;
+  }
+}
