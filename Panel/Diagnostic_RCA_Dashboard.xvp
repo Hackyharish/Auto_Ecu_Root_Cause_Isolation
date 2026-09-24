@@ -26,8 +26,9 @@
         <Property Name="TabIndex">1</Property>
         <Property Name="Font">Segoe UI, 8pt, style=Bold</Property>
         <Property Name="Text">1. WSS FL Sensor Open (ABS)</Property>
-        <Property Name="BackColor">28, 38, 54</Property>
-        <Property Name="ForeColor">186, 230, 253</Property>
+        <Property Name="UseVisualStyleBackColor">False</Property>
+        <Property Name="BackColor">30, 41, 59</Property>
+        <Property Name="ForeColor">224, 242, 254</Property>
         <Property Name="SymbolConfiguration">8;16;;;;Fault_ABS_WheelSpeedFL;1;;;-1;;;Value;;;0</Property>
       </Object>
 
@@ -38,8 +39,9 @@
         <Property Name="TabIndex">2</Property>
         <Property Name="Font">Segoe UI, 8pt, style=Bold</Property>
         <Property Name="Text">2. Throttle Sensor Low (ECM)</Property>
-        <Property Name="BackColor">28, 38, 54</Property>
-        <Property Name="ForeColor">186, 230, 253</Property>
+        <Property Name="UseVisualStyleBackColor">False</Property>
+        <Property Name="BackColor">30, 41, 59</Property>
+        <Property Name="ForeColor">224, 242, 254</Property>
         <Property Name="SymbolConfiguration">8;16;;;;Fault_ECM_ThrottleSensor;1;;;-1;;;Value;;;0</Property>
       </Object>
 
@@ -50,7 +52,8 @@
         <Property Name="TabIndex">3</Property>
         <Property Name="Font">Segoe UI, 8pt, style=Bold</Property>
         <Property Name="Text">3. Cutoff ECM Node (BusOff)</Property>
-        <Property Name="BackColor">48, 28, 40</Property>
+        <Property Name="UseVisualStyleBackColor">False</Property>
+        <Property Name="BackColor">70, 25, 35</Property>
         <Property Name="ForeColor">254, 202, 202</Property>
         <Property Name="SymbolConfiguration">8;16;;;;Fault_Node_Cutoff_ECM;1;;;-1;;;Value;;;0</Property>
       </Object>
@@ -62,8 +65,9 @@
         <Property Name="TabIndex">4</Property>
         <Property Name="Font">Segoe UI, 8pt, style=Bold</Property>
         <Property Name="Text">4. Coolant Overheat (ECM)</Property>
-        <Property Name="BackColor">28, 38, 54</Property>
-        <Property Name="ForeColor">186, 230, 253</Property>
+        <Property Name="UseVisualStyleBackColor">False</Property>
+        <Property Name="BackColor">30, 41, 59</Property>
+        <Property Name="ForeColor">224, 242, 254</Property>
         <Property Name="SymbolConfiguration">8;16;;;;Fault_ECM_CoolantTemp;1;;;-1;;;Value;;;0</Property>
       </Object>
 
@@ -74,8 +78,9 @@
         <Property Name="TabIndex">5</Property>
         <Property Name="Font">Segoe UI, 8pt, style=Bold</Property>
         <Property Name="Text">5. Brake Switch Stuck (BCM)</Property>
-        <Property Name="BackColor">28, 38, 54</Property>
-        <Property Name="ForeColor">186, 230, 253</Property>
+        <Property Name="UseVisualStyleBackColor">False</Property>
+        <Property Name="BackColor">30, 41, 59</Property>
+        <Property Name="ForeColor">224, 242, 254</Property>
         <Property Name="SymbolConfiguration">8;16;;;;Fault_BCM_BrakeSwitch;1;;;-1;;;Value;;;0</Property>
       </Object>
 
@@ -86,7 +91,8 @@
         <Property Name="TabIndex">6</Property>
         <Property Name="Font">Segoe UI, 8pt, style=Bold</Property>
         <Property Name="Text">6. Cutoff ABS Node (BusOff)</Property>
-        <Property Name="BackColor">48, 28, 40</Property>
+        <Property Name="UseVisualStyleBackColor">False</Property>
+        <Property Name="BackColor">70, 25, 35</Property>
         <Property Name="ForeColor">254, 202, 202</Property>
         <Property Name="SymbolConfiguration">8;16;;;;Fault_Node_Cutoff_ABS;1;;;-1;;;Value;;;0</Property>
       </Object>
@@ -98,6 +104,7 @@
         <Property Name="TabIndex">7</Property>
         <Property Name="Font">Segoe UI, 8.5pt, style=Bold</Property>
         <Property Name="Text">RESET ALL FAULTS (Key 0)</Property>
+        <Property Name="UseVisualStyleBackColor">False</Property>
         <Property Name="BackColor">185, 28, 28</Property>
         <Property Name="ForeColor">255, 255, 255</Property>
         <Property Name="SymbolConfiguration">8;16;;;;Fault_Reset_All;1;;;-1;;;Value;;;0</Property>
@@ -110,6 +117,7 @@
         <Property Name="TabIndex">8</Property>
         <Property Name="Font">Segoe UI, 9pt, style=Bold</Property>
         <Property Name="Text">TRIGGER RCA SCAN (Key S)</Property>
+        <Property Name="UseVisualStyleBackColor">False</Property>
         <Property Name="BackColor">14, 116, 144</Property>
         <Property Name="ForeColor">255, 255, 255</Property>
         <Property Name="SymbolConfiguration">8;16;;;;Trigger_RCA_Scan;1;;;-1;;;Value;;;0</Property>
@@ -122,20 +130,28 @@
         <Property Name="TabIndex">9</Property>
         <Property Name="Font">Segoe UI, 8.5pt, style=Bold</Property>
         <Property Name="Text">IGNITION (ON/OFF - Key I)</Property>
+        <Property Name="UseVisualStyleBackColor">False</Property>
         <Property Name="BackColor">21, 128, 61</Property>
         <Property Name="ForeColor">255, 255, 255</Property>
         <Property Name="SymbolConfiguration">8;16;;;;Sim_IgnitionState;1;;;-1;;;Value;;;0</Property>
       </Object>
 
+      <!-- Battery Voltage Field with Explicit High-Contrast Label -->
+      <Object Type="Vector.CANalyzer.Panels.Design.StaticTextControl, Vector.CANalyzer.Panels.CommonControls, Version=18.0.150.0, Culture=neutral, PublicKeyToken=null" Name="Lbl_BattVolt" ControlName="Static Text Batt">
+        <Property Name="Name">Lbl_BattVolt</Property>
+        <Property Name="Size">90, 20</Property>
+        <Property Name="Location">10, 337</Property>
+        <Property Name="Font">Segoe UI, 8.5pt, style=Bold</Property>
+        <Property Name="Text">Battery (V):</Property>
+        <Property Name="ForeColor">224, 242, 254</Property>
+        <Property Name="BackColor">Transparent</Property>
+      </Object>
       <Object Type="Vector.CANalyzer.Panels.Design.TextBoxControl, Vector.CANalyzer.Panels.CommonControls, Version=18.0.150.0, Culture=neutral, PublicKeyToken=null" Name="Txt_BattVolt" ControlName="Txt_BattVolt">
         <Property Name="Name">Txt_BattVolt</Property>
-        <Property Name="Size">210, 24</Property>
-        <Property Name="Location">10, 335</Property>
+        <Property Name="Size">115, 24</Property>
+        <Property Name="Location">105, 335</Property>
         <Property Name="Font">Consolas, 9.5pt, style=Bold</Property>
-        <Property Name="DisplayLabel">Left</Property>
-        <Property Name="DescriptionText">Battery (V):</Property>
-        <Property Name="DescriptionSize">85, 24</Property>
-        <Property Name="DescriptionColor">148, 163, 184</Property>
+        <Property Name="DisplayLabel">None</Property>
         <Property Name="BackColor">15, 23, 42</Property>
         <Property Name="ForeColor">250, 204, 21</Property>
         <Property Name="SymbolConfiguration">8;16;;;;Sim_BatteryVoltage;2;;;-1;;;Value;;;0</Property>
@@ -149,6 +165,7 @@
         <Property Name="TabIndex">10</Property>
         <Property Name="Font">Segoe UI, 8.5pt, style=Bold</Property>
         <Property Name="Text">RUN AUTO TEST SUITE (Key T)</Property>
+        <Property Name="UseVisualStyleBackColor">False</Property>
         <Property Name="BackColor">88, 28, 135</Property>
         <Property Name="ForeColor">255, 255, 255</Property>
         <Property Name="SymbolConfiguration">8;16;;;;Trigger_RCA_Scan;1;;;-1;;;Value;;;0</Property>
@@ -173,7 +190,7 @@
         <Property Name="Location">10, 20</Property>
         <Property Name="Font">Segoe UI, 8pt, style=Bold</Property>
         <Property Name="Text">Accelerator / Speed Demand (0 - 100%):</Property>
-        <Property Name="ForeColor">148, 163, 184</Property>
+        <Property Name="ForeColor">224, 242, 254</Property>
         <Property Name="BackColor">Transparent</Property>
       </Object>
       <Object Type="Vector.CANalyzer.Panels.Design.TrackBarControl, Vector.CANalyzer.Panels.CommonControls, Version=18.0.150.0, Culture=neutral, PublicKeyToken=null" Name="TrackBar_Pedal" ControlName="Track Bar 1">
@@ -196,7 +213,7 @@
         <Property Name="Location">10, 74</Property>
         <Property Name="Font">Segoe UI, 8pt, style=Bold</Property>
         <Property Name="Text">Speed (km/h):</Property>
-        <Property Name="ForeColor">148, 163, 184</Property>
+        <Property Name="ForeColor">224, 242, 254</Property>
         <Property Name="BackColor">Transparent</Property>
       </Object>
       <Object Type="Vector.CANalyzer.Panels.Design.LCDControl, Vector.CANalyzer.Panels.CommonControls, Version=18.0.150.0, Culture=neutral, PublicKeyToken=null" Name="LCD_Speed" ControlName="LCD_Speed">
@@ -216,7 +233,7 @@
         <Property Name="Location">145, 74</Property>
         <Property Name="Font">Segoe UI, 8pt, style=Bold</Property>
         <Property Name="Text">Engine (RPM):</Property>
-        <Property Name="ForeColor">148, 163, 184</Property>
+        <Property Name="ForeColor">224, 242, 254</Property>
         <Property Name="BackColor">Transparent</Property>
       </Object>
       <Object Type="Vector.CANalyzer.Panels.Design.LCDControl, Vector.CANalyzer.Panels.CommonControls, Version=18.0.150.0, Culture=neutral, PublicKeyToken=null" Name="LCD_RPM" ControlName="LCD_RPM">
@@ -237,7 +254,7 @@
         <Property Name="Location">10, 130</Property>
         <Property Name="Font">Segoe UI, 8pt, style=Bold</Property>
         <Property Name="Text">Coolant Temp (0 - 150 °C | Overheat &gt; 120°C):</Property>
-        <Property Name="ForeColor">148, 163, 184</Property>
+        <Property Name="ForeColor">224, 242, 254</Property>
         <Property Name="BackColor">Transparent</Property>
       </Object>
       <Object Type="Vector.CANalyzer.Panels.Design.ProgressBarControl, Vector.CANalyzer.Panels.CommonControls, Version=18.0.150.0, Culture=neutral, PublicKeyToken=null" Name="Prog_Coolant" ControlName="Prog_Coolant">
@@ -251,61 +268,85 @@
         <Property Name="SymbolConfiguration">8;16;;;;Disp_CoolantTemp;2;;;-1;;;Value;;;0</Property>
       </Object>
 
-      <!-- Shifter & Warnings -->
+      <!-- Shifter & Warnings with High-Contrast External Labels -->
+      <Object Type="Vector.CANalyzer.Panels.Design.StaticTextControl, Vector.CANalyzer.Panels.CommonControls, Version=18.0.150.0, Culture=neutral, PublicKeyToken=null" Name="Lbl_PRNDL" ControlName="Static Text PRNDL">
+        <Property Name="Name">Lbl_PRNDL</Property>
+        <Property Name="Size">55, 20</Property>
+        <Property Name="Location">10, 180</Property>
+        <Property Name="Font">Segoe UI, 8pt, style=Bold</Property>
+        <Property Name="Text">PRNDL:</Property>
+        <Property Name="ForeColor">224, 242, 254</Property>
+        <Property Name="BackColor">Transparent</Property>
+      </Object>
       <Object Type="Vector.CANalyzer.Panels.Design.TextBoxControl, Vector.CANalyzer.Panels.CommonControls, Version=18.0.150.0, Culture=neutral, PublicKeyToken=null" Name="Txt_PRNDL" ControlName="Txt_PRNDL">
         <Property Name="Name">Txt_PRNDL</Property>
-        <Property Name="Size">125, 24</Property>
-        <Property Name="Location">10, 178</Property>
+        <Property Name="Size">67, 24</Property>
+        <Property Name="Location">68, 178</Property>
         <Property Name="Font">Consolas, 9.5pt, style=Bold</Property>
-        <Property Name="DisplayLabel">Left</Property>
-        <Property Name="DescriptionText">PRNDL:</Property>
-        <Property Name="DescriptionSize">50, 24</Property>
-        <Property Name="DescriptionColor">148, 163, 184</Property>
+        <Property Name="DisplayLabel">None</Property>
         <Property Name="BackColor">15, 23, 42</Property>
         <Property Name="ForeColor">56, 189, 248</Property>
         <Property Name="SymbolConfiguration">8;16;;;;Disp_PRNDL_State;4;;;-1;;;Value;;;0</Property>
         <Property Name="ReadOnly">True</Property>
       </Object>
 
+      <Object Type="Vector.CANalyzer.Panels.Design.StaticTextControl, Vector.CANalyzer.Panels.CommonControls, Version=18.0.150.0, Culture=neutral, PublicKeyToken=null" Name="Lbl_MIL" ControlName="Static Text MIL">
+        <Property Name="Name">Lbl_MIL</Property>
+        <Property Name="Size">65, 20</Property>
+        <Property Name="Location">145, 180</Property>
+        <Property Name="Font">Segoe UI, 8pt, style=Bold</Property>
+        <Property Name="Text">MIL Lamp:</Property>
+        <Property Name="ForeColor">224, 242, 254</Property>
+        <Property Name="BackColor">Transparent</Property>
+      </Object>
       <Object Type="Vector.CANalyzer.Panels.Design.TextBoxControl, Vector.CANalyzer.Panels.CommonControls, Version=18.0.150.0, Culture=neutral, PublicKeyToken=null" Name="Txt_MIL" ControlName="Txt_MIL">
         <Property Name="Name">Txt_MIL</Property>
-        <Property Name="Size">125, 24</Property>
-        <Property Name="Location">145, 178</Property>
+        <Property Name="Size">58, 24</Property>
+        <Property Name="Location">212, 178</Property>
         <Property Name="Font">Consolas, 9.5pt, style=Bold</Property>
-        <Property Name="DisplayLabel">Left</Property>
-        <Property Name="DescriptionText">MIL Lamp:</Property>
-        <Property Name="DescriptionSize">65, 24</Property>
-        <Property Name="DescriptionColor">148, 163, 184</Property>
+        <Property Name="DisplayLabel">None</Property>
         <Property Name="BackColor">15, 23, 42</Property>
         <Property Name="ForeColor">249, 115, 22</Property>
         <Property Name="SymbolConfiguration">8;16;;;;Disp_MIL;1;;;-1;;;Value;;;0</Property>
         <Property Name="ReadOnly">True</Property>
       </Object>
 
+      <Object Type="Vector.CANalyzer.Panels.Design.StaticTextControl, Vector.CANalyzer.Panels.CommonControls, Version=18.0.150.0, Culture=neutral, PublicKeyToken=null" Name="Lbl_BrakePress" ControlName="Static Text BrkP">
+        <Property Name="Name">Lbl_BrakePress</Property>
+        <Property Name="Size">75, 20</Property>
+        <Property Name="Location">10, 212</Property>
+        <Property Name="Font">Segoe UI, 8pt, style=Bold</Property>
+        <Property Name="Text">Brake (bar):</Property>
+        <Property Name="ForeColor">224, 242, 254</Property>
+        <Property Name="BackColor">Transparent</Property>
+      </Object>
       <Object Type="Vector.CANalyzer.Panels.Design.TextBoxControl, Vector.CANalyzer.Panels.CommonControls, Version=18.0.150.0, Culture=neutral, PublicKeyToken=null" Name="Txt_BrakePress" ControlName="Txt_BrakePress">
         <Property Name="Name">Txt_BrakePress</Property>
-        <Property Name="Size">125, 24</Property>
-        <Property Name="Location">10, 210</Property>
+        <Property Name="Size">47, 24</Property>
+        <Property Name="Location">88, 210</Property>
         <Property Name="Font">Consolas, 9.5pt, style=Bold</Property>
-        <Property Name="DisplayLabel">Left</Property>
-        <Property Name="DescriptionText">Brake (bar):</Property>
-        <Property Name="DescriptionSize">70, 24</Property>
-        <Property Name="DescriptionColor">148, 163, 184</Property>
+        <Property Name="DisplayLabel">None</Property>
         <Property Name="BackColor">15, 23, 42</Property>
         <Property Name="ForeColor">248, 113, 113</Property>
         <Property Name="SymbolConfiguration">8;16;;;;Disp_BrakePressure;2;;;-1;;;Value;;;0</Property>
         <Property Name="ReadOnly">True</Property>
       </Object>
 
+      <Object Type="Vector.CANalyzer.Panels.Design.StaticTextControl, Vector.CANalyzer.Panels.CommonControls, Version=18.0.150.0, Culture=neutral, PublicKeyToken=null" Name="Lbl_ESP" ControlName="Static Text ESP">
+        <Property Name="Name">Lbl_ESP</Property>
+        <Property Name="Size">65, 20</Property>
+        <Property Name="Location">145, 212</Property>
+        <Property Name="Font">Segoe UI, 8pt, style=Bold</Property>
+        <Property Name="Text">ESP Fault:</Property>
+        <Property Name="ForeColor">224, 242, 254</Property>
+        <Property Name="BackColor">Transparent</Property>
+      </Object>
       <Object Type="Vector.CANalyzer.Panels.Design.TextBoxControl, Vector.CANalyzer.Panels.CommonControls, Version=18.0.150.0, Culture=neutral, PublicKeyToken=null" Name="Txt_ESP" ControlName="Txt_ESP">
         <Property Name="Name">Txt_ESP</Property>
-        <Property Name="Size">125, 24</Property>
-        <Property Name="Location">145, 210</Property>
+        <Property Name="Size">58, 24</Property>
+        <Property Name="Location">212, 210</Property>
         <Property Name="Font">Consolas, 9.5pt, style=Bold</Property>
-        <Property Name="DisplayLabel">Left</Property>
-        <Property Name="DescriptionText">ESP Fault:</Property>
-        <Property Name="DescriptionSize">65, 24</Property>
-        <Property Name="DescriptionColor">148, 163, 184</Property>
+        <Property Name="DisplayLabel">None</Property>
         <Property Name="BackColor">15, 23, 42</Property>
         <Property Name="ForeColor">250, 204, 21</Property>
         <Property Name="SymbolConfiguration">8;16;;;;Disp_ESP_Fault;1;;;-1;;;Value;;;0</Property>
@@ -314,11 +355,12 @@
 
       <Object Type="Vector.CANalyzer.Panels.Design.ButtonControl, Vector.CANalyzer.Panels.CommonControls, Version=18.0.150.0, Culture=neutral, PublicKeyToken=null" Name="Btn_BrakePedal" ControlName="Button Brake">
         <Property Name="Name">Btn_BrakePedal</Property>
-        <Property Name="Size">260, 32</Property>
+        <Property Name="Size">260, 34</Property>
         <Property Name="Location">10, 245</Property>
         <Property Name="TabIndex">12</Property>
         <Property Name="Font">Segoe UI, 8.5pt, style=Bold</Property>
         <Property Name="Text">BRAKE PEDAL (Hold / Key B)</Property>
+        <Property Name="UseVisualStyleBackColor">False</Property>
         <Property Name="BackColor">194, 65, 12</Property>
         <Property Name="ForeColor">255, 255, 255</Property>
         <Property Name="SymbolConfiguration">8;16;;;;Sim_BrakePedal;1;;;-1;;;Value;;;0</Property>
@@ -337,60 +379,84 @@
       <Property Name="ForeColor">251, 191, 36</Property>
       <Property Name="BackColor">Transparent</Property>
 
+      <Object Type="Vector.CANalyzer.Panels.Design.StaticTextControl, Vector.CANalyzer.Panels.CommonControls, Version=18.0.150.0, Culture=neutral, PublicKeyToken=null" Name="Lbl_Busload" ControlName="Static Text Busload">
+        <Property Name="Name">Lbl_Busload</Property>
+        <Property Name="Size">80, 20</Property>
+        <Property Name="Location">10, 26</Property>
+        <Property Name="Font">Segoe UI, 8pt, style=Bold</Property>
+        <Property Name="Text">Busload (%):</Property>
+        <Property Name="ForeColor">224, 242, 254</Property>
+        <Property Name="BackColor">Transparent</Property>
+      </Object>
       <Object Type="Vector.CANalyzer.Panels.Design.TextBoxControl, Vector.CANalyzer.Panels.CommonControls, Version=18.0.150.0, Culture=neutral, PublicKeyToken=null" Name="Txt_Busload" ControlName="Txt_Busload">
         <Property Name="Name">Txt_Busload</Property>
-        <Property Name="Size">125, 24</Property>
-        <Property Name="Location">10, 24</Property>
+        <Property Name="Size">43, 24</Property>
+        <Property Name="Location">92, 24</Property>
         <Property Name="Font">Consolas, 9.5pt, style=Bold</Property>
-        <Property Name="DisplayLabel">Left</Property>
-        <Property Name="DescriptionText">Busload (%):</Property>
-        <Property Name="DescriptionSize">75, 24</Property>
-        <Property Name="DescriptionColor">148, 163, 184</Property>
+        <Property Name="DisplayLabel">None</Property>
         <Property Name="BackColor">15, 23, 42</Property>
         <Property Name="ForeColor">56, 189, 248</Property>
         <Property Name="SymbolConfiguration">8;16;;;;Disp_CAN_BusLoad;2;;;-1;;;Value;;;0</Property>
         <Property Name="ReadOnly">True</Property>
       </Object>
 
+      <Object Type="Vector.CANalyzer.Panels.Design.StaticTextControl, Vector.CANalyzer.Panels.CommonControls, Version=18.0.150.0, Culture=neutral, PublicKeyToken=null" Name="Lbl_BusState" ControlName="Static Text BusState">
+        <Property Name="Name">Lbl_BusState</Property>
+        <Property Name="Size">60, 20</Property>
+        <Property Name="Location">145, 26</Property>
+        <Property Name="Font">Segoe UI, 8pt, style=Bold</Property>
+        <Property Name="Text">Bus State:</Property>
+        <Property Name="ForeColor">224, 242, 254</Property>
+        <Property Name="BackColor">Transparent</Property>
+      </Object>
       <Object Type="Vector.CANalyzer.Panels.Design.TextBoxControl, Vector.CANalyzer.Panels.CommonControls, Version=18.0.150.0, Culture=neutral, PublicKeyToken=null" Name="Txt_BusState" ControlName="Txt_BusState">
         <Property Name="Name">Txt_BusState</Property>
-        <Property Name="Size">125, 24</Property>
-        <Property Name="Location">145, 24</Property>
+        <Property Name="Size">62, 24</Property>
+        <Property Name="Location">208, 24</Property>
         <Property Name="Font">Segoe UI, 8pt, style=Bold</Property>
-        <Property Name="DisplayLabel">Left</Property>
-        <Property Name="DescriptionText">Bus State:</Property>
-        <Property Name="DescriptionSize">60, 24</Property>
-        <Property Name="DescriptionColor">148, 163, 184</Property>
+        <Property Name="DisplayLabel">None</Property>
         <Property Name="BackColor">15, 23, 42</Property>
         <Property Name="ForeColor">74, 222, 128</Property>
         <Property Name="SymbolConfiguration">8;16;;;;Disp_CAN_BusState;4;;;-1;;;Value;;;0</Property>
         <Property Name="ReadOnly">True</Property>
       </Object>
 
+      <Object Type="Vector.CANalyzer.Panels.Design.StaticTextControl, Vector.CANalyzer.Panels.CommonControls, Version=18.0.150.0, Culture=neutral, PublicKeyToken=null" Name="Lbl_Errors" ControlName="Static Text Errors">
+        <Property Name="Name">Lbl_Errors</Property>
+        <Property Name="Size">85, 20</Property>
+        <Property Name="Location">10, 58</Property>
+        <Property Name="Font">Segoe UI, 8pt, style=Bold</Property>
+        <Property Name="Text">Error Frames:</Property>
+        <Property Name="ForeColor">224, 242, 254</Property>
+        <Property Name="BackColor">Transparent</Property>
+      </Object>
       <Object Type="Vector.CANalyzer.Panels.Design.TextBoxControl, Vector.CANalyzer.Panels.CommonControls, Version=18.0.150.0, Culture=neutral, PublicKeyToken=null" Name="Txt_Errors" ControlName="Txt_Errors">
         <Property Name="Name">Txt_Errors</Property>
-        <Property Name="Size">125, 24</Property>
-        <Property Name="Location">10, 56</Property>
+        <Property Name="Size">37, 24</Property>
+        <Property Name="Location">98, 56</Property>
         <Property Name="Font">Consolas, 9.5pt, style=Bold</Property>
-        <Property Name="DisplayLabel">Left</Property>
-        <Property Name="DescriptionText">Error Frames:</Property>
-        <Property Name="DescriptionSize">75, 24</Property>
-        <Property Name="DescriptionColor">148, 163, 184</Property>
+        <Property Name="DisplayLabel">None</Property>
         <Property Name="BackColor">15, 23, 42</Property>
         <Property Name="ForeColor">248, 113, 113</Property>
         <Property Name="SymbolConfiguration">8;16;;;;Disp_CAN_ErrorFrames;1;;;-1;;;Value;;;0</Property>
         <Property Name="ReadOnly">True</Property>
       </Object>
 
+      <Object Type="Vector.CANalyzer.Panels.Design.StaticTextControl, Vector.CANalyzer.Panels.CommonControls, Version=18.0.150.0, Culture=neutral, PublicKeyToken=null" Name="Lbl_Preconditions" ControlName="Static Text Precond">
+        <Property Name="Name">Lbl_Preconditions</Property>
+        <Property Name="Size">95, 20</Property>
+        <Property Name="Location">10, 90</Property>
+        <Property Name="Font">Segoe UI, 8pt, style=Bold</Property>
+        <Property Name="Text">Pre-conditions:</Property>
+        <Property Name="ForeColor">224, 242, 254</Property>
+        <Property Name="BackColor">Transparent</Property>
+      </Object>
       <Object Type="Vector.CANalyzer.Panels.Design.TextBoxControl, Vector.CANalyzer.Panels.CommonControls, Version=18.0.150.0, Culture=neutral, PublicKeyToken=null" Name="Txt_Preconditions" ControlName="Txt_Preconditions">
         <Property Name="Name">Txt_Preconditions</Property>
-        <Property Name="Size">260, 24</Property>
-        <Property Name="Location">10, 88</Property>
+        <Property Name="Size">162, 24</Property>
+        <Property Name="Location">108, 88</Property>
         <Property Name="Font">Segoe UI, 8pt, style=Bold</Property>
-        <Property Name="DisplayLabel">Left</Property>
-        <Property Name="DescriptionText">Pre-conditions:</Property>
-        <Property Name="DescriptionSize">90, 24</Property>
-        <Property Name="DescriptionColor">148, 163, 184</Property>
+        <Property Name="DisplayLabel">None</Property>
         <Property Name="BackColor">15, 23, 42</Property>
         <Property Name="ForeColor">74, 222, 128</Property>
         <Property Name="SymbolConfiguration">8;16;;;;RCA_Metric_Preconditions;4;;;-1;;;Value;;;0</Property>
@@ -410,61 +476,85 @@
       <Property Name="ForeColor">192, 132, 252</Property>
       <Property Name="BackColor">Transparent</Property>
 
-      <!-- Health Indicators for 4 Nodes -->
+      <!-- Health Indicators for 4 Nodes with Bright Labels -->
+      <Object Type="Vector.CANalyzer.Panels.Design.StaticTextControl, Vector.CANalyzer.Panels.CommonControls, Version=18.0.150.0, Culture=neutral, PublicKeyToken=null" Name="Lbl_Health_ABS" ControlName="Static Text H_ABS">
+        <Property Name="Name">Lbl_Health_ABS</Property>
+        <Property Name="Size">35, 20</Property>
+        <Property Name="Location">10, 24</Property>
+        <Property Name="Font">Segoe UI, 8pt, style=Bold</Property>
+        <Property Name="Text">ABS:</Property>
+        <Property Name="ForeColor">224, 242, 254</Property>
+        <Property Name="BackColor">Transparent</Property>
+      </Object>
       <Object Type="Vector.CANalyzer.Panels.Design.TextBoxControl, Vector.CANalyzer.Panels.CommonControls, Version=18.0.150.0, Culture=neutral, PublicKeyToken=null" Name="Health_ABS" ControlName="Health_ABS">
         <Property Name="Name">Health_ABS</Property>
-        <Property Name="Size">85, 24</Property>
-        <Property Name="Location">10, 22</Property>
+        <Property Name="Size">45, 24</Property>
+        <Property Name="Location">47, 22</Property>
         <Property Name="Font">Consolas, 9pt, style=Bold</Property>
-        <Property Name="DisplayLabel">Left</Property>
-        <Property Name="DescriptionText">ABS:</Property>
-        <Property Name="DescriptionSize">35, 24</Property>
-        <Property Name="DescriptionColor">148, 163, 184</Property>
+        <Property Name="DisplayLabel">None</Property>
         <Property Name="BackColor">15, 23, 42</Property>
         <Property Name="ForeColor">74, 222, 128</Property>
         <Property Name="SymbolConfiguration">8;16;;;;Node_Health_ABS;1;;;-1;;;Value;;;0</Property>
         <Property Name="ReadOnly">True</Property>
       </Object>
 
+      <Object Type="Vector.CANalyzer.Panels.Design.StaticTextControl, Vector.CANalyzer.Panels.CommonControls, Version=18.0.150.0, Culture=neutral, PublicKeyToken=null" Name="Lbl_Health_ECM" ControlName="Static Text H_ECM">
+        <Property Name="Name">Lbl_Health_ECM</Property>
+        <Property Name="Size">38, 20</Property>
+        <Property Name="Location">105, 24</Property>
+        <Property Name="Font">Segoe UI, 8pt, style=Bold</Property>
+        <Property Name="Text">ECM:</Property>
+        <Property Name="ForeColor">224, 242, 254</Property>
+        <Property Name="BackColor">Transparent</Property>
+      </Object>
       <Object Type="Vector.CANalyzer.Panels.Design.TextBoxControl, Vector.CANalyzer.Panels.CommonControls, Version=18.0.150.0, Culture=neutral, PublicKeyToken=null" Name="Health_ECM" ControlName="Health_ECM">
         <Property Name="Name">Health_ECM</Property>
-        <Property Name="Size">85, 24</Property>
-        <Property Name="Location">105, 22</Property>
+        <Property Name="Size">45, 24</Property>
+        <Property Name="Location">145, 22</Property>
         <Property Name="Font">Consolas, 9pt, style=Bold</Property>
-        <Property Name="DisplayLabel">Left</Property>
-        <Property Name="DescriptionText">ECM:</Property>
-        <Property Name="DescriptionSize">35, 24</Property>
-        <Property Name="DescriptionColor">148, 163, 184</Property>
+        <Property Name="DisplayLabel">None</Property>
         <Property Name="BackColor">15, 23, 42</Property>
         <Property Name="ForeColor">74, 222, 128</Property>
         <Property Name="SymbolConfiguration">8;16;;;;Node_Health_ECM;1;;;-1;;;Value;;;0</Property>
         <Property Name="ReadOnly">True</Property>
       </Object>
 
+      <Object Type="Vector.CANalyzer.Panels.Design.StaticTextControl, Vector.CANalyzer.Panels.CommonControls, Version=18.0.150.0, Culture=neutral, PublicKeyToken=null" Name="Lbl_Health_TCM" ControlName="Static Text H_TCM">
+        <Property Name="Name">Lbl_Health_TCM</Property>
+        <Property Name="Size">38, 20</Property>
+        <Property Name="Location">200, 24</Property>
+        <Property Name="Font">Segoe UI, 8pt, style=Bold</Property>
+        <Property Name="Text">TCM:</Property>
+        <Property Name="ForeColor">224, 242, 254</Property>
+        <Property Name="BackColor">Transparent</Property>
+      </Object>
       <Object Type="Vector.CANalyzer.Panels.Design.TextBoxControl, Vector.CANalyzer.Panels.CommonControls, Version=18.0.150.0, Culture=neutral, PublicKeyToken=null" Name="Health_TCM" ControlName="Health_TCM">
         <Property Name="Name">Health_TCM</Property>
-        <Property Name="Size">85, 24</Property>
-        <Property Name="Location">200, 22</Property>
+        <Property Name="Size">45, 24</Property>
+        <Property Name="Location">240, 22</Property>
         <Property Name="Font">Consolas, 9pt, style=Bold</Property>
-        <Property Name="DisplayLabel">Left</Property>
-        <Property Name="DescriptionText">TCM:</Property>
-        <Property Name="DescriptionSize">35, 24</Property>
-        <Property Name="DescriptionColor">148, 163, 184</Property>
+        <Property Name="DisplayLabel">None</Property>
         <Property Name="BackColor">15, 23, 42</Property>
         <Property Name="ForeColor">74, 222, 128</Property>
         <Property Name="SymbolConfiguration">8;16;;;;Node_Health_TCM;1;;;-1;;;Value;;;0</Property>
         <Property Name="ReadOnly">True</Property>
       </Object>
 
+      <Object Type="Vector.CANalyzer.Panels.Design.StaticTextControl, Vector.CANalyzer.Panels.CommonControls, Version=18.0.150.0, Culture=neutral, PublicKeyToken=null" Name="Lbl_Health_BCM" ControlName="Static Text H_BCM">
+        <Property Name="Name">Lbl_Health_BCM</Property>
+        <Property Name="Size">38, 20</Property>
+        <Property Name="Location">295, 24</Property>
+        <Property Name="Font">Segoe UI, 8pt, style=Bold</Property>
+        <Property Name="Text">BCM:</Property>
+        <Property Name="ForeColor">224, 242, 254</Property>
+        <Property Name="BackColor">Transparent</Property>
+      </Object>
       <Object Type="Vector.CANalyzer.Panels.Design.TextBoxControl, Vector.CANalyzer.Panels.CommonControls, Version=18.0.150.0, Culture=neutral, PublicKeyToken=null" Name="Health_BCM" ControlName="Health_BCM">
         <Property Name="Name">Health_BCM</Property>
-        <Property Name="Size">85, 24</Property>
-        <Property Name="Location">295, 22</Property>
+        <Property Name="Size">45, 24</Property>
+        <Property Name="Location">335, 22</Property>
         <Property Name="Font">Consolas, 9pt, style=Bold</Property>
-        <Property Name="DisplayLabel">Left</Property>
-        <Property Name="DescriptionText">BCM:</Property>
-        <Property Name="DescriptionSize">35, 24</Property>
-        <Property Name="DescriptionColor">148, 163, 184</Property>
+        <Property Name="DisplayLabel">None</Property>
         <Property Name="BackColor">15, 23, 42</Property>
         <Property Name="ForeColor">74, 222, 128</Property>
         <Property Name="SymbolConfiguration">8;16;;;;Node_Health_BCM;1;;;-1;;;Value;;;0</Property>
@@ -472,15 +562,21 @@
       </Object>
 
       <!-- Isolated Root ECU -->
+      <Object Type="Vector.CANalyzer.Panels.Design.StaticTextControl, Vector.CANalyzer.Panels.CommonControls, Version=18.0.150.0, Culture=neutral, PublicKeyToken=null" Name="Lbl_RootECU" ControlName="Static Text RootECU">
+        <Property Name="Name">Lbl_RootECU</Property>
+        <Property Name="Size">120, 20</Property>
+        <Property Name="Location">10, 54</Property>
+        <Property Name="Font">Segoe UI, 8.5pt, style=Bold</Property>
+        <Property Name="Text">Isolated Root ECU:</Property>
+        <Property Name="ForeColor">254, 202, 202</Property>
+        <Property Name="BackColor">Transparent</Property>
+      </Object>
       <Object Type="Vector.CANalyzer.Panels.Design.TextBoxControl, Vector.CANalyzer.Panels.CommonControls, Version=18.0.150.0, Culture=neutral, PublicKeyToken=null" Name="Txt_RootECU" ControlName="Txt_RootECU">
         <Property Name="Name">Txt_RootECU</Property>
-        <Property Name="Size">370, 24</Property>
-        <Property Name="Location">10, 52</Property>
+        <Property Name="Size">248, 24</Property>
+        <Property Name="Location">132, 52</Property>
         <Property Name="Font">Segoe UI, 8.5pt, style=Bold</Property>
-        <Property Name="DisplayLabel">Left</Property>
-        <Property Name="DescriptionText">Isolated Root ECU:</Property>
-        <Property Name="DescriptionSize">125, 24</Property>
-        <Property Name="DescriptionColor">148, 163, 184</Property>
+        <Property Name="DisplayLabel">None</Property>
         <Property Name="BackColor">15, 23, 42</Property>
         <Property Name="ForeColor">248, 113, 113</Property>
         <Property Name="SymbolConfiguration">8;16;;;;RCA_Output_RootECU;4;;;-1;;;Value;;;0</Property>
@@ -488,15 +584,21 @@
       </Object>
 
       <!-- Primary Root DTC -->
+      <Object Type="Vector.CANalyzer.Panels.Design.StaticTextControl, Vector.CANalyzer.Panels.CommonControls, Version=18.0.150.0, Culture=neutral, PublicKeyToken=null" Name="Lbl_RootDTC" ControlName="Static Text RootDTC">
+        <Property Name="Name">Lbl_RootDTC</Property>
+        <Property Name="Size">120, 20</Property>
+        <Property Name="Location">10, 82</Property>
+        <Property Name="Font">Segoe UI, 8.5pt, style=Bold</Property>
+        <Property Name="Text">Primary Root DTC:</Property>
+        <Property Name="ForeColor">254, 202, 202</Property>
+        <Property Name="BackColor">Transparent</Property>
+      </Object>
       <Object Type="Vector.CANalyzer.Panels.Design.TextBoxControl, Vector.CANalyzer.Panels.CommonControls, Version=18.0.150.0, Culture=neutral, PublicKeyToken=null" Name="Txt_RootDTC" ControlName="Txt_RootDTC">
         <Property Name="Name">Txt_RootDTC</Property>
-        <Property Name="Size">370, 24</Property>
-        <Property Name="Location">10, 80</Property>
+        <Property Name="Size">248, 24</Property>
+        <Property Name="Location">132, 80</Property>
         <Property Name="Font">Consolas, 9.5pt, style=Bold</Property>
-        <Property Name="DisplayLabel">Left</Property>
-        <Property Name="DescriptionText">Primary Root DTC:</Property>
-        <Property Name="DescriptionSize">125, 24</Property>
-        <Property Name="DescriptionColor">148, 163, 184</Property>
+        <Property Name="DisplayLabel">None</Property>
         <Property Name="BackColor">15, 23, 42</Property>
         <Property Name="ForeColor">239, 68, 68</Property>
         <Property Name="SymbolConfiguration">8;16;;;;RCA_Output_RootDTC;4;;;-1;;;Value;;;0</Property>
@@ -504,16 +606,22 @@
       </Object>
 
       <!-- Pruned Secondary Symptoms -->
+      <Object Type="Vector.CANalyzer.Panels.Design.StaticTextControl, Vector.CANalyzer.Panels.CommonControls, Version=18.0.150.0, Culture=neutral, PublicKeyToken=null" Name="Lbl_Pruned" ControlName="Static Text Pruned">
+        <Property Name="Name">Lbl_Pruned</Property>
+        <Property Name="Size">120, 20</Property>
+        <Property Name="Location">10, 110</Property>
+        <Property Name="Font">Segoe UI, 8pt, style=Bold</Property>
+        <Property Name="Text">Pruned Symptoms:</Property>
+        <Property Name="ForeColor">148, 163, 184</Property>
+        <Property Name="BackColor">Transparent</Property>
+      </Object>
       <Object Type="Vector.CANalyzer.Panels.Design.TextBoxControl, Vector.CANalyzer.Panels.CommonControls, Version=18.0.150.0, Culture=neutral, PublicKeyToken=null" Name="Txt_Pruned" ControlName="Txt_Pruned">
         <Property Name="Name">Txt_Pruned</Property>
-        <Property Name="Size">370, 42</Property>
-        <Property Name="Location">10, 108</Property>
+        <Property Name="Size">248, 42</Property>
+        <Property Name="Location">132, 108</Property>
         <Property Name="Font">Segoe UI, 8pt</Property>
         <Property Name="Multiline">True</Property>
-        <Property Name="DisplayLabel">Left</Property>
-        <Property Name="DescriptionText">Pruned Symptoms:</Property>
-        <Property Name="DescriptionSize">125, 24</Property>
-        <Property Name="DescriptionColor">148, 163, 184</Property>
+        <Property Name="DisplayLabel">None</Property>
         <Property Name="BackColor">15, 23, 42</Property>
         <Property Name="ForeColor">148, 163, 184</Property>
         <Property Name="SymbolConfiguration">8;16;;;;RCA_Output_PrunedSymptoms;4;;;-1;;;Value;;;0</Property>
@@ -527,7 +635,7 @@
         <Property Name="Location">10, 162</Property>
         <Property Name="Font">Segoe UI, 8pt, style=Bold</Property>
         <Property Name="Text">Isolation Latency (ms):</Property>
-        <Property Name="ForeColor">148, 163, 184</Property>
+        <Property Name="ForeColor">224, 242, 254</Property>
         <Property Name="BackColor">Transparent</Property>
       </Object>
       <Object Type="Vector.CANalyzer.Panels.Design.LCDControl, Vector.CANalyzer.Panels.CommonControls, Version=18.0.150.0, Culture=neutral, PublicKeyToken=null" Name="LCD_Latency" ControlName="LCD_Latency">
@@ -542,60 +650,84 @@
       </Object>
 
       <!-- Benchmark Scorecard -->
+      <Object Type="Vector.CANalyzer.Panels.Design.StaticTextControl, Vector.CANalyzer.Panels.CommonControls, Version=18.0.150.0, Culture=neutral, PublicKeyToken=null" Name="Lbl_RawCount" ControlName="Static Text Raw">
+        <Property Name="Name">Lbl_RawCount</Property>
+        <Property Name="Size">65, 20</Property>
+        <Property Name="Location">10, 202</Property>
+        <Property Name="Font">Segoe UI, 8pt, style=Bold</Property>
+        <Property Name="Text">Raw DTCs:</Property>
+        <Property Name="ForeColor">224, 242, 254</Property>
+        <Property Name="BackColor">Transparent</Property>
+      </Object>
       <Object Type="Vector.CANalyzer.Panels.Design.TextBoxControl, Vector.CANalyzer.Panels.CommonControls, Version=18.0.150.0, Culture=neutral, PublicKeyToken=null" Name="Txt_RawCount" ControlName="Txt_RawCount">
         <Property Name="Name">Txt_RawCount</Property>
-        <Property Name="Size">115, 24</Property>
-        <Property Name="Location">10, 200</Property>
+        <Property Name="Size">45, 24</Property>
+        <Property Name="Location">78, 200</Property>
         <Property Name="Font">Consolas, 9.5pt, style=Bold</Property>
-        <Property Name="DisplayLabel">Left</Property>
-        <Property Name="DescriptionText">Raw DTCs:</Property>
-        <Property Name="DescriptionSize">60, 24</Property>
-        <Property Name="DescriptionColor">148, 163, 184</Property>
+        <Property Name="DisplayLabel">None</Property>
         <Property Name="BackColor">15, 23, 42</Property>
         <Property Name="ForeColor">56, 189, 248</Property>
         <Property Name="SymbolConfiguration">8;16;;;;RCA_Metric_RawDTCCount;1;;;-1;;;Value;;;0</Property>
         <Property Name="ReadOnly">True</Property>
       </Object>
 
+      <Object Type="Vector.CANalyzer.Panels.Design.StaticTextControl, Vector.CANalyzer.Panels.CommonControls, Version=18.0.150.0, Culture=neutral, PublicKeyToken=null" Name="Lbl_PrunedCount" ControlName="Static Text Prn">
+        <Property Name="Name">Lbl_PrunedCount</Property>
+        <Property Name="Size">55, 20</Property>
+        <Property Name="Location">135, 202</Property>
+        <Property Name="Font">Segoe UI, 8pt, style=Bold</Property>
+        <Property Name="Text">Pruned:</Property>
+        <Property Name="ForeColor">224, 242, 254</Property>
+        <Property Name="BackColor">Transparent</Property>
+      </Object>
       <Object Type="Vector.CANalyzer.Panels.Design.TextBoxControl, Vector.CANalyzer.Panels.CommonControls, Version=18.0.150.0, Culture=neutral, PublicKeyToken=null" Name="Txt_PrunedCount" ControlName="Txt_PrunedCount">
         <Property Name="Name">Txt_PrunedCount</Property>
-        <Property Name="Size">115, 24</Property>
-        <Property Name="Location">135, 200</Property>
+        <Property Name="Size">45, 24</Property>
+        <Property Name="Location">192, 200</Property>
         <Property Name="Font">Consolas, 9.5pt, style=Bold</Property>
-        <Property Name="DisplayLabel">Left</Property>
-        <Property Name="DescriptionText">Pruned:</Property>
-        <Property Name="DescriptionSize">50, 24</Property>
-        <Property Name="DescriptionColor">148, 163, 184</Property>
+        <Property Name="DisplayLabel">None</Property>
         <Property Name="BackColor">15, 23, 42</Property>
         <Property Name="ForeColor">56, 189, 248</Property>
         <Property Name="SymbolConfiguration">8;16;;;;RCA_Metric_PrunedCount;1;;;-1;;;Value;;;0</Property>
         <Property Name="ReadOnly">True</Property>
       </Object>
 
+      <Object Type="Vector.CANalyzer.Panels.Design.StaticTextControl, Vector.CANalyzer.Panels.CommonControls, Version=18.0.150.0, Culture=neutral, PublicKeyToken=null" Name="Lbl_PruningRatio" ControlName="Static Text Ratio">
+        <Property Name="Name">Lbl_PruningRatio</Property>
+        <Property Name="Size">68, 20</Property>
+        <Property Name="Location">250, 202</Property>
+        <Property Name="Font">Segoe UI, 8pt, style=Bold</Property>
+        <Property Name="Text">Pruned %:</Property>
+        <Property Name="ForeColor">224, 242, 254</Property>
+        <Property Name="BackColor">Transparent</Property>
+      </Object>
       <Object Type="Vector.CANalyzer.Panels.Design.TextBoxControl, Vector.CANalyzer.Panels.CommonControls, Version=18.0.150.0, Culture=neutral, PublicKeyToken=null" Name="Txt_PruningRatio" ControlName="Txt_PruningRatio">
         <Property Name="Name">Txt_PruningRatio</Property>
-        <Property Name="Size">120, 24</Property>
-        <Property Name="Location">260, 200</Property>
+        <Property Name="Size">60, 24</Property>
+        <Property Name="Location">320, 200</Property>
         <Property Name="Font">Consolas, 9.5pt, style=Bold</Property>
-        <Property Name="DisplayLabel">Left</Property>
-        <Property Name="DescriptionText">Pruned %:</Property>
-        <Property Name="DescriptionSize">55, 24</Property>
-        <Property Name="DescriptionColor">148, 163, 184</Property>
+        <Property Name="DisplayLabel">None</Property>
         <Property Name="BackColor">15, 23, 42</Property>
         <Property Name="ForeColor">56, 189, 248</Property>
         <Property Name="SymbolConfiguration">8;16;;;;RCA_Metric_PruningRatio;2;;;-1;;;Value;;;0</Property>
         <Property Name="ReadOnly">True</Property>
       </Object>
 
+      <Object Type="Vector.CANalyzer.Panels.Design.StaticTextControl, Vector.CANalyzer.Panels.CommonControls, Version=18.0.150.0, Culture=neutral, PublicKeyToken=null" Name="Lbl_ASIL" ControlName="Static Text ASIL">
+        <Property Name="Name">Lbl_ASIL</Property>
+        <Property Name="Size">80, 20</Property>
+        <Property Name="Location">10, 234</Property>
+        <Property Name="Font">Segoe UI, 8.5pt, style=Bold</Property>
+        <Property Name="Text">Safety ASIL:</Property>
+        <Property Name="ForeColor">244, 114, 182</Property>
+        <Property Name="BackColor">Transparent</Property>
+      </Object>
       <Object Type="Vector.CANalyzer.Panels.Design.TextBoxControl, Vector.CANalyzer.Panels.CommonControls, Version=18.0.150.0, Culture=neutral, PublicKeyToken=null" Name="Txt_ASIL" ControlName="Txt_ASIL">
         <Property Name="Name">Txt_ASIL</Property>
-        <Property Name="Size">370, 24</Property>
-        <Property Name="Location">10, 232</Property>
+        <Property Name="Size">285, 24</Property>
+        <Property Name="Location">95, 232</Property>
         <Property Name="Font">Segoe UI, 8.5pt, style=Bold</Property>
-        <Property Name="DisplayLabel">Left</Property>
-        <Property Name="DescriptionText">Safety ASIL:</Property>
-        <Property Name="DescriptionSize">80, 24</Property>
-        <Property Name="DescriptionColor">148, 163, 184</Property>
+        <Property Name="DisplayLabel">None</Property>
         <Property Name="BackColor">15, 23, 42</Property>
         <Property Name="ForeColor">244, 114, 182</Property>
         <Property Name="SymbolConfiguration">8;16;;;;RCA_Metric_ASIL;4;;;-1;;;Value;;;0</Property>
@@ -609,7 +741,7 @@
         <Property Name="Location">10, 268</Property>
         <Property Name="Font">Segoe UI, 8pt, style=Bold</Property>
         <Property Name="Text">ISO 14229 SERVICE 0x19 04 FREEZE FRAME SNAPSHOT</Property>
-        <Property Name="ForeColor">148, 163, 184</Property>
+        <Property Name="ForeColor">224, 242, 254</Property>
         <Property Name="BackColor">Transparent</Property>
       </Object>
 
@@ -619,6 +751,7 @@
         <Property Name="Location">10, 288</Property>
         <Property Name="Font">Consolas, 8.5pt</Property>
         <Property Name="Multiline">True</Property>
+        <Property Name="DisplayLabel">None</Property>
         <Property Name="BackColor">15, 23, 42</Property>
         <Property Name="ForeColor">186, 230, 253</Property>
         <Property Name="SymbolConfiguration">8;16;;;;RCA_FreezeFrame_Text;4;;;-1;;;Value;;;0</Property>
@@ -643,6 +776,7 @@
         <Property Name="Size">900, 40</Property>
         <Property Name="Location">10, 20</Property>
         <Property Name="Multiline">True</Property>
+        <Property Name="DisplayLabel">None</Property>
         <Property Name="Font">Segoe UI, 8.5pt, style=Bold</Property>
         <Property Name="BackColor">15, 23, 42</Property>
         <Property Name="ForeColor">224, 242, 254</Property>
