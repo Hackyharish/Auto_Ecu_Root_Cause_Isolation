@@ -11,7 +11,6 @@
 includes
 {
   #include "Common_UDS.cin"
-  #include "Test_RCA_Automation.cin"
 }
 
 variables
@@ -77,7 +76,6 @@ on start
   write(" Panel: Press 'Reset All Faults' or key '0' to clear all faults.");
   write(" Keys '1'-'6': Trigger Scenarios 1 to 6.");
   write(" Key 'I': Toggle Ignition (OFF/RUN). Key 'V': Toggle Battery Voltage.");
-  write(" Key 'T': Launch Full Automated Regression Test Suite & HTML Report.");
   write("===================================================================");
   g_ScanState = STATE_IDLE;
   setTimer(t_Monitor100ms, 100);
@@ -172,7 +170,7 @@ on key 'b'
   }
 }
 
-on key 'i', 'I'
+void ToggleIgnition()
 {
   if (@sysvar::Sim_IgnitionState >= 2)
   {
@@ -188,7 +186,17 @@ on key 'i', 'I'
   }
 }
 
-on key 'v', 'V'
+on key 'i'
+{
+  ToggleIgnition();
+}
+
+on key 'I'
+{
+  ToggleIgnition();
+}
+
+void ToggleVoltage()
 {
   if (@sysvar::Sim_BatteryVoltage >= 11.0)
   {
@@ -202,6 +210,16 @@ on key 'v', 'V'
     write("\n>>> [POWER STATE] Key V: Battery Voltage restored to 13.8V (Nominal).");
     sysSetVariableString(sysvar::Panel_Scenario_Info, "Battery Nominal: 13.8V restored. Diagnostic operating window nominal.");
   }
+}
+
+on key 'v'
+{
+  ToggleVoltage();
+}
+
+on key 'V'
+{
+  ToggleVoltage();
 }
 
 on sysvar sysvar::Trigger_RCA_Scan

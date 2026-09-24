@@ -23,6 +23,18 @@ variables
   int g_FailCount = 0;
 }
 
+void writeLineFile(dword hFile, char text[])
+{
+  char buf[2048];
+  long len;
+  if (hFile == 0) return;
+  len = snprintf(buf, elCount(buf), "%s\n", text);
+  if (len > 0)
+  {
+    filePutString(buf, len, hFile);
+  }
+}
+
 void LogHtmlHeader()
 {
   writeLineFile(g_ReportFile, "<!DOCTYPE html>");
@@ -93,7 +105,7 @@ on start
   write("[TEST AUTOMATION] Press Key 'T' to launch full automated RCA regression test suite.");
 }
 
-on key 't', 'T'
+void StartAutomationTestSuite()
 {
   write("\n===================================================================");
   write(" [TEST SUITE] Starting Automated Multi-ECU RCA Regression Test Suite...");
@@ -110,6 +122,16 @@ on key 't', 'T'
   g_FailCount = 0;
   g_CurrentTestCase = 1;
   setTimer(t_TestStep, 100);
+}
+
+on key 't'
+{
+  StartAutomationTestSuite();
+}
+
+on key 'T'
+{
+  StartAutomationTestSuite();
 }
 
 on timer t_TestStep
