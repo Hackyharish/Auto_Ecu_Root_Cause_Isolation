@@ -73,18 +73,32 @@ on timer t_TCM_20ms
 
   g_AliveCounter = (g_AliveCounter + 1) & 0x0F;
 
-  // Latch incoming fault trigger pulses
-  if (@sysvar::Fault_Node_Cutoff_TCM == 1)
+  // Diagnostic Enable Criteria & Vehicle Operational State Check
+  if (@sysvar::Sim_IgnitionState < 2)
   {
-    g_Fault_Cutoff_TCM_Active = 1;
+    g_CurrentGear = 3; // D1 / Standstill
+    g_TargetGear = 3;
+    @sysvar::Disp_CurrentGear = 1;
+    g_DegradedMode = 0;
   }
-  if (@sysvar::Fault_ECM_ThrottleSensor == 1)
+  else
   {
-    g_Fault_ECM_Throttle_Active = 1;
-  }
-  if (@sysvar::Fault_Node_Cutoff_ECM == 1)
-  {
-    g_Fault_ECM_Cutoff_Active = 1;
+    // Latch incoming fault trigger pulses ONLY when pre-conditions met
+    if (@sysvar::Sim_BatteryVoltage >= 9.5 && @sysvar::Sim_BatteryVoltage <= 16.0)
+    {
+      if (@sysvar::Fault_Node_Cutoff_TCM == 1)
+      {
+        g_Fault_Cutoff_TCM_Active = 1;
+      }
+      if (@sysvar::Fault_ECM_ThrottleSensor == 1)
+      {
+        g_Fault_ECM_Throttle_Active = 1;
+      }
+      if (@sysvar::Fault_Node_Cutoff_ECM == 1)
+      {
+        g_Fault_ECM_Cutoff_Active = 1;
+      }
+    }
   }
 
   // Authoritative vehicle speed sync from cluster telemetry
@@ -94,52 +108,56 @@ on timer t_TCM_20ms
   }
 
   // Check for ASIL-D High-Severity Safe Stop (Chassis / Powertrain Hazard)
-  if (@sysvar::Fault_ABS_WheelSpeedFL == 1 || @sysvar::Fault_Node_Cutoff_ABS == 1 || g_Fault_ECM_Throttle_Active == 1 || g_Fault_ECM_Cutoff_Active == 1 || @sysvar::Node_Health_ABS == 2)
+  if (@sysvar::Sim_IgnitionState >= 2 && (@sysvar::Fault_ABS_WheelSpeedFL == 1 || @sysvar::Fault_Node_Cutoff_ABS == 1 || g_Fault_ECM_Throttle_Active == 1 || g_Fault_ECM_Cutoff_Active == 1 || @sysvar::Node_Health_ABS == 2))
   {
     isAsilDSafeStop = 1;
   }
 
-  // Cross-Dependency Check 1: ABS Wheel Speed Anomaly (C0035 propagation)
-  if (g_RxSpeedFL < 5.0 && g_RxSpeedFR > 25.0)
+  // Evaluate Cross-Dependencies ONLY when Ignition is ON (KL15) and Battery Voltage is Valid
+  if (@sysvar::Sim_IgnitionState >= 2 && @sysvar::Sim_BatteryVoltage >= 9.5 && @sysvar::Sim_BatteryVoltage <= 16.0)
   {
-    if (g_Symptom_U0415_Active == 0)
+    // Cross-Dependency Check 1: ABS Wheel Speed Anomaly (C0035 propagation)
+    if (g_RxSpeedFL < 5.0 && g_RxSpeedFR > 25.0)
     {
-      g_Symptom_U0415_Active = 1;
-      AddDTC(0xD41581, (DTC_STATUS_TEST_FAILED | DTC_STATUS_CONFIRMED_DTC)); // U0415-81
-      write("[TCM] SECONDARY SYMPTOM DETECTED: U0415-81 (Invalid Data From ABS Module). Entering Degraded Shift Mode.");
+      if (g_Symptom_U0415_Active == 0)
+      {
+        g_Symptom_U0415_Active = 1;
+        AddDTC(0xD41581, (DTC_STATUS_TEST_FAILED | DTC_STATUS_CONFIRMED_DTC)); // U0415-81
+        write("[TCM] SECONDARY SYMPTOM DETECTED: U0415-81 (Invalid Data From ABS Module). Entering Degraded Shift Mode.");
+      }
     }
-  }
 
-  // Cross-Dependency Check 2: ECM Throttle Sensor Failure (P0122 propagation -> U0401-86)
-  if (g_Fault_ECM_Throttle_Active == 1 || @sysvar::Fault_ECM_ThrottleSensor == 1)
-  {
-    if (g_Symptom_U0401_Active == 0)
+    // Cross-Dependency Check 2: ECM Throttle Sensor Failure (P0122 propagation -> U0401-86)
+    if (g_Fault_ECM_Throttle_Active == 1 || @sysvar::Fault_ECM_ThrottleSensor == 1)
     {
-      g_Symptom_U0401_Active = 1;
-      AddDTC(0xD40186, (DTC_STATUS_TEST_FAILED | DTC_STATUS_CONFIRMED_DTC)); // U0401-86
-      write("[TCM] SECONDARY SYMPTOM DETECTED: U0401-86 (Invalid Data From ECM).");
+      if (g_Symptom_U0401_Active == 0)
+      {
+        g_Symptom_U0401_Active = 1;
+        AddDTC(0xD40186, (DTC_STATUS_TEST_FAILED | DTC_STATUS_CONFIRMED_DTC)); // U0401-86
+        write("[TCM] SECONDARY SYMPTOM DETECTED: U0401-86 (Invalid Data From ECM).");
+      }
     }
-  }
 
-  // Cross-Dependency Check 3: ECM Node Loss (Timeout > 250ms)
-  if ((timeNow() - g_LastECMTimestamp) > 250000 && g_LastECMTimestamp > 0)
-  {
-    if (g_Symptom_U0100_Active == 0)
+    // Cross-Dependency Check 3: ECM Node Loss (Timeout > 250ms)
+    if ((timeNow() - g_LastECMTimestamp) > 250000 && g_LastECMTimestamp > 0)
     {
-      g_Symptom_U0100_Active = 1;
-      AddDTC(0xD10000, (DTC_STATUS_TEST_FAILED | DTC_STATUS_CONFIRMED_DTC)); // U0100-00
-      write("[TCM] SECONDARY SYMPTOM DETECTED: U0100-00 (Lost Comm with ECM/PCM).");
+      if (g_Symptom_U0100_Active == 0)
+      {
+        g_Symptom_U0100_Active = 1;
+        AddDTC(0xD10000, (DTC_STATUS_TEST_FAILED | DTC_STATUS_CONFIRMED_DTC)); // U0100-00
+        write("[TCM] SECONDARY SYMPTOM DETECTED: U0100-00 (Lost Comm with ECM/PCM).");
+      }
     }
-  }
 
-  // Cross-Dependency Check 4: ABS Node Loss (Timeout > 250ms or Fault_Node_Cutoff_ABS == 1)
-  if (@sysvar::Fault_Node_Cutoff_ABS == 1 || ((timeNow() - g_LastABSTimestamp) > 250000 && g_LastABSTimestamp > 0))
-  {
-    if (g_Symptom_ABS_Lost_Active == 0)
+    // Cross-Dependency Check 4: ABS Node Loss (Timeout > 250ms or Fault_Node_Cutoff_ABS == 1)
+    if (@sysvar::Fault_Node_Cutoff_ABS == 1 || ((timeNow() - g_LastABSTimestamp) > 250000 && g_LastABSTimestamp > 0))
     {
-      g_Symptom_ABS_Lost_Active = 1;
-      AddDTC(0xD12100, (DTC_STATUS_TEST_FAILED | DTC_STATUS_CONFIRMED_DTC)); // U0121-00
-      write("[TCM] SECONDARY SYMPTOM DETECTED: U0121-00 (Lost Comm with ABS Module).");
+      if (g_Symptom_ABS_Lost_Active == 0)
+      {
+        g_Symptom_ABS_Lost_Active = 1;
+        AddDTC(0xD12100, (DTC_STATUS_TEST_FAILED | DTC_STATUS_CONFIRMED_DTC)); // U0121-00
+        write("[TCM] SECONDARY SYMPTOM DETECTED: U0121-00 (Lost Comm with ABS Module).");
+      }
     }
   }
 

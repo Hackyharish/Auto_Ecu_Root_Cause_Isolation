@@ -16,7 +16,7 @@
     <Object Type="Vector.CANalyzer.Panels.Design.ButtonControl, Vector.CANalyzer.Panels.CommonControls, Version=18.0.150.0, Culture=neutral, PublicKeyToken=null" Name="Btn_Scen1" ControlName="Button 1">
       <Property Name="Name">Btn_Scen1</Property>
       <Property Name="Size">210, 32</Property>
-      <Property Name="Location">15, 40</Property>
+      <Property Name="Location">15, 38</Property>
       <Property Name="TabIndex">1</Property>
       <Property Name="Text">1. WSS FL Sensor Open (ABS)</Property>
       <Property Name="SymbolConfiguration">8;16;;;;Fault_ABS_WheelSpeedFL;1;;;-1;;;Value;;;0</Property>
@@ -25,7 +25,7 @@
     <Object Type="Vector.CANalyzer.Panels.Design.ButtonControl, Vector.CANalyzer.Panels.CommonControls, Version=18.0.150.0, Culture=neutral, PublicKeyToken=null" Name="Btn_Scen2" ControlName="Button 2">
       <Property Name="Name">Btn_Scen2</Property>
       <Property Name="Size">210, 32</Property>
-      <Property Name="Location">15, 80</Property>
+      <Property Name="Location">15, 75</Property>
       <Property Name="TabIndex">2</Property>
       <Property Name="Text">2. Throttle Sensor Low (ECM)</Property>
       <Property Name="SymbolConfiguration">8;16;;;;Fault_ECM_ThrottleSensor;1;;;-1;;;Value;;;0</Property>
@@ -34,7 +34,7 @@
     <Object Type="Vector.CANalyzer.Panels.Design.ButtonControl, Vector.CANalyzer.Panels.CommonControls, Version=18.0.150.0, Culture=neutral, PublicKeyToken=null" Name="Btn_Scen3" ControlName="Button 3">
       <Property Name="Name">Btn_Scen3</Property>
       <Property Name="Size">210, 32</Property>
-      <Property Name="Location">15, 120</Property>
+      <Property Name="Location">15, 112</Property>
       <Property Name="TabIndex">3</Property>
       <Property Name="Text">3. Cutoff ECM Node (BusOff)</Property>
       <Property Name="SymbolConfiguration">8;16;;;;Fault_Node_Cutoff_ECM;1;;;-1;;;Value;;;0</Property>
@@ -43,7 +43,7 @@
     <Object Type="Vector.CANalyzer.Panels.Design.ButtonControl, Vector.CANalyzer.Panels.CommonControls, Version=18.0.150.0, Culture=neutral, PublicKeyToken=null" Name="Btn_Scen4" ControlName="Button 4">
       <Property Name="Name">Btn_Scen4</Property>
       <Property Name="Size">210, 32</Property>
-      <Property Name="Location">15, 160</Property>
+      <Property Name="Location">15, 149</Property>
       <Property Name="TabIndex">4</Property>
       <Property Name="Text">4. Coolant Overheat (ECM)</Property>
       <Property Name="SymbolConfiguration">8;16;;;;Fault_ECM_CoolantTemp;1;;;-1;;;Value;;;0</Property>
@@ -52,7 +52,7 @@
     <Object Type="Vector.CANalyzer.Panels.Design.ButtonControl, Vector.CANalyzer.Panels.CommonControls, Version=18.0.150.0, Culture=neutral, PublicKeyToken=null" Name="Btn_Scen5" ControlName="Button 5">
       <Property Name="Name">Btn_Scen5</Property>
       <Property Name="Size">210, 32</Property>
-      <Property Name="Location">15, 200</Property>
+      <Property Name="Location">15, 186</Property>
       <Property Name="TabIndex">5</Property>
       <Property Name="Text">5. Brake Switch Stuck (BCM)</Property>
       <Property Name="SymbolConfiguration">8;16;;;;Fault_BCM_BrakeSwitch;1;;;-1;;;Value;;;0</Property>
@@ -61,7 +61,7 @@
     <Object Type="Vector.CANalyzer.Panels.Design.ButtonControl, Vector.CANalyzer.Panels.CommonControls, Version=18.0.150.0, Culture=neutral, PublicKeyToken=null" Name="Btn_Scen6" ControlName="Button 6">
       <Property Name="Name">Btn_Scen6</Property>
       <Property Name="Size">210, 32</Property>
-      <Property Name="Location">15, 240</Property>
+      <Property Name="Location">15, 223</Property>
       <Property Name="TabIndex">6</Property>
       <Property Name="Text">6. Cutoff ABS Node (BusOff)</Property>
       <Property Name="SymbolConfiguration">8;16;;;;Fault_Node_Cutoff_ABS;1;;;-1;;;Value;;;0</Property>
@@ -69,8 +69,8 @@
 
     <Object Type="Vector.CANalyzer.Panels.Design.ButtonControl, Vector.CANalyzer.Panels.CommonControls, Version=18.0.150.0, Culture=neutral, PublicKeyToken=null" Name="Btn_ResetAll" ControlName="Button 7">
       <Property Name="Name">Btn_ResetAll</Property>
-      <Property Name="Size">210, 36</Property>
-      <Property Name="Location">15, 290</Property>
+      <Property Name="Size">210, 34</Property>
+      <Property Name="Location">15, 265</Property>
       <Property Name="TabIndex">7</Property>
       <Property Name="Font">Microsoft Sans Serif, 9pt, style=Bold</Property>
       <Property Name="Text">RESET ALL FAULTS (Key 0)</Property>
@@ -79,11 +79,43 @@
 
     <Object Type="Vector.CANalyzer.Panels.Design.ButtonControl, Vector.CANalyzer.Panels.CommonControls, Version=18.0.150.0, Culture=neutral, PublicKeyToken=null" Name="Btn_TriggerRCA" ControlName="Button 8">
       <Property Name="Name">Btn_TriggerRCA</Property>
-      <Property Name="Size">210, 42</Property>
-      <Property Name="Location">15, 340</Property>
+      <Property Name="Size">210, 38</Property>
+      <Property Name="Location">15, 305</Property>
       <Property Name="TabIndex">8</Property>
       <Property Name="Font">Microsoft Sans Serif, 9.75pt, style=Bold</Property>
       <Property Name="Text">TRIGGER RCA SCAN (Key S)</Property>
+      <Property Name="SymbolConfiguration">8;16;;;;Trigger_RCA_Scan;1;;;-1;;;Value;;;0</Property>
+    </Object>
+
+    <!-- Pre-conditions: Ignition & Battery Controls -->
+    <Object Type="Vector.CANalyzer.Panels.Design.ButtonControl, Vector.CANalyzer.Panels.CommonControls, Version=18.0.150.0, Culture=neutral, PublicKeyToken=null" Name="Btn_Ignition" ControlName="Button Ignition">
+      <Property Name="Name">Btn_Ignition</Property>
+      <Property Name="Size">210, 32</Property>
+      <Property Name="Location">15, 350</Property>
+      <Property Name="TabIndex">9</Property>
+      <Property Name="Font">Microsoft Sans Serif, 8.25pt, style=Bold</Property>
+      <Property Name="Text">IGNITION (ON/OFF - Key I)</Property>
+      <Property Name="SymbolConfiguration">8;16;;;;Sim_IgnitionState;1;;;-1;;;Value;;;0</Property>
+    </Object>
+
+    <Object Type="Vector.CANalyzer.Panels.Design.TextBoxControl, Vector.CANalyzer.Panels.CommonControls, Version=18.0.150.0, Culture=neutral, PublicKeyToken=null" Name="Txt_BattVolt" ControlName="Txt_BattVolt">
+      <Property Name="Name">Txt_BattVolt</Property>
+      <Property Name="Size">210, 24</Property>
+      <Property Name="Location">15, 390</Property>
+      <Property Name="DisplayLabel">Left</Property>
+      <Property Name="DescriptionText">Battery (V):</Property>
+      <Property Name="DescriptionSize">75, 24</Property>
+      <Property Name="SymbolConfiguration">8;16;;;;Sim_BatteryVoltage;2;;;-1;;;Value;;;0</Property>
+      <Property Name="ReadOnly">True</Property>
+    </Object>
+
+    <Object Type="Vector.CANalyzer.Panels.Design.ButtonControl, Vector.CANalyzer.Panels.CommonControls, Version=18.0.150.0, Culture=neutral, PublicKeyToken=null" Name="Btn_AutoTest" ControlName="Button AutoTest">
+      <Property Name="Name">Btn_AutoTest</Property>
+      <Property Name="Size">210, 36</Property>
+      <Property Name="Location">15, 425</Property>
+      <Property Name="TabIndex">10</Property>
+      <Property Name="Font">Microsoft Sans Serif, 8.5pt, style=Bold</Property>
+      <Property Name="Text">RUN AUTO TEST SUITE (Key T)</Property>
       <Property Name="SymbolConfiguration">8;16;;;;Trigger_RCA_Scan;1;;;-1;;;Value;;;0</Property>
     </Object>
 
@@ -108,10 +140,10 @@
     </Object>
     <Object Type="Vector.CANalyzer.Panels.Design.TrackBarControl, Vector.CANalyzer.Panels.CommonControls, Version=18.0.150.0, Culture=neutral, PublicKeyToken=null" Name="TrackBar_Pedal" ControlName="Track Bar 1">
       <Property Name="Name">TrackBar_Pedal</Property>
-      <Property Name="Size">260, 40</Property>
+      <Property Name="Size">260, 36</Property>
       <Property Name="Location">255, 50</Property>
       <Property Name="DisplayMinMax">True</Property>
-      <Property Name="TabIndex">9</Property>
+      <Property Name="TabIndex">11</Property>
       <Property Name="MaximumDouble">100</Property>
       <Property Name="MaximumSize">100000, 45</Property>
       <Property Name="Maximum">100</Property>
@@ -121,8 +153,8 @@
     <!-- Speedometer Display -->
     <Object Type="Vector.CANalyzer.Panels.Design.LCDControl, Vector.CANalyzer.Panels.CommonControls, Version=18.0.150.0, Culture=neutral, PublicKeyToken=null" Name="LCD_Speed" ControlName="LCD_Speed">
       <Property Name="Name">LCD_Speed</Property>
-      <Property Name="Size">120, 36</Property>
-      <Property Name="Location">255, 110</Property>
+      <Property Name="Size">120, 34</Property>
+      <Property Name="Location">255, 105</Property>
       <Property Name="NumberIntDigits">3</Property>
       <Property Name="DecimalPlaces">1</Property>
       <Property Name="SymbolConfiguration">8;16;;;;Disp_VehicleSpeed;2;;;-1;;;Value;;;0</Property>
@@ -130,7 +162,7 @@
     <Object Type="Vector.CANalyzer.Panels.Design.StaticTextControl, Vector.CANalyzer.Panels.CommonControls, Version=18.0.150.0, Culture=neutral, PublicKeyToken=null" Name="Lbl_Speed" ControlName="Static Text Speed">
       <Property Name="Name">Lbl_Speed</Property>
       <Property Name="Size">120, 16</Property>
-      <Property Name="Location">255, 92</Property>
+      <Property Name="Location">255, 88</Property>
       <Property Name="Font">Microsoft Sans Serif, 8.25pt, style=Bold</Property>
       <Property Name="Text">Speed (km/h):</Property>
     </Object>
@@ -138,8 +170,8 @@
     <!-- Tachometer Display -->
     <Object Type="Vector.CANalyzer.Panels.Design.LCDControl, Vector.CANalyzer.Panels.CommonControls, Version=18.0.150.0, Culture=neutral, PublicKeyToken=null" Name="LCD_RPM" ControlName="LCD_RPM">
       <Property Name="Name">LCD_RPM</Property>
-      <Property Name="Size">120, 36</Property>
-      <Property Name="Location">395, 110</Property>
+      <Property Name="Size">120, 34</Property>
+      <Property Name="Location">395, 105</Property>
       <Property Name="NumberIntDigits">4</Property>
       <Property Name="DecimalPlaces">0</Property>
       <Property Name="SymbolConfiguration">8;16;;;;Disp_EngineRPM;2;;;-1;;;Value;;;0</Property>
@@ -147,7 +179,7 @@
     <Object Type="Vector.CANalyzer.Panels.Design.StaticTextControl, Vector.CANalyzer.Panels.CommonControls, Version=18.0.150.0, Culture=neutral, PublicKeyToken=null" Name="Lbl_RPM" ControlName="Static Text RPM">
       <Property Name="Name">Lbl_RPM</Property>
       <Property Name="Size">120, 16</Property>
-      <Property Name="Location">395, 92</Property>
+      <Property Name="Location">395, 88</Property>
       <Property Name="Font">Microsoft Sans Serif, 8.25pt, style=Bold</Property>
       <Property Name="Text">Engine (RPM):</Property>
     </Object>
@@ -155,8 +187,8 @@
     <!-- Coolant Temperature Progress Bar -->
     <Object Type="Vector.CANalyzer.Panels.Design.ProgressBarControl, Vector.CANalyzer.Panels.CommonControls, Version=18.0.150.0, Culture=neutral, PublicKeyToken=null" Name="Prog_Coolant" ControlName="Prog_Coolant">
       <Property Name="Name">Prog_Coolant</Property>
-      <Property Name="Size">260, 26</Property>
-      <Property Name="Location">255, 180</Property>
+      <Property Name="Size">260, 24</Property>
+      <Property Name="Location">255, 165</Property>
       <Property Name="Maximum">150</Property>
       <Property Name="Minimum">0</Property>
       <Property Name="SymbolConfiguration">8;16;;;;Disp_CoolantTemp;2;;;-1;;;Value;;;0</Property>
@@ -164,44 +196,28 @@
     <Object Type="Vector.CANalyzer.Panels.Design.StaticTextControl, Vector.CANalyzer.Panels.CommonControls, Version=18.0.150.0, Culture=neutral, PublicKeyToken=null" Name="Lbl_Coolant" ControlName="Static Text Coolant">
       <Property Name="Name">Lbl_Coolant</Property>
       <Property Name="Size">260, 16</Property>
-      <Property Name="Location">255, 160</Property>
+      <Property Name="Location">255, 148</Property>
       <Property Name="Font">Microsoft Sans Serif, 8.25pt, style=Bold</Property>
       <Property Name="Text">Coolant Temp (0 - 150 °C | Red > 120°C):</Property>
     </Object>
 
-    <!-- Transmission Gear Display -->
-    <Object Type="Vector.CANalyzer.Panels.Design.TextBoxControl, Vector.CANalyzer.Panels.CommonControls, Version=18.0.150.0, Culture=neutral, PublicKeyToken=null" Name="Txt_Gear" ControlName="Txt_Gear">
-      <Property Name="Name">Txt_Gear</Property>
+    <!-- Transmission PRNDL & Warning Tell-tales -->
+    <Object Type="Vector.CANalyzer.Panels.Design.TextBoxControl, Vector.CANalyzer.Panels.CommonControls, Version=18.0.150.0, Culture=neutral, PublicKeyToken=null" Name="Txt_PRNDL" ControlName="Txt_PRNDL">
+      <Property Name="Name">Txt_PRNDL</Property>
       <Property Name="Size">120, 24</Property>
-      <Property Name="Location">255, 235</Property>
-      <Property Name="AlarmUpperTextColor">WindowText</Property>
-      <Property Name="ValueDecimalPlaces">0</Property>
-      <Property Name="AlarmLowerBkgColor">Salmon</Property>
-      <Property Name="TextBackColor">240, 240, 240</Property>
-      <Property Name="ValueDisplay">Decimal</Property>
-      <Property Name="AlarmUpperBkgColor">IndianRed</Property>
-      <Property Name="AlarmLowerTextColor">WindowText</Property>
-      <Property Name="AlarmGeneralSettings">1;0;0;100</Property>
+      <Property Name="Location">255, 205</Property>
+      <Property Name="Font">Microsoft Sans Serif, 9pt, style=Bold</Property>
       <Property Name="DisplayLabel">Left</Property>
-      <Property Name="DescriptionText">Gear:</Property>
-      <Property Name="DescriptionSize">45, 24</Property>
-      <Property Name="SymbolConfiguration">8;16;;;;Disp_CurrentGear;1;;;-1;;;Value;;;0</Property>
+      <Property Name="DescriptionText">PRNDL:</Property>
+      <Property Name="DescriptionSize">50, 24</Property>
+      <Property Name="SymbolConfiguration">8;16;;;;Disp_PRNDL_State;4;;;-1;;;Value;;;0</Property>
       <Property Name="ReadOnly">True</Property>
     </Object>
 
-    <!-- Warning Tell-tales -->
     <Object Type="Vector.CANalyzer.Panels.Design.TextBoxControl, Vector.CANalyzer.Panels.CommonControls, Version=18.0.150.0, Culture=neutral, PublicKeyToken=null" Name="Txt_MIL" ControlName="Txt_MIL">
       <Property Name="Name">Txt_MIL</Property>
       <Property Name="Size">130, 24</Property>
-      <Property Name="Location">385, 235</Property>
-      <Property Name="AlarmUpperTextColor">WindowText</Property>
-      <Property Name="ValueDecimalPlaces">0</Property>
-      <Property Name="AlarmLowerBkgColor">Salmon</Property>
-      <Property Name="TextBackColor">240, 240, 240</Property>
-      <Property Name="ValueDisplay">Decimal</Property>
-      <Property Name="AlarmUpperBkgColor">IndianRed</Property>
-      <Property Name="AlarmLowerTextColor">WindowText</Property>
-      <Property Name="AlarmGeneralSettings">1;0;0;100</Property>
+      <Property Name="Location">385, 205</Property>
       <Property Name="DisplayLabel">Left</Property>
       <Property Name="DescriptionText">MIL Lamp:</Property>
       <Property Name="DescriptionSize">65, 24</Property>
@@ -209,38 +225,10 @@
       <Property Name="ReadOnly">True</Property>
     </Object>
 
-    <Object Type="Vector.CANalyzer.Panels.Design.TextBoxControl, Vector.CANalyzer.Panels.CommonControls, Version=18.0.150.0, Culture=neutral, PublicKeyToken=null" Name="Txt_ESP" ControlName="Txt_ESP">
-      <Property Name="Name">Txt_ESP</Property>
-      <Property Name="Size">130, 24</Property>
-      <Property Name="Location">385, 275</Property>
-      <Property Name="AlarmUpperTextColor">WindowText</Property>
-      <Property Name="ValueDecimalPlaces">0</Property>
-      <Property Name="AlarmLowerBkgColor">Salmon</Property>
-      <Property Name="TextBackColor">240, 240, 240</Property>
-      <Property Name="ValueDisplay">Decimal</Property>
-      <Property Name="AlarmUpperBkgColor">IndianRed</Property>
-      <Property Name="AlarmLowerTextColor">WindowText</Property>
-      <Property Name="AlarmGeneralSettings">1;0;0;100</Property>
-      <Property Name="DisplayLabel">Left</Property>
-      <Property Name="DescriptionText">ESP Fault:</Property>
-      <Property Name="DescriptionSize">65, 24</Property>
-      <Property Name="SymbolConfiguration">8;16;;;;Disp_ESP_Fault;1;;;-1;;;Value;;;0</Property>
-      <Property Name="ReadOnly">True</Property>
-    </Object>
-
-    <!-- Brake Pressure Telemetry Display -->
     <Object Type="Vector.CANalyzer.Panels.Design.TextBoxControl, Vector.CANalyzer.Panels.CommonControls, Version=18.0.150.0, Culture=neutral, PublicKeyToken=null" Name="Txt_BrakePress" ControlName="Txt_BrakePress">
       <Property Name="Name">Txt_BrakePress</Property>
       <Property Name="Size">120, 24</Property>
-      <Property Name="Location">255, 275</Property>
-      <Property Name="AlarmUpperTextColor">WindowText</Property>
-      <Property Name="ValueDecimalPlaces">1</Property>
-      <Property Name="AlarmLowerBkgColor">Salmon</Property>
-      <Property Name="TextBackColor">240, 240, 240</Property>
-      <Property Name="ValueDisplay">Decimal</Property>
-      <Property Name="AlarmUpperBkgColor">IndianRed</Property>
-      <Property Name="AlarmLowerTextColor">WindowText</Property>
-      <Property Name="AlarmGeneralSettings">1;0;0;100</Property>
+      <Property Name="Location">255, 240</Property>
       <Property Name="DisplayLabel">Left</Property>
       <Property Name="DescriptionText">Brake (bar):</Property>
       <Property Name="DescriptionSize">65, 24</Property>
@@ -248,15 +236,69 @@
       <Property Name="ReadOnly">True</Property>
     </Object>
 
+    <Object Type="Vector.CANalyzer.Panels.Design.TextBoxControl, Vector.CANalyzer.Panels.CommonControls, Version=18.0.150.0, Culture=neutral, PublicKeyToken=null" Name="Txt_ESP" ControlName="Txt_ESP">
+      <Property Name="Name">Txt_ESP</Property>
+      <Property Name="Size">130, 24</Property>
+      <Property Name="Location">385, 240</Property>
+      <Property Name="DisplayLabel">Left</Property>
+      <Property Name="DescriptionText">ESP Fault:</Property>
+      <Property Name="DescriptionSize">65, 24</Property>
+      <Property Name="SymbolConfiguration">8;16;;;;Disp_ESP_Fault;1;;;-1;;;Value;;;0</Property>
+      <Property Name="ReadOnly">True</Property>
+    </Object>
+
     <!-- Brake Pedal Control -->
     <Object Type="Vector.CANalyzer.Panels.Design.ButtonControl, Vector.CANalyzer.Panels.CommonControls, Version=18.0.150.0, Culture=neutral, PublicKeyToken=null" Name="Btn_BrakePedal" ControlName="Button Brake">
       <Property Name="Name">Btn_BrakePedal</Property>
-      <Property Name="Size">260, 36</Property>
-      <Property Name="Location">255, 315</Property>
-      <Property Name="TabIndex">10</Property>
-      <Property Name="Font">Microsoft Sans Serif, 9pt, style=Bold</Property>
+      <Property Name="Size">260, 32</Property>
+      <Property Name="Location">255, 275</Property>
+      <Property Name="TabIndex">12</Property>
+      <Property Name="Font">Microsoft Sans Serif, 8.5pt, style=Bold</Property>
       <Property Name="Text">BRAKE PEDAL (Hold / Key B)</Property>
       <Property Name="SymbolConfiguration">8;16;;;;Sim_BrakePedal;1;;;-1;;;Value;;;0</Property>
+    </Object>
+
+    <!-- CAN Physical Layer & Bus Health Header -->
+    <Object Type="Vector.CANalyzer.Panels.Design.StaticTextControl, Vector.CANalyzer.Panels.CommonControls, Version=18.0.150.0, Culture=neutral, PublicKeyToken=null" Name="Lbl_BusHealth" ControlName="Static Text Bus">
+      <Property Name="Name">Lbl_BusHealth</Property>
+      <Property Name="Size">260, 18</Property>
+      <Property Name="Location">255, 320</Property>
+      <Property Name="Font">Microsoft Sans Serif, 9pt, style=Bold</Property>
+      <Property Name="Text">CAN BUS UTILIZATION &amp; HEALTH</Property>
+    </Object>
+
+    <Object Type="Vector.CANalyzer.Panels.Design.TextBoxControl, Vector.CANalyzer.Panels.CommonControls, Version=18.0.150.0, Culture=neutral, PublicKeyToken=null" Name="Txt_Busload" ControlName="Txt_Busload">
+      <Property Name="Name">Txt_Busload</Property>
+      <Property Name="Size">120, 24</Property>
+      <Property Name="Location">255, 345</Property>
+      <Property Name="DisplayLabel">Left</Property>
+      <Property Name="DescriptionText">Busload (%):</Property>
+      <Property Name="DescriptionSize">70, 24</Property>
+      <Property Name="SymbolConfiguration">8;16;;;;Disp_CAN_BusLoad;2;;;-1;;;Value;;;0</Property>
+      <Property Name="ReadOnly">True</Property>
+    </Object>
+
+    <Object Type="Vector.CANalyzer.Panels.Design.TextBoxControl, Vector.CANalyzer.Panels.CommonControls, Version=18.0.150.0, Culture=neutral, PublicKeyToken=null" Name="Txt_BusState" ControlName="Txt_BusState">
+      <Property Name="Name">Txt_BusState</Property>
+      <Property Name="Size">130, 24</Property>
+      <Property Name="Location">385, 345</Property>
+      <Property Name="DisplayLabel">Left</Property>
+      <Property Name="DescriptionText">Bus State:</Property>
+      <Property Name="DescriptionSize">60, 24</Property>
+      <Property Name="SymbolConfiguration">8;16;;;;Disp_CAN_BusState;4;;;-1;;;Value;;;0</Property>
+      <Property Name="ReadOnly">True</Property>
+    </Object>
+
+    <Object Type="Vector.CANalyzer.Panels.Design.TextBoxControl, Vector.CANalyzer.Panels.CommonControls, Version=18.0.150.0, Culture=neutral, PublicKeyToken=null" Name="Txt_Preconditions" ControlName="Txt_Preconditions">
+      <Property Name="Name">Txt_Preconditions</Property>
+      <Property Name="Size">260, 24</Property>
+      <Property Name="Location">255, 385</Property>
+      <Property Name="Font">Microsoft Sans Serif, 8pt, style=Bold</Property>
+      <Property Name="DisplayLabel">Left</Property>
+      <Property Name="DescriptionText">Pre-conditions:</Property>
+      <Property Name="DescriptionSize">85, 24</Property>
+      <Property Name="SymbolConfiguration">8;16;;;;RCA_Metric_Preconditions;4;;;-1;;;Value;;;0</Property>
+      <Property Name="ReadOnly">True</Property>
     </Object>
 
     <!-- =================================================================== -->
@@ -274,7 +316,7 @@
     <Object Type="Vector.CANalyzer.Panels.Design.TextBoxControl, Vector.CANalyzer.Panels.CommonControls, Version=18.0.150.0, Culture=neutral, PublicKeyToken=null" Name="Health_ABS" ControlName="Health_ABS">
       <Property Name="Name">Health_ABS</Property>
       <Property Name="Size">75, 24</Property>
-      <Property Name="Location">540, 42</Property>
+      <Property Name="Location">540, 36</Property>
       <Property Name="DisplayLabel">Left</Property>
       <Property Name="DescriptionText">ABS:</Property>
       <Property Name="DescriptionSize">35, 24</Property>
@@ -285,7 +327,7 @@
     <Object Type="Vector.CANalyzer.Panels.Design.TextBoxControl, Vector.CANalyzer.Panels.CommonControls, Version=18.0.150.0, Culture=neutral, PublicKeyToken=null" Name="Health_ECM" ControlName="Health_ECM">
       <Property Name="Name">Health_ECM</Property>
       <Property Name="Size">75, 24</Property>
-      <Property Name="Location">630, 42</Property>
+      <Property Name="Location">630, 36</Property>
       <Property Name="DisplayLabel">Left</Property>
       <Property Name="DescriptionText">ECM:</Property>
       <Property Name="DescriptionSize">35, 24</Property>
@@ -296,7 +338,7 @@
     <Object Type="Vector.CANalyzer.Panels.Design.TextBoxControl, Vector.CANalyzer.Panels.CommonControls, Version=18.0.150.0, Culture=neutral, PublicKeyToken=null" Name="Health_TCM" ControlName="Health_TCM">
       <Property Name="Name">Health_TCM</Property>
       <Property Name="Size">75, 24</Property>
-      <Property Name="Location">720, 42</Property>
+      <Property Name="Location">720, 36</Property>
       <Property Name="DisplayLabel">Left</Property>
       <Property Name="DescriptionText">TCM:</Property>
       <Property Name="DescriptionSize">35, 24</Property>
@@ -307,7 +349,7 @@
     <Object Type="Vector.CANalyzer.Panels.Design.TextBoxControl, Vector.CANalyzer.Panels.CommonControls, Version=18.0.150.0, Culture=neutral, PublicKeyToken=null" Name="Health_BCM" ControlName="Health_BCM">
       <Property Name="Name">Health_BCM</Property>
       <Property Name="Size">75, 24</Property>
-      <Property Name="Location">810, 42</Property>
+      <Property Name="Location">810, 36</Property>
       <Property Name="DisplayLabel">Left</Property>
       <Property Name="DescriptionText">BCM:</Property>
       <Property Name="DescriptionSize">35, 24</Property>
@@ -319,7 +361,7 @@
     <Object Type="Vector.CANalyzer.Panels.Design.StaticTextControl, Vector.CANalyzer.Panels.CommonControls, Version=18.0.150.0, Culture=neutral, PublicKeyToken=null" Name="Lbl_Section4" ControlName="Static Text 4">
       <Property Name="Name">Lbl_Section4</Property>
       <Property Name="Size">350, 20</Property>
-      <Property Name="Location">540, 90</Property>
+      <Property Name="Location">540, 72</Property>
       <Property Name="Font">Microsoft Sans Serif, 9.75pt, style=Bold</Property>
       <Property Name="Text">AUTOMATED ROOT CAUSE ISOLATION RESULTS</Property>
     </Object>
@@ -327,13 +369,13 @@
     <!-- Isolated Root ECU -->
     <Object Type="Vector.CANalyzer.Panels.Design.TextBoxControl, Vector.CANalyzer.Panels.CommonControls, Version=18.0.150.0, Culture=neutral, PublicKeyToken=null" Name="Txt_RootECU" ControlName="Txt_RootECU">
       <Property Name="Name">Txt_RootECU</Property>
-      <Property Name="Size">360, 26</Property>
-      <Property Name="Location">540, 120</Property>
+      <Property Name="Size">350, 24</Property>
+      <Property Name="Location">540, 96</Property>
       <Property Name="Font">Microsoft Sans Serif, 9pt, style=Bold</Property>
       <Property Name="TextBackColor">240, 245, 255</Property>
       <Property Name="DisplayLabel">Left</Property>
       <Property Name="DescriptionText">Isolated Root ECU:</Property>
-      <Property Name="DescriptionSize">130, 26</Property>
+      <Property Name="DescriptionSize">125, 24</Property>
       <Property Name="SymbolConfiguration">8;16;;;;RCA_Output_RootECU;4;;;-1;;;Value;;;0</Property>
       <Property Name="ReadOnly">True</Property>
     </Object>
@@ -341,13 +383,13 @@
     <!-- Primary Root DTC -->
     <Object Type="Vector.CANalyzer.Panels.Design.TextBoxControl, Vector.CANalyzer.Panels.CommonControls, Version=18.0.150.0, Culture=neutral, PublicKeyToken=null" Name="Txt_RootDTC" ControlName="Txt_RootDTC">
       <Property Name="Name">Txt_RootDTC</Property>
-      <Property Name="Size">360, 26</Property>
-      <Property Name="Location">540, 160</Property>
+      <Property Name="Size">350, 24</Property>
+      <Property Name="Location">540, 128</Property>
       <Property Name="Font">Microsoft Sans Serif, 9pt, style=Bold</Property>
       <Property Name="TextBackColor">255, 240, 240</Property>
       <Property Name="DisplayLabel">Left</Property>
       <Property Name="DescriptionText">Primary Root DTC:</Property>
-      <Property Name="DescriptionSize">130, 26</Property>
+      <Property Name="DescriptionSize">125, 24</Property>
       <Property Name="SymbolConfiguration">8;16;;;;RCA_Output_RootDTC;4;;;-1;;;Value;;;0</Property>
       <Property Name="ReadOnly">True</Property>
     </Object>
@@ -355,13 +397,13 @@
     <!-- Pruned Secondary Symptoms -->
     <Object Type="Vector.CANalyzer.Panels.Design.TextBoxControl, Vector.CANalyzer.Panels.CommonControls, Version=18.0.150.0, Culture=neutral, PublicKeyToken=null" Name="Txt_Pruned" ControlName="Txt_Pruned">
       <Property Name="Name">Txt_Pruned</Property>
-      <Property Name="Size">360, 48</Property>
-      <Property Name="Location">540, 200</Property>
+      <Property Name="Size">350, 42</Property>
+      <Property Name="Location">540, 160</Property>
       <Property Name="TextBackColor">245, 245, 245</Property>
       <Property Name="Multiline">True</Property>
       <Property Name="DisplayLabel">Left</Property>
       <Property Name="DescriptionText">Pruned Symptoms:</Property>
-      <Property Name="DescriptionSize">130, 26</Property>
+      <Property Name="DescriptionSize">125, 24</Property>
       <Property Name="SymbolConfiguration">8;16;;;;RCA_Output_PrunedSymptoms;4;;;-1;;;Value;;;0</Property>
       <Property Name="ReadOnly">True</Property>
     </Object>
@@ -369,22 +411,109 @@
     <!-- Algorithm Latency Display -->
     <Object Type="Vector.CANalyzer.Panels.Design.LCDControl, Vector.CANalyzer.Panels.CommonControls, Version=18.0.150.0, Culture=neutral, PublicKeyToken=null" Name="LCD_Latency" ControlName="LCD_Latency">
       <Property Name="Name">LCD_Latency</Property>
-      <Property Name="Size">140, 40</Property>
-      <Property Name="Location">680, 270</Property>
+      <Property Name="Size">120, 32</Property>
+      <Property Name="Location">690, 210</Property>
       <Property Name="NumberIntDigits">3</Property>
       <Property Name="DecimalPlaces">2</Property>
       <Property Name="SymbolConfiguration">8;16;;;;RCA_Result_Latency;2;;;-1;;;Value;;;0</Property>
     </Object>
     <Object Type="Vector.CANalyzer.Panels.Design.StaticTextControl, Vector.CANalyzer.Panels.CommonControls, Version=18.0.150.0, Culture=neutral, PublicKeyToken=null" Name="Lbl_Latency" ControlName="Static Text Latency">
       <Property Name="Name">Lbl_Latency</Property>
-      <Property Name="Size">130, 20</Property>
-      <Property Name="Location">540, 280</Property>
+      <Property Name="Size">140, 20</Property>
+      <Property Name="Location">540, 218</Property>
       <Property Name="Font">Microsoft Sans Serif, 8.25pt, style=Bold</Property>
       <Property Name="Text">Isolation Latency (ms):</Property>
     </Object>
 
+    <!-- Benchmark Scorecard Header -->
+    <Object Type="Vector.CANalyzer.Panels.Design.StaticTextControl, Vector.CANalyzer.Panels.CommonControls, Version=18.0.150.0, Culture=neutral, PublicKeyToken=null" Name="Lbl_Metrics" ControlName="Static Text Metrics">
+      <Property Name="Name">Lbl_Metrics</Property>
+      <Property Name="Size">350, 18</Property>
+      <Property Name="Location">540, 252</Property>
+      <Property Name="Font">Microsoft Sans Serif, 9pt, style=Bold</Property>
+      <Property Name="Text">ALGORITHM BENCHMARK SCORECARD</Property>
+    </Object>
+
+    <Object Type="Vector.CANalyzer.Panels.Design.TextBoxControl, Vector.CANalyzer.Panels.CommonControls, Version=18.0.150.0, Culture=neutral, PublicKeyToken=null" Name="Txt_RawCount" ControlName="Txt_RawCount">
+      <Property Name="Name">Txt_RawCount</Property>
+      <Property Name="Size">110, 24</Property>
+      <Property Name="Location">540, 275</Property>
+      <Property Name="DisplayLabel">Left</Property>
+      <Property Name="DescriptionText">Raw DTCs:</Property>
+      <Property Name="DescriptionSize">60, 24</Property>
+      <Property Name="SymbolConfiguration">8;16;;;;RCA_Metric_RawDTCCount;1;;;-1;;;Value;;;0</Property>
+      <Property Name="ReadOnly">True</Property>
+    </Object>
+
+    <Object Type="Vector.CANalyzer.Panels.Design.TextBoxControl, Vector.CANalyzer.Panels.CommonControls, Version=18.0.150.0, Culture=neutral, PublicKeyToken=null" Name="Txt_PrunedCount" ControlName="Txt_PrunedCount">
+      <Property Name="Name">Txt_PrunedCount</Property>
+      <Property Name="Size">110, 24</Property>
+      <Property Name="Location">660, 275</Property>
+      <Property Name="DisplayLabel">Left</Property>
+      <Property Name="DescriptionText">Pruned:</Property>
+      <Property Name="DescriptionSize">50, 24</Property>
+      <Property Name="SymbolConfiguration">8;16;;;;RCA_Metric_PrunedCount;1;;;-1;;;Value;;;0</Property>
+      <Property Name="ReadOnly">True</Property>
+    </Object>
+
+    <Object Type="Vector.CANalyzer.Panels.Design.TextBoxControl, Vector.CANalyzer.Panels.CommonControls, Version=18.0.150.0, Culture=neutral, PublicKeyToken=null" Name="Txt_PruningRatio" ControlName="Txt_PruningRatio">
+      <Property Name="Name">Txt_PruningRatio</Property>
+      <Property Name="Size">115, 24</Property>
+      <Property Name="Location">775, 275</Property>
+      <Property Name="DisplayLabel">Left</Property>
+      <Property Name="DescriptionText">Pruned %:</Property>
+      <Property Name="DescriptionSize">55, 24</Property>
+      <Property Name="SymbolConfiguration">8;16;;;;RCA_Metric_PruningRatio;2;;;-1;;;Value;;;0</Property>
+      <Property Name="ReadOnly">True</Property>
+    </Object>
+
+    <Object Type="Vector.CANalyzer.Panels.Design.TextBoxControl, Vector.CANalyzer.Panels.CommonControls, Version=18.0.150.0, Culture=neutral, PublicKeyToken=null" Name="Txt_ASIL" ControlName="Txt_ASIL">
+      <Property Name="Name">Txt_ASIL</Property>
+      <Property Name="Size">350, 24</Property>
+      <Property Name="Location">540, 310</Property>
+      <Property Name="Font">Microsoft Sans Serif, 8.25pt, style=Bold</Property>
+      <Property Name="DisplayLabel">Left</Property>
+      <Property Name="DescriptionText">Safety ASIL:</Property>
+      <Property Name="DescriptionSize">80, 24</Property>
+      <Property Name="SymbolConfiguration">8;16;;;;RCA_Metric_ASIL;4;;;-1;;;Value;;;0</Property>
+      <Property Name="ReadOnly">True</Property>
+    </Object>
+
+    <!-- Freeze Frame Snapshot -->
+    <Object Type="Vector.CANalyzer.Panels.Design.StaticTextControl, Vector.CANalyzer.Panels.CommonControls, Version=18.0.150.0, Culture=neutral, PublicKeyToken=null" Name="Lbl_Snapshot" ControlName="Static Text Snap">
+      <Property Name="Name">Lbl_Snapshot</Property>
+      <Property Name="Size">350, 18</Property>
+      <Property Name="Location">540, 345</Property>
+      <Property Name="Font">Microsoft Sans Serif, 8.25pt, style=Bold</Property>
+      <Property Name="Text">ISO 14229 SERVICE 0x19 04 FREEZE FRAME SNAPSHOT</Property>
+    </Object>
+
+    <Object Type="Vector.CANalyzer.Panels.Design.TextBoxControl, Vector.CANalyzer.Panels.CommonControls, Version=18.0.150.0, Culture=neutral, PublicKeyToken=null" Name="Txt_Snapshot" ControlName="Txt_Snapshot">
+      <Property Name="Name">Txt_Snapshot</Property>
+      <Property Name="Size">350, 42</Property>
+      <Property Name="Location">540, 368</Property>
+      <Property Name="Multiline">True</Property>
+      <Property Name="TextBackColor">245, 250, 245</Property>
+      <Property Name="SymbolConfiguration">8;16;;;;RCA_FreezeFrame_Text;4;;;-1;;;Value;;;0</Property>
+      <Property Name="ReadOnly">True</Property>
+    </Object>
+
+    <!-- =================================================================== -->
+    <!-- BOTTOM ROW: CONTEXTUAL SCENARIO GUIDANCE BANNER                     -->
+    <!-- =================================================================== -->
+    <Object Type="Vector.CANalyzer.Panels.Design.TextBoxControl, Vector.CANalyzer.Panels.CommonControls, Version=18.0.150.0, Culture=neutral, PublicKeyToken=null" Name="Txt_ScenarioGuide" ControlName="Txt_ScenarioGuide">
+      <Property Name="Name">Txt_ScenarioGuide</Property>
+      <Property Name="Size">875, 45</Property>
+      <Property Name="Location">15, 475</Property>
+      <Property Name="Multiline">True</Property>
+      <Property Name="Font">Microsoft Sans Serif, 8.5pt, style=Bold</Property>
+      <Property Name="TextBackColor">255, 255, 235</Property>
+      <Property Name="SymbolConfiguration">8;16;;;;Panel_Scenario_Info;4;;;-1;;;Value;;;0</Property>
+      <Property Name="ReadOnly">True</Property>
+    </Object>
+
     <Property Name="Name">Panel</Property>
-    <Property Name="Size">920, 400</Property>
+    <Property Name="Size">915, 540</Property>
     <Property Name="Location">0, 0</Property>
     <Property Name="BackColor">White</Property>
   </Object>

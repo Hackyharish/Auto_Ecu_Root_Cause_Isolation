@@ -73,20 +73,32 @@ on start
 on timer t_ECM_10ms
 {
   byte isAsilDSafeStop;
-  isAsilDSafeStop = 0;
-
-  // Latch incoming fault trigger pulses
-  if (@sysvar::Fault_ECM_ThrottleSensor == 1)
+  // Vehicle Operational State & Diagnostic Enable Criteria Check
+  if (@sysvar::Sim_IgnitionState < 2)
   {
-    g_Fault_ThrottleActive = 1;
+    g_EngineStatus = 1; // STOPPED
+    g_EngineRPM = 0.0;
+    g_ThrottlePos = 0.0;
+    g_EngineTorque = 0.0;
   }
-  if (@sysvar::Fault_Node_Cutoff_ECM == 1)
+  else
   {
-    g_Fault_Cutoff_ECM_Active = 1;
+    // Latch incoming fault trigger pulses ONLY when operating pre-conditions are met
+    if (@sysvar::Sim_BatteryVoltage >= 9.5 && @sysvar::Sim_BatteryVoltage <= 16.0)
+    {
+      if (@sysvar::Fault_ECM_ThrottleSensor == 1)
+      {
+        g_Fault_ThrottleActive = 1;
+      }
+      if (@sysvar::Fault_Node_Cutoff_ECM == 1)
+      {
+        g_Fault_Cutoff_ECM_Active = 1;
+      }
+    }
   }
 
   // Check for ASIL-D High Severity Hazards (ECM Throttle, ECM Cutoff, ABS WSS, ABS Cutoff)
-  if (g_Fault_ThrottleActive == 1 || g_Fault_Cutoff_ECM_Active == 1 || @sysvar::Fault_ABS_WheelSpeedFL == 1 || @sysvar::Fault_Node_Cutoff_ABS == 1 || @sysvar::Node_Health_ABS == 2)
+  if (@sysvar::Sim_IgnitionState >= 2 && (g_Fault_ThrottleActive == 1 || g_Fault_Cutoff_ECM_Active == 1 || @sysvar::Fault_ABS_WheelSpeedFL == 1 || @sysvar::Fault_Node_Cutoff_ABS == 1 || @sysvar::Node_Health_ABS == 2))
   {
     isAsilDSafeStop = 1;
   }
@@ -252,10 +264,13 @@ on timer t_ECM_10ms
 // -----------------------------------------------------------------------------
 on timer t_ECM_50ms
 {
-  // Handle Latched Fault Injection: Engine Coolant Over-Temperature
-  if (@sysvar::Fault_ECM_CoolantTemp == 1)
+  // Handle Latched Fault Injection: Engine Coolant Over-Temperature (Only when Pre-conditions Met)
+  if (@sysvar::Sim_IgnitionState >= 2 && @sysvar::Sim_BatteryVoltage >= 9.5 && @sysvar::Sim_BatteryVoltage <= 16.0)
   {
-    g_Fault_CoolantActive = 1;
+    if (@sysvar::Fault_ECM_CoolantTemp == 1)
+    {
+      g_Fault_CoolantActive = 1;
+    }
   }
 
   if (g_Fault_CoolantActive == 1)

@@ -56,11 +56,16 @@ variables
   dword g_ScanEndMicroSec = 0;
   double g_IsolationLatencyMs = 0.0;
 
-  // Result Strings
+  // Timers
+  msTimer t_Monitor100ms;
+
+  // Result Strings & Metrics
   char g_RootECU[64];
   char g_RootDTC[32];
   char g_RootDescription[128];
   char g_PrunedSymptoms[256];
+  char g_FreezeFrameText[128];
+  char g_ASIL[32];
 }
 
 on start
@@ -70,8 +75,77 @@ on start
   write(" Panel: Press 'Automated RCA Scan' or key 'S' to run isolation.");
   write(" Panel: Press 'Reset All Faults' or key '0' to clear all faults.");
   write(" Keys '1'-'6': Trigger Scenarios 1 to 6.");
+  write(" Key 'I': Toggle Ignition (OFF/RUN). Key 'V': Toggle Battery Voltage.");
   write("===================================================================");
   g_ScanState = STATE_IDLE;
+  setTimer(t_Monitor100ms, 100);
+}
+
+// -----------------------------------------------------------------------------
+// 100ms Periodic Monitor: Busload, PRNDL, and Diagnostics Pre-conditions
+// -----------------------------------------------------------------------------
+on timer t_Monitor100ms
+{
+  double load;
+  char gearStr[8];
+
+  // Dynamic CAN Busload Calculation
+  load = 29.5;
+  if (g_ScanState != STATE_IDLE)
+  {
+    load = load + 4.5;
+  }
+  if (@sysvar::Fault_Node_Cutoff_ECM == 1 || @sysvar::Fault_Node_Cutoff_ABS == 1)
+  {
+    load = load - 5.5;
+  }
+  @sysvar::Disp_CAN_BusLoad = load;
+
+  // CAN Controller & Error Tracking
+  if (@sysvar::Fault_Node_Cutoff_ECM == 1 || @sysvar::Fault_Node_Cutoff_ABS == 1 || @sysvar::Fault_Node_Cutoff_TCM == 1 || @sysvar::Fault_Node_Cutoff_BCM == 1)
+  {
+    @sysvar::Disp_CAN_ErrorFrames = @sysvar::Disp_CAN_ErrorFrames + 1;
+    sysSetVariableString(sysvar::Disp_CAN_BusState, "Warning (Node Cutoff)");
+  }
+  else
+  {
+    sysSetVariableString(sysvar::Disp_CAN_BusState, "Active (Nominal)");
+  }
+
+  // PRNDL Selector State
+  if (@sysvar::Sim_IgnitionState < 2)
+  {
+    sysSetVariableString(sysvar::Disp_PRNDL_State, "OFF");
+  }
+  else if (@sysvar::Disp_VehicleSpeed <= 0.5 && @sysvar::Sim_AcceleratorPedal == 0.0 && @sysvar::Sim_BrakePedal == 1)
+  {
+    sysSetVariableString(sysvar::Disp_PRNDL_State, "P");
+  }
+  else
+  {
+    snprintf(gearStr, elCount(gearStr), "D%d", @sysvar::Disp_CurrentGear);
+    sysSetVariableString(sysvar::Disp_PRNDL_State, gearStr);
+  }
+
+  // Pre-condition Status Indicator
+  if (@sysvar::Sim_IgnitionState < 2)
+  {
+    sysSetVariableString(sysvar::RCA_Metric_Preconditions, "FAIL: KL15 OFF");
+  }
+  else if (@sysvar::Sim_BatteryVoltage < 9.5)
+  {
+    sysSetVariableString(sysvar::RCA_Metric_Preconditions, "FAIL: Brownout (<9.5V)");
+  }
+  else if (@sysvar::Sim_BatteryVoltage > 16.0)
+  {
+    sysSetVariableString(sysvar::RCA_Metric_Preconditions, "FAIL: Over-Voltage (>16V)");
+  }
+  else
+  {
+    sysSetVariableString(sysvar::RCA_Metric_Preconditions, "PASS: KL15 ON / Vbatt OK");
+  }
+
+  setTimer(t_Monitor100ms, 100);
 }
 
 // -----------------------------------------------------------------------------
@@ -93,6 +167,38 @@ on key 'b'
   {
     @sysvar::Sim_BrakePedal = 0;
     write("[PANEL] Brake Pedal RELEASED via key 'B'.");
+  }
+}
+
+on key 'i', 'I'
+{
+  if (@sysvar::Sim_IgnitionState >= 2)
+  {
+    @sysvar::Sim_IgnitionState = 0;
+    write("\n>>> [VEHICLE STATE] Key I: Ignition switched OFF (KL30 only).");
+    sysSetVariableString(sysvar::Panel_Scenario_Info, "Vehicle OFF: Ignition OFF (KL15 inactive). Diagnostics and dynamic DTCs inhibited.");
+  }
+  else
+  {
+    @sysvar::Sim_IgnitionState = 2;
+    write("\n>>> [VEHICLE STATE] Key I: Ignition switched ON (KL15 active).");
+    sysSetVariableString(sysvar::Panel_Scenario_Info, "Vehicle ON: Ignition set to RUN (KL15 active). Diagnostic operations enabled.");
+  }
+}
+
+on key 'v', 'V'
+{
+  if (@sysvar::Sim_BatteryVoltage >= 11.0)
+  {
+    @sysvar::Sim_BatteryVoltage = 8.5;
+    write("\n>>> [POWER STATE] Key V: Battery Voltage dropped to 8.5V (Undervoltage).");
+    sysSetVariableString(sysvar::Panel_Scenario_Info, "Battery Brownout: 8.5V injected. ISO 14229 diagnostic pre-conditions will fail.");
+  }
+  else
+  {
+    @sysvar::Sim_BatteryVoltage = 13.8;
+    write("\n>>> [POWER STATE] Key V: Battery Voltage restored to 13.8V (Nominal).");
+    sysSetVariableString(sysvar::Panel_Scenario_Info, "Battery Nominal: 13.8V restored. Diagnostic operating window nominal.");
   }
 }
 
@@ -122,36 +228,42 @@ on key '1'
 {
   write("\n>>> [FAULT INJECTION] Key 1: Left Front Wheel Speed Sensor Open (ABS).");
   @sysvar::Fault_ABS_WheelSpeedFL = 1;
+  sysSetVariableString(sysvar::Panel_Scenario_Info, "Scenario 1: FL Wheel Speed Sensor Open (ABS C0035-13). Propagates to TCM U0415-81 & ECM P0500-00. Root: ABS.");
 }
 
 on key '2'
 {
   write("\n>>> [FAULT INJECTION] Key 2: Throttle Position Sensor Low Circuit (ECM).");
   @sysvar::Fault_ECM_ThrottleSensor = 1;
+  sysSetVariableString(sysvar::Panel_Scenario_Info, "Scenario 2: Throttle Position Sensor Low (ECM P0122-12). Propagates to TCM U0401-86. Root: ECM.");
 }
 
 on key '3'
 {
   write("\n>>> [FAULT INJECTION] Key 3: Complete ECM Node Communication Cutoff.");
   @sysvar::Fault_Node_Cutoff_ECM = 1;
+  sysSetVariableString(sysvar::Panel_Scenario_Info, "Scenario 3: Complete ECM Node Dropout (U0100-00). Missing heartbeat causes TCM & BCM loss of comm. Root: ECM.");
 }
 
 on key '4'
 {
   write("\n>>> [FAULT INJECTION] Key 4: Engine Coolant Over-Temperature Fault (ECM).");
   @sysvar::Fault_ECM_CoolantTemp = 1;
+  sysSetVariableString(sysvar::Panel_Scenario_Info, "Scenario 4: Engine Coolant Overheat (ECM P0217-00). Propagates to TCM U0401-82 & BCM B10A2-00. Root: ECM.");
 }
 
 on key '5'
 {
   write("\n>>> [FAULT INJECTION] Key 5: Brake Pedal Switch Stuck High/Active (BCM).");
   @sysvar::Fault_BCM_BrakeSwitch = 1;
+  sysSetVariableString(sysvar::Panel_Scenario_Info, "Scenario 5: Brake Switch Stuck Closed (BCM B1318-11). Plausibility conflict triggers ECM P0504 & TCM U0422. Root: BCM.");
 }
 
 on key '6'
 {
   write("\n>>> [FAULT INJECTION] Key 6: Complete ABS Node Communication Cutoff.");
   @sysvar::Fault_Node_Cutoff_ABS = 1;
+  sysSetVariableString(sysvar::Panel_Scenario_Info, "Scenario 6: Complete ABS Node Dropout (U0121-00). Missing heartbeat causes TCM & ECM loss of comm. Root: ABS.");
 }
 
 void StartAutomatedRCA()
@@ -159,6 +271,35 @@ void StartAutomatedRCA()
   if (g_ScanState != STATE_IDLE)
   {
     write("[DIAG MASTER] Warning: Scan already in progress.");
+    return;
+  }
+
+  // Pre-conditions Check: AUTOSAR DEM / ISO 14229 Diagnostic Enable Criteria
+  if (@sysvar::Sim_IgnitionState < 2)
+  {
+    write("\n>>> [RCA ENGINE - INHIBITED] Pre-conditions FAILED: Vehicle OFF / KL15 Inactive.");
+    sysSetVariableString(sysvar::RCA_Output_RootECU, "REJECTED: Vehicle OFF");
+    sysSetVariableString(sysvar::RCA_Output_RootDTC, "Pre-conditions Failed");
+    sysSetVariableString(sysvar::RCA_Output_PrunedSymptoms, "Diagnostic inhibited: Ignition must be ON (KL15) for dynamic DTC evaluation.");
+    sysSetVariableString(sysvar::RCA_Metric_ASIL, "N/A (Inhibited)");
+    @sysvar::RCA_Metric_RawDTCCount = 0;
+    @sysvar::RCA_Metric_PrunedCount = 0;
+    @sysvar::RCA_Metric_PruningRatio = 0.0;
+    @sysvar::RCA_Result_Latency = 0.0;
+    return;
+  }
+
+  if (@sysvar::Sim_BatteryVoltage < 9.5 || @sysvar::Sim_BatteryVoltage > 16.0)
+  {
+    write("\n>>> [RCA ENGINE - INHIBITED] Pre-conditions FAILED: Battery Voltage (%.1f V) out of window (9.5-16.0V).", @sysvar::Sim_BatteryVoltage);
+    sysSetVariableString(sysvar::RCA_Output_RootECU, "REJECTED: Voltage Inhibit");
+    sysSetVariableString(sysvar::RCA_Output_RootDTC, "Brownout Protection");
+    sysSetVariableString(sysvar::RCA_Output_PrunedSymptoms, "Brownout / Overvoltage protection active: Vbatt must be 9.5V - 16.0V.");
+    sysSetVariableString(sysvar::RCA_Metric_ASIL, "N/A (Inhibited)");
+    @sysvar::RCA_Metric_RawDTCCount = 0;
+    @sysvar::RCA_Metric_PrunedCount = 0;
+    @sysvar::RCA_Metric_PruningRatio = 0.0;
+    @sysvar::RCA_Result_Latency = 0.0;
     return;
   }
 
@@ -324,6 +465,14 @@ on message 0x7EB // BCM Response
 // -----------------------------------------------------------------------------
 void ExecuteRootCausePruning()
 {
+  int rawDTCs;
+  int prunedCount;
+  double ratio;
+
+  rawDTCs = 0;
+  prunedCount = 0;
+  ratio = 0.0;
+
   write("[RCA ALGORITHM] Active DTC Matrix:");
   write("  * ECM: 0x%06X | TCM: 0x%06X | ABS: 0x%06X | BCM: 0x%06X", g_DTC_ECM, g_DTC_TCM, g_DTC_ABS, g_DTC_BCM);
 
@@ -335,79 +484,107 @@ void ExecuteRootCausePruning()
     strncpy(g_RootDTC, "C0035-13", elCount(g_RootDTC));
     strncpy(g_RootDescription, "Left Front Wheel Speed Sensor Circuit Open", elCount(g_RootDescription));
     strncpy(g_PrunedSymptoms, "TCM: U0415-81 (Invalid ABS Data) | ECM: P0500-00 (Missing Speed Signal)", elCount(g_PrunedSymptoms));
-    return;
+    strncpy(g_ASIL, "ASIL D (Chassis Safety)", elCount(g_ASIL));
+    rawDTCs = 3; prunedCount = 2; ratio = 66.7;
   }
-
   // SCENARIO 2: ECM Throttle Position Sensor Primary Failure (P0122-12)
   // Dependency DAG: Sensor_TPS -> ECM_Node (P0122) -> Signal:ThrottlePos -> TCM (U0401)
-  if (g_DTC_ECM == 0x012212)
+  else if (g_DTC_ECM == 0x012212)
   {
     strncpy(g_RootECU, "Engine Control Module (ECM)", elCount(g_RootECU));
     strncpy(g_RootDTC, "P0122-12", elCount(g_RootDTC));
     strncpy(g_RootDescription, "Throttle Position Sensor 'A' Circuit Low", elCount(g_RootDescription));
     strncpy(g_PrunedSymptoms, "TCM: U0401-86 (Invalid Data Received from ECM)", elCount(g_PrunedSymptoms));
-    return;
+    strncpy(g_ASIL, "ASIL D (Powertrain Hazard)", elCount(g_ASIL));
+    rawDTCs = 2; prunedCount = 1; ratio = 50.0;
   }
-
   // SCENARIO 3: Complete ECM Node Loss / Bus Dropout
   // Dependency DAG: ECM Offline -> TCM (U0100), BCM (U0100)
-  if ((g_DTC_TCM == 0xD10000 || g_RespReceived_ECM == 0) && @sysvar::Fault_Node_Cutoff_ECM == 1)
+  else if ((g_DTC_TCM == 0xD10000 || g_RespReceived_ECM == 0) && @sysvar::Fault_Node_Cutoff_ECM == 1)
   {
     strncpy(g_RootECU, "Engine Control Module (ECM)", elCount(g_RootECU));
     strncpy(g_RootDTC, "U0100-00", elCount(g_RootDTC));
     strncpy(g_RootDescription, "ECM Complete Node Dropout / Power Failure", elCount(g_RootDescription));
     strncpy(g_PrunedSymptoms, "TCM: U0100-00 (Lost Comm with ECM) | BCM: Lost Comm with ECM", elCount(g_PrunedSymptoms));
-    return;
+    strncpy(g_ASIL, "ASIL D (Gateway/Drive Loss)", elCount(g_ASIL));
+    rawDTCs = 3; prunedCount = 2; ratio = 66.7;
   }
-
   // SCENARIO 4: Engine Coolant Over-Temperature Condition (P0217-00)
   // Dependency DAG: CoolantSensor -> ECM (P0217) -> Signal:CoolantTemp -> TCM (U0401-82), BCM (B10A2)
-  if (g_DTC_ECM == 0x021700)
+  else if (g_DTC_ECM == 0x021700)
   {
     strncpy(g_RootECU, "Engine Control Module (ECM)", elCount(g_RootECU));
     strncpy(g_RootDTC, "P0217-00", elCount(g_RootDTC));
     strncpy(g_RootDescription, "Engine Coolant Temperature Sensor / Overheat Condition", elCount(g_RootDescription));
     strncpy(g_PrunedSymptoms, "TCM: U0401-82 (Engine Temp Range) | BCM: B10A2-00 (High Temp Warning)", elCount(g_PrunedSymptoms));
-    return;
+    strncpy(g_ASIL, "ASIL B (Engine Thermal Protection)", elCount(g_ASIL));
+    rawDTCs = 3; prunedCount = 2; ratio = 66.7;
   }
-
   // SCENARIO 5: Brake Pedal Switch Stuck High / Electrical Short (B1318-11)
   // Dependency DAG: BrakeSwitch -> BCM (B1318) -> Signal:BrakeSwitchStatus -> ECM (P0504), TCM (U0422)
-  if (g_DTC_BCM == 0x931811)
+  else if (g_DTC_BCM == 0x931811)
   {
     strncpy(g_RootECU, "Body Control Module (BCM)", elCount(g_RootECU));
     strncpy(g_RootDTC, "B1318-11", elCount(g_RootDTC));
     strncpy(g_RootDescription, "Brake Pedal Switch Stuck Active / Circuit Short to Power", elCount(g_RootDescription));
     strncpy(g_PrunedSymptoms, "ECM: P0504-00 (Brake/Throttle Plausibility Conflict) | TCM: U0422-81 (Invalid BCM Data)", elCount(g_PrunedSymptoms));
-    return;
+    strncpy(g_ASIL, "ASIL B (Braking Plausibility)", elCount(g_ASIL));
+    rawDTCs = 3; prunedCount = 2; ratio = 66.7;
   }
-
   // SCENARIO 6: Complete ABS Node Loss / Bus Dropout (U0121-00)
   // Dependency DAG: ABS Offline -> TCM (U0121), ECM (U0121)
-  if ((g_DTC_TCM == 0xD12100 || g_DTC_ECM == 0xD12100 || g_RespReceived_ABS == 0) && @sysvar::Fault_Node_Cutoff_ABS == 1)
+  else if ((g_DTC_TCM == 0xD12100 || g_DTC_ECM == 0xD12100 || g_RespReceived_ABS == 0) && @sysvar::Fault_Node_Cutoff_ABS == 1)
   {
     strncpy(g_RootECU, "ABS / ESP Control Module", elCount(g_RootECU));
     strncpy(g_RootDTC, "U0121-00", elCount(g_RootDTC));
     strncpy(g_RootDescription, "ABS / ESP Complete Node Power Loss / CAN Bus Dropout", elCount(g_RootDescription));
     strncpy(g_PrunedSymptoms, "TCM: U0121-00 (Lost Comm with ABS) | ECM: U0121-00 (Lost Comm with ABS)", elCount(g_PrunedSymptoms));
-    return;
+    strncpy(g_ASIL, "ASIL D (Chassis Stability Loss)", elCount(g_ASIL));
+    rawDTCs = 3; prunedCount = 2; ratio = 66.7;
   }
-
   // No active faults detected
-  if (g_DTC_ECM == 0 && g_DTC_TCM == 0 && g_DTC_ABS == 0 && g_DTC_BCM == 0)
+  else if (g_DTC_ECM == 0 && g_DTC_TCM == 0 && g_DTC_ABS == 0 && g_DTC_BCM == 0)
   {
     strncpy(g_RootECU, "None (Network Healthy)", elCount(g_RootECU));
     strncpy(g_RootDTC, "No Faults", elCount(g_RootDTC));
     strncpy(g_RootDescription, "All ECU nodes operating nominally.", elCount(g_RootDescription));
     strncpy(g_PrunedSymptoms, "None", elCount(g_PrunedSymptoms));
-    return;
+    strncpy(g_ASIL, "QM (Nominal)", elCount(g_ASIL));
+    rawDTCs = 0; prunedCount = 0; ratio = 0.0;
+  }
+  // Fallback
+  else
+  {
+    strncpy(g_RootECU, "Multiple / Uncorrelated", elCount(g_RootECU));
+    strncpy(g_RootDTC, "Multiple", elCount(g_RootDTC));
+    strncpy(g_RootDescription, "Uncorrelated DTC combination detected.", elCount(g_RootDescription));
+    strncpy(g_PrunedSymptoms, "None", elCount(g_PrunedSymptoms));
+    strncpy(g_ASIL, "QM (Uncorrelated)", elCount(g_ASIL));
+    rawDTCs = 1; prunedCount = 0; ratio = 0.0;
   }
 
-  // Fallback
-  strncpy(g_RootECU, "Multiple / Uncorrelated", elCount(g_RootECU));
-  strncpy(g_RootDTC, "Multiple", elCount(g_RootDTC));
-  strncpy(g_RootDescription, "Uncorrelated DTC combination detected.", elCount(g_RootDescription));
-  strncpy(g_PrunedSymptoms, "None", elCount(g_PrunedSymptoms));
+  // Record ISO 14229 Service 0x19 04 Freeze Frame Snapshot
+  @sysvar::RCA_FreezeFrame_Speed = @sysvar::Disp_VehicleSpeed;
+  @sysvar::RCA_FreezeFrame_RPM = @sysvar::Disp_EngineRPM;
+  @sysvar::RCA_FreezeFrame_Coolant = @sysvar::Disp_CoolantTemp;
+  @sysvar::RCA_FreezeFrame_BattVolt = @sysvar::Sim_BatteryVoltage;
+  if (strncmp(g_RootDTC, "No Faults", 9) == 0)
+  {
+    sysSetVariableString(sysvar::RCA_FreezeFrame_Text, "No Snapshot Captured (Healthy)");
+  }
+  else
+  {
+    snprintf(g_FreezeFrameText, elCount(g_FreezeFrameText),
+      "DTC: %s | Spd: %.1f km/h | RPM: %.0f | Temp: %.1f C | Vbatt: %.1f V",
+      g_RootDTC, @sysvar::Disp_VehicleSpeed, @sysvar::Disp_EngineRPM, @sysvar::Disp_CoolantTemp, @sysvar::Sim_BatteryVoltage);
+    sysSetVariableString(sysvar::RCA_FreezeFrame_Text, g_FreezeFrameText);
+  }
+
+  // Update Benchmark & Efficiency Metrics
+  @sysvar::RCA_Metric_RawDTCCount = rawDTCs;
+  @sysvar::RCA_Metric_PrunedCount = prunedCount;
+  @sysvar::RCA_Metric_PruningRatio = ratio;
+  sysSetVariableString(sysvar::RCA_Metric_ASIL, g_ASIL);
 }
 
 // -----------------------------------------------------------------------------
@@ -468,6 +645,14 @@ void ResetEntireNetwork()
   sysSetVariableString(sysvar::RCA_Output_RootECU, "None (Network Healthy)");
   sysSetVariableString(sysvar::RCA_Output_RootDTC, "No Faults");
   sysSetVariableString(sysvar::RCA_Output_PrunedSymptoms, "None");
+  sysSetVariableString(sysvar::RCA_FreezeFrame_Text, "No Snapshot Captured (Healthy)");
+  sysSetVariableString(sysvar::Panel_Scenario_Info, "Nominal Operation: Press Keys 1-6 or panel buttons to inject fault scenarios.");
+  sysSetVariableString(sysvar::RCA_Metric_ASIL, "QM (Nominal)");
+  @sysvar::RCA_Metric_RawDTCCount = 0;
+  @sysvar::RCA_Metric_PrunedCount = 0;
+  @sysvar::RCA_Metric_PruningRatio = 0.0;
+  @sysvar::Disp_CAN_ErrorFrames = 0;
+  sysSetVariableString(sysvar::Disp_CAN_BusState, "Active (Nominal)");
 
   // Reset Node Health LEDs
   @sysvar::Node_Health_ABS = 0;

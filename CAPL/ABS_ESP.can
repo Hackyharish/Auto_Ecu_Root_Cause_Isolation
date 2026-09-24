@@ -65,26 +65,42 @@ on timer t_ABS_10ms
   byte isAsilDSafeStop;
   isAsilDSafeStop = 0;
 
-  // Latch incoming fault trigger pulses
-  if (@sysvar::Fault_ABS_WheelSpeedFL == 1)
+  // Diagnostic Enable Criteria & Vehicle Operational State Check
+  if (@sysvar::Sim_IgnitionState < 2)
   {
-    g_Fault_WSS_FL_Active = 1;
+    g_VehicleSpeed = 0.0;
+    g_SpeedFL = 0.0;
+    g_SpeedFR = 0.0;
+    g_SpeedRL = 0.0;
+    g_SpeedRR = 0.0;
+    g_BrakePressure = 0.0;
   }
-  if (@sysvar::Fault_Node_Cutoff_ABS == 1)
+  else
   {
-    g_Fault_Cutoff_ABS_Active = 1;
-  }
-  if (@sysvar::Fault_ECM_ThrottleSensor == 1)
-  {
-    g_Fault_ECM_Throttle_Active = 1;
-  }
-  if (@sysvar::Fault_Node_Cutoff_ECM == 1)
-  {
-    g_Fault_ECM_Cutoff_Active = 1;
+    // Latch incoming fault trigger pulses ONLY when pre-conditions met
+    if (@sysvar::Sim_BatteryVoltage >= 9.5 && @sysvar::Sim_BatteryVoltage <= 16.0)
+    {
+      if (@sysvar::Fault_ABS_WheelSpeedFL == 1)
+      {
+        g_Fault_WSS_FL_Active = 1;
+      }
+      if (@sysvar::Fault_Node_Cutoff_ABS == 1)
+      {
+        g_Fault_Cutoff_ABS_Active = 1;
+      }
+      if (@sysvar::Fault_ECM_ThrottleSensor == 1)
+      {
+        g_Fault_ECM_Throttle_Active = 1;
+      }
+      if (@sysvar::Fault_Node_Cutoff_ECM == 1)
+      {
+        g_Fault_ECM_Cutoff_Active = 1;
+      }
+    }
   }
 
   // Check for ASIL-D High Severity Hazards (ABS WSS, ABS Node Cutoff, ECM Throttle, ECM Node Cutoff)
-  if (g_Fault_WSS_FL_Active == 1 || g_Fault_Cutoff_ABS_Active == 1 || g_Fault_ECM_Throttle_Active == 1 || g_Fault_ECM_Cutoff_Active == 1)
+  if (@sysvar::Sim_IgnitionState >= 2 && (g_Fault_WSS_FL_Active == 1 || g_Fault_Cutoff_ABS_Active == 1 || g_Fault_ECM_Throttle_Active == 1 || g_Fault_ECM_Cutoff_Active == 1))
   {
     isAsilDSafeStop = 1;
   }

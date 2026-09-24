@@ -49,19 +49,23 @@ on start
 on timer t_BCM_50ms
 {
   g_AliveCounter = (g_AliveCounter + 1) & 0x0F;
+  g_IgnitionState = @sysvar::Sim_IgnitionState;
 
-  // Latch incoming fault trigger pulses
-  if (@sysvar::Fault_BCM_BrakeSwitch == 1)
+  // Latch incoming fault trigger pulses ONLY when pre-conditions met
+  if (@sysvar::Sim_IgnitionState >= 2 && @sysvar::Sim_BatteryVoltage >= 9.5 && @sysvar::Sim_BatteryVoltage <= 16.0)
   {
-    g_Fault_BrakeActive = 1;
-  }
-  if (@sysvar::Fault_Node_Cutoff_BCM == 1)
-  {
-    g_Fault_Cutoff_BCM_Active = 1;
+    if (@sysvar::Fault_BCM_BrakeSwitch == 1)
+    {
+      g_Fault_BrakeActive = 1;
+    }
+    if (@sysvar::Fault_Node_Cutoff_BCM == 1)
+    {
+      g_Fault_Cutoff_BCM_Active = 1;
+    }
   }
 
   // Handle Latched Fault Injection: Brake Switch Stuck High (Scenario 5) or Normal Brake Pedal
-  if (g_Fault_BrakeActive == 1 || @sysvar::Sim_BrakePedal == 1 || @sysvar::Fault_BCM_BrakeSwitch == 1)
+  if (g_Fault_BrakeActive == 1 || @sysvar::Sim_BrakePedal == 1)
   {
     g_BrakeSwitch = 1;
     if (g_Fault_BrakeActive == 1 && g_NumDTCs == 0)
