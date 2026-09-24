@@ -2,10 +2,10 @@
 /* =========================================================================
    Test Module: Test_RCA_Automation.can
    Project: Automated Root Cause Isolation in Multi-ECU Networks
-   Description: Automated CAPL Test Suite & Regression Verification.
+   Description: Vector CANoe CAPL Test Module (Test Feature Set / TFS).
                 Sequentially validates Pre-condition rejection, Scenarios 1 to 6,
                 pruning accuracy, execution latency (<50ms), and writes
-                formatted HTML Test Report.
+                both native CANoe test reports and formatted HTML Test Reports.
    Author: IVN Capstone Team | Tata Technologies TechPulse
    ========================================================================= */
 
@@ -16,8 +16,6 @@ includes
 
 variables
 {
-  msTimer t_TestStep;
-  int g_CurrentTestCase = 0;
   dword g_ReportFile;
   int g_PassCount = 0;
   int g_FailCount = 0;
@@ -100,17 +98,205 @@ void LogHtmlFooter()
   write("===================================================================\n");
 }
 
-on start
+// -----------------------------------------------------------------------------
+// TEST CASES (Vector CANoe Test Feature Set)
+// -----------------------------------------------------------------------------
+
+testcase TC_01_Precondition_Rejection()
 {
-  write("[TEST AUTOMATION] Press Key 'T' to launch full automated RCA regression test suite.");
+  char resDTC[32];
+
+  // Turn Ignition OFF
+  @sysvar::Sim_IgnitionState = 0;
+  @sysvar::Trigger_RCA_Scan = 1;
+  testWaitForTimeout(200);
+
+  sysGetVariableString(sysvar::RCA_Output_RootDTC, resDTC, elCount(resDTC));
+  if (strncmp(resDTC, "Pre-conditions", 14) == 0)
+  {
+    testStepPass("TC1", "Pre-conditions correctly inhibited scan when Ignition is OFF.");
+    LogHtmlRow(1, "Pre-condition Rejection: Vehicle Ignition OFF", "N/A (Inhibited)", "Pre-conditions Failed", 0.0, 1);
+  }
+  else
+  {
+    testStepFail("TC1", "Diagnostics scan was not properly inhibited when vehicle was OFF.");
+    LogHtmlRow(1, "Pre-condition Rejection: Vehicle Ignition OFF", "N/A (Inhibited)", "Pre-conditions Failed", 0.0, 0);
+  }
+
+  // Restore Nominal Vehicle State
+  @sysvar::Sim_IgnitionState = 2;
+  @sysvar::Sim_BatteryVoltage = 13.8;
+  @sysvar::Fault_Reset_All = 1;
+  testWaitForTimeout(250);
 }
 
-void StartAutomationTestSuite()
+testcase TC_02_Scenario1_ABS_WSS()
+{
+  char resDTC[32];
+
+  // Inject Scenario 1
+  @sysvar::Fault_ABS_WheelSpeedFL = 1;
+  testWaitForTimeout(200);
+
+  // Trigger RCA Scan
+  @sysvar::Trigger_RCA_Scan = 1;
+  testWaitForTimeout(250);
+
+  sysGetVariableString(sysvar::RCA_Output_RootDTC, resDTC, elCount(resDTC));
+  if (strncmp(resDTC, "C0035-13", 8) == 0 && @sysvar::RCA_Result_Latency < 50.0)
+  {
+    testStepPass("TC2", "Scenario 1 isolated root DTC C0035-13 in ABS within latency target.");
+    LogHtmlRow(2, "Scenario 1: Left Front Wheel Speed Sensor Open", "ABS/ESP", "C0035-13", @sysvar::RCA_Result_Latency, 1);
+  }
+  else
+  {
+    testStepFail("TC2", "Scenario 1 failed to isolate C0035-13 within target latency.");
+    LogHtmlRow(2, "Scenario 1: Left Front Wheel Speed Sensor Open", "ABS/ESP", "C0035-13", @sysvar::RCA_Result_Latency, 0);
+  }
+
+  @sysvar::Fault_Reset_All = 1;
+  testWaitForTimeout(250);
+}
+
+testcase TC_03_Scenario2_ECM_TPS()
+{
+  char resDTC[32];
+
+  @sysvar::Fault_ECM_ThrottleSensor = 1;
+  testWaitForTimeout(200);
+
+  @sysvar::Trigger_RCA_Scan = 1;
+  testWaitForTimeout(250);
+
+  sysGetVariableString(sysvar::RCA_Output_RootDTC, resDTC, elCount(resDTC));
+  if (strncmp(resDTC, "P0122-12", 8) == 0 && @sysvar::RCA_Result_Latency < 50.0)
+  {
+    testStepPass("TC3", "Scenario 2 isolated root DTC P0122-12 in ECM within latency target.");
+    LogHtmlRow(3, "Scenario 2: Throttle Position Sensor Low Circuit", "ECM", "P0122-12", @sysvar::RCA_Result_Latency, 1);
+  }
+  else
+  {
+    testStepFail("TC3", "Scenario 2 failed to isolate P0122-12 within target latency.");
+    LogHtmlRow(3, "Scenario 2: Throttle Position Sensor Low Circuit", "ECM", "P0122-12", @sysvar::RCA_Result_Latency, 0);
+  }
+
+  @sysvar::Fault_Reset_All = 1;
+  testWaitForTimeout(250);
+}
+
+testcase TC_04_Scenario3_ECM_Node_Dropout()
+{
+  char resDTC[32];
+
+  @sysvar::Fault_Node_Cutoff_ECM = 1;
+  testWaitForTimeout(350);
+
+  @sysvar::Trigger_RCA_Scan = 1;
+  testWaitForTimeout(250);
+
+  sysGetVariableString(sysvar::RCA_Output_RootDTC, resDTC, elCount(resDTC));
+  if (strncmp(resDTC, "U0100-00", 8) == 0)
+  {
+    testStepPass("TC4", "Scenario 3 isolated ECM node dropout DTC U0100-00.");
+    LogHtmlRow(4, "Scenario 3: Complete ECM Node Loss / Bus Dropout", "ECM", "U0100-00", @sysvar::RCA_Result_Latency, 1);
+  }
+  else
+  {
+    testStepFail("TC4", "Scenario 3 failed to isolate U0100-00.");
+    LogHtmlRow(4, "Scenario 3: Complete ECM Node Loss / Bus Dropout", "ECM", "U0100-00", @sysvar::RCA_Result_Latency, 0);
+  }
+
+  @sysvar::Fault_Reset_All = 1;
+  testWaitForTimeout(250);
+}
+
+testcase TC_05_Scenario4_Coolant_Overheat()
+{
+  char resDTC[32];
+
+  @sysvar::Fault_ECM_CoolantTemp = 1;
+  testWaitForTimeout(200);
+
+  @sysvar::Trigger_RCA_Scan = 1;
+  testWaitForTimeout(250);
+
+  sysGetVariableString(sysvar::RCA_Output_RootDTC, resDTC, elCount(resDTC));
+  if (strncmp(resDTC, "P0217-00", 8) == 0)
+  {
+    testStepPass("TC5", "Scenario 4 isolated Coolant Overheat DTC P0217-00.");
+    LogHtmlRow(5, "Scenario 4: Engine Coolant Over-Temperature", "ECM", "P0217-00", @sysvar::RCA_Result_Latency, 1);
+  }
+  else
+  {
+    testStepFail("TC5", "Scenario 4 failed to isolate P0217-00.");
+    LogHtmlRow(5, "Scenario 4: Engine Coolant Over-Temperature", "ECM", "P0217-00", @sysvar::RCA_Result_Latency, 0);
+  }
+
+  @sysvar::Fault_Reset_All = 1;
+  testWaitForTimeout(250);
+}
+
+testcase TC_06_Scenario5_BCM_Brake_Switch()
+{
+  char resDTC[32];
+
+  @sysvar::Fault_BCM_BrakeSwitch = 1;
+  testWaitForTimeout(200);
+
+  @sysvar::Trigger_RCA_Scan = 1;
+  testWaitForTimeout(250);
+
+  sysGetVariableString(sysvar::RCA_Output_RootDTC, resDTC, elCount(resDTC));
+  if (strncmp(resDTC, "B1318-11", 8) == 0)
+  {
+    testStepPass("TC6", "Scenario 5 isolated Brake Switch Stuck DTC B1318-11.");
+    LogHtmlRow(6, "Scenario 5: Brake Pedal Switch Stuck High", "BCM", "B1318-11", @sysvar::RCA_Result_Latency, 1);
+  }
+  else
+  {
+    testStepFail("TC6", "Scenario 5 failed to isolate B1318-11.");
+    LogHtmlRow(6, "Scenario 5: Brake Pedal Switch Stuck High", "BCM", "B1318-11", @sysvar::RCA_Result_Latency, 0);
+  }
+
+  @sysvar::Fault_Reset_All = 1;
+  testWaitForTimeout(250);
+}
+
+testcase TC_07_Scenario6_ABS_Node_Dropout()
+{
+  char resDTC[32];
+
+  @sysvar::Fault_Node_Cutoff_ABS = 1;
+  testWaitForTimeout(350);
+
+  @sysvar::Trigger_RCA_Scan = 1;
+  testWaitForTimeout(250);
+
+  sysGetVariableString(sysvar::RCA_Output_RootDTC, resDTC, elCount(resDTC));
+  if (strncmp(resDTC, "U0121-00", 8) == 0)
+  {
+    testStepPass("TC7", "Scenario 6 isolated ABS node dropout DTC U0121-00.");
+    LogHtmlRow(7, "Scenario 6: Complete ABS Node Dropout / Bus Loss", "ABS/ESP", "U0121-00", @sysvar::RCA_Result_Latency, 1);
+  }
+  else
+  {
+    testStepFail("TC7", "Scenario 6 failed to isolate U0121-00.");
+    LogHtmlRow(7, "Scenario 6: Complete ABS Node Dropout / Bus Loss", "ABS/ESP", "U0121-00", @sysvar::RCA_Result_Latency, 0);
+  }
+
+  @sysvar::Fault_Reset_All = 1;
+  testWaitForTimeout(250);
+}
+
+// -----------------------------------------------------------------------------
+// TEST MODULE ENTRY POINT
+// -----------------------------------------------------------------------------
+void MainTest()
 {
   write("\n===================================================================");
-  write(" [TEST SUITE] Starting Automated Multi-ECU RCA Regression Test Suite...");
+  write(" [TEST MODULE] Starting Automated Multi-ECU RCA Regression Test Suite...");
   write("===================================================================");
-  
+
   g_ReportFile = openFileWrite("Logs/RCA_Automated_Test_Report.html", 2); // Overwrite mode
   if (g_ReportFile == 0)
   {
@@ -120,242 +306,14 @@ void StartAutomationTestSuite()
 
   g_PassCount = 0;
   g_FailCount = 0;
-  g_CurrentTestCase = 1;
-  setTimer(t_TestStep, 100);
-}
 
-on key 't'
-{
-  StartAutomationTestSuite();
-}
+  TC_01_Precondition_Rejection();
+  TC_02_Scenario1_ABS_WSS();
+  TC_03_Scenario2_ECM_TPS();
+  TC_04_Scenario3_ECM_Node_Dropout();
+  TC_05_Scenario4_Coolant_Overheat();
+  TC_06_Scenario5_BCM_Brake_Switch();
+  TC_07_Scenario6_ABS_Node_Dropout();
 
-on key 'T'
-{
-  StartAutomationTestSuite();
-}
-
-on timer t_TestStep
-{
-  switch (g_CurrentTestCase)
-  {
-    case 1:
-      // Test Case 1: Pre-condition Rejection (Ignition OFF)
-      @sysvar::Sim_IgnitionState = 0; // Turn OFF
-      @sysvar::Trigger_RCA_Scan = 1;
-      setTimer(t_TestStep, 100);
-      g_CurrentTestCase = 2;
-      break;
-
-    case 2:
-      // Verify TC1 Result
-      {
-        char resDTC[32];
-        sysGetVariableString(sysvar::RCA_Output_RootDTC, resDTC, elCount(resDTC));
-        if (strncmp(resDTC, "Pre-conditions", 14) == 0)
-        {
-          LogHtmlRow(1, "Pre-condition Rejection: Vehicle Ignition OFF", "N/A (Inhibited)", "Pre-conditions Failed", 0.0, 1);
-        }
-        else
-        {
-          LogHtmlRow(1, "Pre-condition Rejection: Vehicle Ignition OFF", "N/A (Inhibited)", "Pre-conditions Failed", 0.0, 0);
-        }
-      }
-      // Prepare TC 2: Scenario 1 (ABS WSS FL Open)
-      @sysvar::Sim_IgnitionState = 2;
-      @sysvar::Sim_BatteryVoltage = 13.8;
-      @sysvar::Fault_Reset_All = 1;
-      setTimer(t_TestStep, 200);
-      g_CurrentTestCase = 3;
-      break;
-
-    case 3:
-      @sysvar::Fault_ABS_WheelSpeedFL = 1;
-      setTimer(t_TestStep, 150); // Propagation delay
-      g_CurrentTestCase = 4;
-      break;
-
-    case 4:
-      @sysvar::Trigger_RCA_Scan = 1;
-      setTimer(t_TestStep, 150); // Execution delay
-      g_CurrentTestCase = 5;
-      break;
-
-    case 5:
-      // Verify TC 2 (Scenario 1)
-      {
-        char resDTC[32];
-        sysGetVariableString(sysvar::RCA_Output_RootDTC, resDTC, elCount(resDTC));
-        if (strncmp(resDTC, "C0035-13", 8) == 0 && @sysvar::RCA_Result_Latency < 50.0)
-        {
-          LogHtmlRow(2, "Scenario 1: Left Front Wheel Speed Sensor Open", "ABS/ESP", "C0035-13", @sysvar::RCA_Result_Latency, 1);
-        }
-        else
-        {
-          LogHtmlRow(2, "Scenario 1: Left Front Wheel Speed Sensor Open", "ABS/ESP", "C0035-13", @sysvar::RCA_Result_Latency, 0);
-        }
-      }
-      // Prepare TC 3: Scenario 2 (ECM Throttle Sensor Low)
-      @sysvar::Fault_Reset_All = 1;
-      setTimer(t_TestStep, 200);
-      g_CurrentTestCase = 6;
-      break;
-
-    case 6:
-      @sysvar::Fault_ECM_ThrottleSensor = 1;
-      setTimer(t_TestStep, 150);
-      g_CurrentTestCase = 7;
-      break;
-
-    case 7:
-      @sysvar::Trigger_RCA_Scan = 1;
-      setTimer(t_TestStep, 150);
-      g_CurrentTestCase = 8;
-      break;
-
-    case 8:
-      // Verify TC 3 (Scenario 2)
-      {
-        char resDTC[32];
-        sysGetVariableString(sysvar::RCA_Output_RootDTC, resDTC, elCount(resDTC));
-        if (strncmp(resDTC, "P0122-12", 8) == 0 && @sysvar::RCA_Result_Latency < 50.0)
-        {
-          LogHtmlRow(3, "Scenario 2: Throttle Position Sensor Low Circuit", "ECM", "P0122-12", @sysvar::RCA_Result_Latency, 1);
-        }
-        else
-        {
-          LogHtmlRow(3, "Scenario 2: Throttle Position Sensor Low Circuit", "ECM", "P0122-12", @sysvar::RCA_Result_Latency, 0);
-        }
-      }
-      // Prepare TC 4: Scenario 3 (ECM Node Cutoff)
-      @sysvar::Fault_Reset_All = 1;
-      setTimer(t_TestStep, 200);
-      g_CurrentTestCase = 9;
-      break;
-
-    case 9:
-      @sysvar::Fault_Node_Cutoff_ECM = 1;
-      setTimer(t_TestStep, 300); // Wait for timeout
-      g_CurrentTestCase = 10;
-      break;
-
-    case 10:
-      @sysvar::Trigger_RCA_Scan = 1;
-      setTimer(t_TestStep, 150);
-      g_CurrentTestCase = 11;
-      break;
-
-    case 11:
-      // Verify TC 4 (Scenario 3)
-      {
-        char resDTC[32];
-        sysGetVariableString(sysvar::RCA_Output_RootDTC, resDTC, elCount(resDTC));
-        if (strncmp(resDTC, "U0100-00", 8) == 0)
-        {
-          LogHtmlRow(4, "Scenario 3: Complete ECM Node Loss / Bus Dropout", "ECM", "U0100-00", @sysvar::RCA_Result_Latency, 1);
-        }
-        else
-        {
-          LogHtmlRow(4, "Scenario 3: Complete ECM Node Loss / Bus Dropout", "ECM", "U0100-00", @sysvar::RCA_Result_Latency, 0);
-        }
-      }
-      // Prepare TC 5: Scenario 4 (Engine Coolant Overheat)
-      @sysvar::Fault_Reset_All = 1;
-      setTimer(t_TestStep, 200);
-      g_CurrentTestCase = 12;
-      break;
-
-    case 12:
-      @sysvar::Fault_ECM_CoolantTemp = 1;
-      setTimer(t_TestStep, 150);
-      g_CurrentTestCase = 13;
-      break;
-
-    case 13:
-      @sysvar::Trigger_RCA_Scan = 1;
-      setTimer(t_TestStep, 150);
-      g_CurrentTestCase = 14;
-      break;
-
-    case 14:
-      // Verify TC 5 (Scenario 4)
-      {
-        char resDTC[32];
-        sysGetVariableString(sysvar::RCA_Output_RootDTC, resDTC, elCount(resDTC));
-        if (strncmp(resDTC, "P0217-00", 8) == 0)
-        {
-          LogHtmlRow(5, "Scenario 4: Engine Coolant Over-Temperature", "ECM", "P0217-00", @sysvar::RCA_Result_Latency, 1);
-        }
-        else
-        {
-          LogHtmlRow(5, "Scenario 4: Engine Coolant Over-Temperature", "ECM", "P0217-00", @sysvar::RCA_Result_Latency, 0);
-        }
-      }
-      // Prepare TC 6: Scenario 5 (Brake Switch Short)
-      @sysvar::Fault_Reset_All = 1;
-      setTimer(t_TestStep, 200);
-      g_CurrentTestCase = 15;
-      break;
-
-    case 15:
-      @sysvar::Fault_BCM_BrakeSwitch = 1;
-      setTimer(t_TestStep, 150);
-      g_CurrentTestCase = 16;
-      break;
-
-    case 16:
-      @sysvar::Trigger_RCA_Scan = 1;
-      setTimer(t_TestStep, 150);
-      g_CurrentTestCase = 17;
-      break;
-
-    case 17:
-      // Verify TC 6 (Scenario 5)
-      {
-        char resDTC[32];
-        sysGetVariableString(sysvar::RCA_Output_RootDTC, resDTC, elCount(resDTC));
-        if (strncmp(resDTC, "B1318-11", 8) == 0)
-        {
-          LogHtmlRow(6, "Scenario 5: Brake Pedal Switch Stuck High", "BCM", "B1318-11", @sysvar::RCA_Result_Latency, 1);
-        }
-        else
-        {
-          LogHtmlRow(6, "Scenario 5: Brake Pedal Switch Stuck High", "BCM", "B1318-11", @sysvar::RCA_Result_Latency, 0);
-        }
-      }
-      // Prepare TC 7: Scenario 6 (ABS Node Loss)
-      @sysvar::Fault_Reset_All = 1;
-      setTimer(t_TestStep, 200);
-      g_CurrentTestCase = 18;
-      break;
-
-    case 18:
-      @sysvar::Fault_Node_Cutoff_ABS = 1;
-      setTimer(t_TestStep, 300);
-      g_CurrentTestCase = 19;
-      break;
-
-    case 19:
-      @sysvar::Trigger_RCA_Scan = 1;
-      setTimer(t_TestStep, 150);
-      g_CurrentTestCase = 20;
-      break;
-
-    case 20:
-      // Verify TC 7 (Scenario 6)
-      {
-        char resDTC[32];
-        sysGetVariableString(sysvar::RCA_Output_RootDTC, resDTC, elCount(resDTC));
-        if (strncmp(resDTC, "U0121-00", 8) == 0)
-        {
-          LogHtmlRow(7, "Scenario 6: Complete ABS Node Dropout / Bus Loss", "ABS/ESP", "U0121-00", @sysvar::RCA_Result_Latency, 1);
-        }
-        else
-        {
-          LogHtmlRow(7, "Scenario 6: Complete ABS Node Dropout / Bus Loss", "ABS/ESP", "U0121-00", @sysvar::RCA_Result_Latency, 0);
-        }
-      }
-      @sysvar::Fault_Reset_All = 1;
-      LogHtmlFooter();
-      break;
-  }
+  LogHtmlFooter();
 }
