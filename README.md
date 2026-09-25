@@ -98,35 +98,74 @@ Diagnostic services, Data Identifiers (DIDs), and fault memory trees are defined
 The system models the inter-ECU communication matrix as a Directed Acyclic Graph $G = (V, E)$, where $V$ represents the set of ECUs and $E$ represents directional signal dependencies defined in `Powertrain_Body_Network.dbc`.
 
 ### Step 1: Signal Dependency Matrix ($D$)
-$$D_{ij} = \begin{cases} 1 & \text{if } ECU_j \text{ consumes signals published by } ECU_i \\ 0 & \text{otherwise} \end{cases}$$
+
+$$
+D_{ij} = \begin{cases} 
+1 & \text{if } \text{ECU}_j \text{ consumes signals published by } \text{ECU}_i \\ 
+0 & \text{otherwise} 
+\end{cases}
+$$
 
 For the 4-ECU cluster:
-$$D = \begin{pmatrix}
+
+$$
+D = \begin{pmatrix}
 0 & 1 & 1 & 1 \\
 1 & 0 & 1 & 0 \\
 0 & 0 & 0 & 0 \\
 0 & 0 & 0 & 0
-\end{pmatrix} \quad \begin{matrix} \text{Row 0: ECM} \\ \text{Row 1: ABS} \\ \text{Row 2: TCM} \\ \text{Row 3: BCM} \end{matrix}$$
+\end{pmatrix}
+\quad
+\begin{matrix}
+\text{Row 0: ECM} \\
+\text{Row 1: ABS} \\
+\text{Row 2: TCM} \\
+\text{Row 3: BCM}
+\end{matrix}
+$$
 
 ### Step 2: Diagnostic Pre-Conditions Evaluation
+
 Before interrogating DTCs, the Diagnostic Master validates vehicle operational boundaries:
-$$\text{Preconditions Met} = (\text{Ignition} == \text{ON}) \land (9.5\text{V} \le V_{\text{batt}} \le 16.0\text{V})$$
+
+$$
+\text{Preconditions Met} = (\text{Ignition} == \text{ON}) \land (9.5\,\text{V} \le V_{\text{batt}} \le 16.0\,\text{V})
+$$
+
 If conditions fail, the scan is inhibited to prevent false isolation caused by low-voltage brownouts or key-off states.
 
 ### Step 3: Active Fault Vector Retrieval ($\mathbf{f}$)
+
 The Diagnostic Master broadcasts UDS Service `0x19 02` (`mask = 0x09`). Responses build the binary fault vector:
-$$f_i = \begin{cases} 1 & \text{if } ECU_i \text{ returns confirmed DTCs} \\ 0 & \text{if } ECU_i \text{ is healthy} \end{cases}$$
+
+$$
+f_i = \begin{cases} 
+1 & \text{if } \text{ECU}_i \text{ returns confirmed DTCs} \\ 
+0 & \text{if } \text{ECU}_i \text{ is healthy} 
+\end{cases}
+$$
 
 ### Step 4: Topological In-Degree Computation
+
 The fault in-degree for each node $j$ is computed as the inner product of the dependency column and the fault vector:
-$$\text{in-degree}_{\text{fault}}(j) = \sum_{i \neq j} D_{ij} \cdot f_i$$
+
+$$
+\text{in-degree}_{\text{fault}}(j) = \sum_{i \neq j} D_{ij} \cdot f_i
+$$
 
 ### Step 5: Root Cause Isolation & Symptom Suppression Decision Rule
-$$\begin{cases} \mathbf{\text{in-degree} = 0} & \implies \textbf{Primary Root Cause Node} \quad \text{(Local component/sensor failure)} \\ \mathbf{\text{in-degree} \ge 1} & \implies \textbf{Secondary Cascading Symptom} \quad \text{(Pruned from technician view)} \end{cases}$$
+
+$$
+\begin{cases} 
+\text{in-degree}_{\text{fault}}(j) = 0 \implies \text{Primary Root Cause Node (Local component/sensor failure)} \\ 
+\text{in-degree}_{\text{fault}}(j) \ge 1 \implies \text{Secondary Cascading Symptom (Pruned from technician view)} 
+\end{cases}
+$$
 
 ### Step 6: Node Dropout & Bus Silence Handling
+
 When an ECU suffers physical power or transceiver failure (e.g. ECM cutoff):
-1. The failed node ceases CAN transmission and suppresses UDS server responses (`0x7E8`/`0x7EA`).
+1. The failed node ceases CAN transmission and suppresses UDS server responses (`0x7E8` / `0x7EA`).
 2. Downstream nodes (`TCM`, `BCM`) detect message reception timeouts and log cascade DTCs (`U0100-00`).
 3. The RCA engine interrogates surviving nodes, registers physical UDS timeout on the silent node, and correctly identifies node dropout as the primary root cause without false sensor attribution.
 
