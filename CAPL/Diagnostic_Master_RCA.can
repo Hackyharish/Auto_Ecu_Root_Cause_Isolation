@@ -66,6 +66,11 @@ variables
   char g_PrunedSymptoms[256];
   char g_FreezeFrameText[128];
   char g_ASIL[32];
+
+  // Vehicle Power & Sound State Tracking
+  int g_IgnitionActive = 1;
+  int g_SoundPlaying = 0;
+  msTimer t_SoundCooldown;
 }
 
 on start
@@ -76,8 +81,18 @@ on start
   write(" Panel: Press 'Reset All Faults' or key '0' to clear all faults.");
   write(" Keys '1'-'6': Trigger Scenarios 1 to 6.");
   write(" Key 'I': Toggle Ignition (OFF/RUN). Key 'V': Toggle Battery Voltage.");
+  write(" Key 'E': Play Realistic Multi-Gear Engine Acceleration Sound.");
   write("===================================================================");
   g_ScanState = STATE_IDLE;
+  if (@sysvar::Sim_IgnitionState >= 2)
+  {
+    g_IgnitionActive = 1;
+  }
+  else
+  {
+    g_IgnitionActive = 0;
+  }
+  g_SoundPlaying = 0;
   setTimer(t_Monitor100ms, 100);
 }
 
@@ -170,19 +185,49 @@ on key 'b'
   }
 }
 
+void PlayEngineSound()
+{
+  write("\n>>> [AUDIO] Playing realistic multi-gear engine acceleration sound (Audio/engine_accel_gearchange.wav)...");
+  sysExec("cmd.exe", "/c start /min \"\" \"Scripts\\play_engine_sound.bat\"");
+}
+
+on timer t_SoundCooldown
+{
+  g_SoundPlaying = 0;
+}
+
 void ToggleIgnition()
 {
-  if (@sysvar::Sim_IgnitionState >= 2)
+  if (g_IgnitionActive == 1)
   {
+    g_IgnitionActive = 0;
     @sysvar::Sim_IgnitionState = 0;
-    write("\n>>> [VEHICLE STATE] Key I: Ignition switched OFF (KL30 only).");
+    write("\n>>> [VEHICLE STATE] Ignition switched OFF (KL30 only).");
     sysSetVariableString(sysvar::Panel_Scenario_Info, "Vehicle OFF: Ignition OFF (KL15 inactive). Diagnostics and dynamic DTCs inhibited.");
   }
   else
   {
+    g_IgnitionActive = 1;
     @sysvar::Sim_IgnitionState = 2;
-    write("\n>>> [VEHICLE STATE] Key I: Ignition switched ON (KL15 active).");
+    write("\n>>> [VEHICLE STATE] Ignition switched ON (KL15 active).");
     sysSetVariableString(sysvar::Panel_Scenario_Info, "Vehicle ON: Ignition set to RUN (KL15 active). Diagnostic operations enabled.");
+  }
+}
+
+on sysvar sysvar::Sim_IgnitionState
+{
+  if (@this == 1)
+  {
+    // Panel button pressed (pulses 1) -> toggle ignition state
+    ToggleIgnition();
+  }
+  else if (@this >= 2)
+  {
+    g_IgnitionActive = 1;
+  }
+  else if (@this == 0)
+  {
+    g_IgnitionActive = 0;
   }
 }
 
@@ -194,6 +239,26 @@ on key 'i'
 on key 'I'
 {
   ToggleIgnition();
+}
+
+on key 'e'
+{
+  PlayEngineSound();
+}
+
+on key 'E'
+{
+  PlayEngineSound();
+}
+
+on sysvar sysvar::Sim_AcceleratorPedal
+{
+  if (@this > 20.0 && g_SoundPlaying == 0 && @sysvar::Sim_IgnitionState >= 2)
+  {
+    g_SoundPlaying = 1;
+    PlayEngineSound();
+    setTimer(t_SoundCooldown, 20000); // 20s cooldown matching track duration
+  }
 }
 
 void ToggleVoltage()
@@ -244,46 +309,91 @@ on key '0'
   ResetEntireNetwork();
 }
 
+// -----------------------------------------------------------------------------
+// Scenario Trigger Handlers (Keyboard and Panel Buttons)
+// -----------------------------------------------------------------------------
 on key '1'
 {
   write("\n>>> [FAULT INJECTION] Key 1: Left Front Wheel Speed Sensor Open (ABS).");
   @sysvar::Fault_ABS_WheelSpeedFL = 1;
-  sysSetVariableString(sysvar::Panel_Scenario_Info, "Scenario 1: FL Wheel Speed Sensor Open (ABS C0035-13). Propagates to TCM U0415-81 & ECM P0500-00. Root: ABS.");
+}
+
+on sysvar sysvar::Fault_ABS_WheelSpeedFL
+{
+  if (@this == 1)
+  {
+    sysSetVariableString(sysvar::Panel_Scenario_Info, "Scenario 1: FL Wheel Speed Sensor Open (ABS C0035-13). Propagates to TCM U0415-81 & ECM P0500-00. Root: ABS.");
+  }
 }
 
 on key '2'
 {
   write("\n>>> [FAULT INJECTION] Key 2: Throttle Position Sensor Low Circuit (ECM).");
   @sysvar::Fault_ECM_ThrottleSensor = 1;
-  sysSetVariableString(sysvar::Panel_Scenario_Info, "Scenario 2: Throttle Position Sensor Low (ECM P0122-12). Propagates to TCM U0401-86. Root: ECM.");
+}
+
+on sysvar sysvar::Fault_ECM_ThrottleSensor
+{
+  if (@this == 1)
+  {
+    sysSetVariableString(sysvar::Panel_Scenario_Info, "Scenario 2: Throttle Position Sensor Low (ECM P0122-12). Propagates to TCM U0401-86. Root: ECM.");
+  }
 }
 
 on key '3'
 {
   write("\n>>> [FAULT INJECTION] Key 3: Complete ECM Node Communication Cutoff.");
   @sysvar::Fault_Node_Cutoff_ECM = 1;
-  sysSetVariableString(sysvar::Panel_Scenario_Info, "Scenario 3: Complete ECM Node Dropout (U0100-00). Missing heartbeat causes TCM & BCM loss of comm. Root: ECM.");
+}
+
+on sysvar sysvar::Fault_Node_Cutoff_ECM
+{
+  if (@this == 1)
+  {
+    sysSetVariableString(sysvar::Panel_Scenario_Info, "Scenario 3: Complete ECM Node Dropout (U0100-00). Missing heartbeat causes TCM & BCM loss of comm. Root: ECM.");
+  }
 }
 
 on key '4'
 {
   write("\n>>> [FAULT INJECTION] Key 4: Engine Coolant Over-Temperature Fault (ECM).");
   @sysvar::Fault_ECM_CoolantTemp = 1;
-  sysSetVariableString(sysvar::Panel_Scenario_Info, "Scenario 4: Engine Coolant Overheat (ECM P0217-00). Propagates to TCM U0401-82 & BCM B10A2-00. Root: ECM.");
+}
+
+on sysvar sysvar::Fault_ECM_CoolantTemp
+{
+  if (@this == 1)
+  {
+    sysSetVariableString(sysvar::Panel_Scenario_Info, "Scenario 4: Engine Coolant Overheat (ECM P0217-00). Propagates to TCM U0401-82 & BCM B10A2-00. Root: ECM.");
+  }
 }
 
 on key '5'
 {
   write("\n>>> [FAULT INJECTION] Key 5: Brake Pedal Switch Stuck High/Active (BCM).");
   @sysvar::Fault_BCM_BrakeSwitch = 1;
-  sysSetVariableString(sysvar::Panel_Scenario_Info, "Scenario 5: Brake Switch Stuck Closed (BCM B1318-11). Plausibility conflict triggers ECM P0504 & TCM U0422. Root: BCM.");
+}
+
+on sysvar sysvar::Fault_BCM_BrakeSwitch
+{
+  if (@this == 1)
+  {
+    sysSetVariableString(sysvar::Panel_Scenario_Info, "Scenario 5: Brake Switch Stuck Closed (BCM B1318-11). Plausibility conflict triggers ECM P0504 & TCM U0422. Root: BCM.");
+  }
 }
 
 on key '6'
 {
   write("\n>>> [FAULT INJECTION] Key 6: Complete ABS Node Communication Cutoff.");
   @sysvar::Fault_Node_Cutoff_ABS = 1;
-  sysSetVariableString(sysvar::Panel_Scenario_Info, "Scenario 6: Complete ABS Node Dropout (U0121-00). Missing heartbeat causes TCM & ECM loss of comm. Root: ABS.");
+}
+
+on sysvar sysvar::Fault_Node_Cutoff_ABS
+{
+  if (@this == 1)
+  {
+    sysSetVariableString(sysvar::Panel_Scenario_Info, "Scenario 6: Complete ABS Node Dropout (U0121-00). Missing heartbeat causes TCM & ECM loss of comm. Root: ABS.");
+  }
 }
 
 void StartAutomatedRCA()

@@ -29,11 +29,11 @@
         <Property Name="ReadOnly">True</Property>
       </Object>
       <Property Name="Name">Grp_Guidance</Property>
-      <Property Name="Size">920, 68</Property>
-      <Property Name="Location">15, 483</Property>
+      <Property Name="Size">920, 62</Property>
+      <Property Name="Location">15, 489</Property>
       <Property Name="ForeColor">White</Property>
       <Property Name="Font">Segoe UI, 8.5pt, style=Bold</Property>
-      <Property Name="Text">5. CONTEXTUAL DIAGNOSTIC SCENARIO GUIDANCE</Property>
+      <Property Name="Text"></Property>
       <Property Name="TabIndex">0</Property>
       <Property Name="UseWindowsStyle">False</Property>
     </Object>
@@ -166,7 +166,7 @@
       <Object Type="Vector.CANalyzer.Panels.Design.TextBoxControl, Vector.CANalyzer.Panels.CommonControls, Version=18.0.150.0, Culture=neutral, PublicKeyToken=null" Name="Txt_BattVolt" ControlName="Txt_BattVolt">
         <Property Name="Name">Txt_BattVolt</Property>
         <Property Name="Size">53, 21</Property>
-        <Property Name="Location">94, 336</Property>
+        <Property Name="Location">88, 337</Property>
         <Property Name="AlarmGeneralSettings">1;0;0;100</Property>
         <Property Name="AlarmLowerBkgColor">Salmon</Property>
         <Property Name="AlarmLowerTextColor">Black</Property>
@@ -191,7 +191,7 @@
       <Object Type="Vector.CANalyzer.Panels.Design.ButtonControl, Vector.CANalyzer.Panels.CommonControls, Version=18.0.150.0, Culture=neutral, PublicKeyToken=null" Name="Btn_AutoTest" ControlName="Button AutoTest">
         <Property Name="Name">Btn_AutoTest</Property>
         <Property Name="Size">210, 34</Property>
-        <Property Name="Location">10, 368</Property>
+        <Property Name="Location">10, 372</Property>
         <Property Name="UseWindowsStyle">False</Property>
         <Property Name="BackColor">255, 106, 78, 140</Property>
         <Property Name="TabIndex">10</Property>
@@ -202,15 +202,47 @@
         <Property Name="UseVisualStyleBackColor">False</Property>
       </Object>
       <Property Name="Name">Grp_Faults</Property>
-      <Property Name="Size">230, 465</Property>
-      <Property Name="Location">15, 12</Property>
+      <Property Name="Size">230, 455</Property>
+      <Property Name="Location">15, 22</Property>
       <Property Name="ForeColor">White</Property>
       <Property Name="Font">Segoe UI, 8.5pt, style=Bold</Property>
-      <Property Name="Text">1. FAULT INJECTION SCENARIOS</Property>
+      <Property Name="Text"></Property>
       <Property Name="TabIndex">0</Property>
       <Property Name="UseWindowsStyle">False</Property>
     </Object>
     <Object Type="Vector.CANalyzer.Panels.Design.GroupBoxControl, Vector.CANalyzer.Panels.CommonControls, Version=18.0.150.0, Culture=neutral, PublicKeyToken=null" Name="Grp_Telemetry" ControlName="Grp_Telemetry">
+      <Object Type="Vector.CANalyzer.Panels.Design.LEDControl, Vector.CANalyzer.Panels.CommonControls, Version=18.0.150.0, Culture=neutral, PublicKeyToken=null" Name="X0351ce56e1f71e477cea59aebafc9a6d9193" ControlName="LED Control 7">
+        <Property Name="Name">X0351ce56e1f71e477cea59aebafc9a6d9193</Property>
+        <Property Name="Size">28, 28</Property>
+        <Property Name="Location">212, 207</Property>
+        <Property Name="ReadOnlyControl">True</Property>
+        <Property Name="TabIndex">15</Property>
+        <Property Name="TabStopActive">False</Property>
+        <Property Name="SwitchValuesVTXml">&lt;Version&gt;2&lt;/Version&gt;&lt;Count&gt;2&lt;/Count&gt;&lt;RxValue&gt;0&lt;/RxValue&gt;&lt;LowerUpper&gt;Lower&lt;/LowerUpper&gt;&lt;TxValue&gt;0&lt;/TxValue&gt;&lt;Color&gt;Green&lt;/Color&gt;&lt;RxValue&gt;1&lt;/RxValue&gt;&lt;LowerUpper&gt;Lower&lt;/LowerUpper&gt;&lt;TxValue&gt;1&lt;/TxValue&gt;&lt;Color&gt;Red&lt;/Color&gt;</Property>
+        <Property Name="UsedLEDColorOff">Green</Property>
+        <Property Name="SymbolConfiguration">8;16;;;;Disp_ESP_Fault;1;;;-1;;;Value;;;0</Property>
+      </Object>
+      <Object Type="Vector.CANalyzer.Panels.Design.LEDControl, Vector.CANalyzer.Panels.CommonControls, Version=18.0.150.0, Culture=neutral, PublicKeyToken=null" Name="X171af957ea447e490eeb383e5fe4a5f09fd8" ControlName="LED Control 6">
+        <Property Name="Name">X171af957ea447e490eeb383e5fe4a5f09fd8</Property>
+        <Property Name="Size">24, 24</Property>
+        <Property Name="Location">280, 207</Property>
+        <Property Name="ReadOnlyControl">True</Property>
+        <Property Name="TabIndex">14</Property>
+        <Property Name="TabStopActive">False</Property>
+        <Property Name="SymbolConfiguration"></Property>
+      </Object>
+      <Object Type="Vector.CANalyzer.Panels.Design.LEDControl, Vector.CANalyzer.Panels.CommonControls, Version=18.0.150.0, Culture=neutral, PublicKeyToken=null" Name="X4b71981de6acce45dde8e35e0d47acc5786a" ControlName="LED Control 5">
+        <Property Name="Name">X4b71981de6acce45dde8e35e0d47acc5786a</Property>
+        <Property Name="Size">28, 28</Property>
+        <Property Name="Location">212, 176</Property>
+        <Property Name="ReadOnlyControl">True</Property>
+        <Property Name="TabIndex">13</Property>
+        <Property Name="TabStopActive">False</Property>
+        <Property Name="SwitchValuesVTXml">&lt;Version&gt;2&lt;/Version&gt;&lt;Count&gt;3&lt;/Count&gt;&lt;RxValue&gt;0&lt;/RxValue&gt;&lt;LowerUpper&gt;Lower&lt;/LowerUpper&gt;&lt;TxValue&gt;0&lt;/TxValue&gt;&lt;Color&gt;Green&lt;/Color&gt;&lt;RxValue&gt;1&lt;/RxValue&gt;&lt;LowerUpper&gt;Lower&lt;/LowerUpper&gt;&lt;TxValue&gt;1&lt;/TxValue&gt;&lt;Color&gt;Yellow&lt;/Color&gt;&lt;RxValue&gt;2&lt;/RxValue&gt;&lt;LowerUpper&gt;Lower&lt;/LowerUpper&gt;&lt;TxValue&gt;2&lt;/TxValue&gt;&lt;Color&gt;Red&lt;/Color&gt;</Property>
+        <Property Name="UsedLEDColorOff">Green</Property>
+        <Property Name="UsedLEDColorOn">Yellow</Property>
+        <Property Name="SymbolConfiguration">8;16;;;;Disp_MIL;1;;;-1;;;Value;;;0</Property>
+      </Object>
       <Object Type="Vector.CANalyzer.Panels.Design.StaticTextControl, Vector.CANalyzer.Panels.CommonControls, Version=18.0.150.0, Culture=neutral, PublicKeyToken=null" Name="Lbl_Pedal" ControlName="Static Text Pedal">
         <Property Name="Name">Lbl_Pedal</Property>
         <Property Name="Size">260, 16</Property>
@@ -436,11 +468,11 @@
         <Property Name="UseVisualStyleBackColor">False</Property>
       </Object>
       <Property Name="Name">Grp_Telemetry</Property>
-      <Property Name="Size">280, 310</Property>
-      <Property Name="Location">255, 12</Property>
+      <Property Name="Size">280, 300</Property>
+      <Property Name="Location">255, 22</Property>
       <Property Name="ForeColor">White</Property>
       <Property Name="Font">Segoe UI, 8.5pt, style=Bold</Property>
-      <Property Name="Text">2. VEHICLE DYNAMICS &amp; CLUSTER</Property>
+      <Property Name="Text"></Property>
       <Property Name="TabIndex">0</Property>
       <Property Name="UseWindowsStyle">False</Property>
     </Object>
@@ -488,7 +520,7 @@
       </Object>
       <Object Type="Vector.CANalyzer.Panels.Design.TextBoxControl, Vector.CANalyzer.Panels.CommonControls, Version=18.0.150.0, Culture=neutral, PublicKeyToken=null" Name="Txt_BusState" ControlName="Txt_BusState">
         <Property Name="Name">Txt_BusState</Property>
-        <Property Name="Size">57, 21</Property>
+        <Property Name="Size">67, 21</Property>
         <Property Name="Location">208, 24</Property>
         <Property Name="AlarmGeneralSettings">1;0;0;100</Property>
         <Property Name="AlarmLowerBkgColor">Salmon</Property>
@@ -521,7 +553,7 @@
       </Object>
       <Object Type="Vector.CANalyzer.Panels.Design.TextBoxControl, Vector.CANalyzer.Panels.CommonControls, Version=18.0.150.0, Culture=neutral, PublicKeyToken=null" Name="Txt_Errors" ControlName="Txt_Errors">
         <Property Name="Name">Txt_Errors</Property>
-        <Property Name="Size">24, 21</Property>
+        <Property Name="Size">32, 21</Property>
         <Property Name="Location">98, 57</Property>
         <Property Name="AlarmGeneralSettings">1;0;0;100</Property>
         <Property Name="AlarmLowerBkgColor">Salmon</Property>
@@ -579,15 +611,21 @@
         <Property Name="ReadOnly">True</Property>
       </Object>
       <Property Name="Name">Grp_BusHealth</Property>
-      <Property Name="Size">280, 145</Property>
-      <Property Name="Location">255, 332</Property>
+      <Property Name="Size">280, 140</Property>
+      <Property Name="Location">255, 337</Property>
       <Property Name="ForeColor">White</Property>
       <Property Name="Font">Segoe UI, 8.5pt, style=Bold</Property>
-      <Property Name="Text">3. CAN BUS UTILIZATION &amp; HEALTH</Property>
+      <Property Name="Text"></Property>
       <Property Name="TabIndex">0</Property>
       <Property Name="UseWindowsStyle">False</Property>
     </Object>
     <Object Type="Vector.CANalyzer.Panels.Design.GroupBoxControl, Vector.CANalyzer.Panels.CommonControls, Version=18.0.150.0, Culture=neutral, PublicKeyToken=null" Name="Grp_RCAResults" ControlName="Grp_RCAResults">
+      <Object Type="Vector.CANalyzer.Panels.Design.StartStopControl, Vector.CANalyzer.Panels.CommonControls, Version=18.0.150.0, Culture=neutral, PublicKeyToken=null" Name="X55c4a1c1efc28e405fead6ae263993db454c" ControlName="Start Stop Control 1">
+        <Property Name="Name">X55c4a1c1efc28e405fead6ae263993db454c</Property>
+        <Property Name="Size">154, 77</Property>
+        <Property Name="Location">114, 337</Property>
+        <Property Name="TabIndex">5</Property>
+      </Object>
       <Object Type="Vector.CANalyzer.Panels.Design.LEDControl, Vector.CANalyzer.Panels.CommonControls, Version=18.0.150.0, Culture=neutral, PublicKeyToken=null" Name="X05ef8f68e331de49c2eb12fec61f7186bb19" ControlName="LED Control 4">
         <Property Name="Name">X05ef8f68e331de49c2eb12fec61f7186bb19</Property>
         <Property Name="Size">34, 34</Property>
@@ -1055,19 +1093,19 @@
         <Property Name="ReadOnly">True</Property>
       </Object>
       <Property Name="Name">Grp_RCAResults</Property>
-      <Property Name="Size">390, 465</Property>
-      <Property Name="Location">545, 12</Property>
+      <Property Name="Size">386, 455</Property>
+      <Property Name="Location">549, 22</Property>
       <Property Name="ForeColor">White</Property>
       <Property Name="Font">Segoe UI, 8.5pt, style=Bold</Property>
-      <Property Name="Text">4. ROOT CAUSE ISOLATION &amp; BENCHMARKS</Property>
+      <Property Name="Text"></Property>
       <Property Name="TabIndex">0</Property>
       <Property Name="UseWindowsStyle">False</Property>
     </Object>
     <Property Name="Name">Panel</Property>
-    <Property Name="Size">998, 557</Property>
+    <Property Name="Size">995, 557</Property>
     <Property Name="Location">0, 0</Property>
     <Property Name="BackColor">255, 15, 20, 30</Property>
-    <Property Name="ImageFileName">panel_backdrop.jpg</Property>
+    <Property Name="ImageFileName">pANEL_BG.png</Property>
     <Property Name="IsProportional">True</Property>
     <Property Name="BackImage">panel_backdrop.jpg</Property>
   </Object>
