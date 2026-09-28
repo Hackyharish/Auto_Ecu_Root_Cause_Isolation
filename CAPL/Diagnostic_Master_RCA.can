@@ -188,12 +188,66 @@ on key 'b'
 void PlayEngineSound()
 {
   write("\n>>> [AUDIO] Playing realistic multi-gear engine acceleration sound (Audio/engine_accel_gearchange.wav)...");
-  sysExec("cmd.exe", "/c start /min \"\" \"Scripts\\play_engine_sound.bat\"");
+  sysExec("wscript.exe", "Scripts\\play_engine_sound.vbs");
 }
 
 on timer t_SoundCooldown
 {
   g_SoundPlaying = 0;
+}
+
+on key 'a'
+{
+  if (@sysvar::Sim_AcceleratorPedal < 10.0)
+  {
+    @sysvar::Sim_AcceleratorPedal = 65.0;
+    write("\n>>> [THROTTLE] Key A: Accelerator applied to 65%. Engine revving...");
+  }
+  else
+  {
+    @sysvar::Sim_AcceleratorPedal = 0.0;
+    write("\n>>> [THROTTLE] Key A: Accelerator released to 0%. Coasting...");
+  }
+}
+
+on key 'A'
+{
+  if (@sysvar::Sim_AcceleratorPedal < 10.0)
+  {
+    @sysvar::Sim_AcceleratorPedal = 65.0;
+    write("\n>>> [THROTTLE] Key A: Accelerator applied to 65%. Engine revving...");
+  }
+  else
+  {
+    @sysvar::Sim_AcceleratorPedal = 0.0;
+    write("\n>>> [THROTTLE] Key A: Accelerator released to 0%. Coasting...");
+  }
+}
+
+on key 'e'
+{
+  PlayEngineSound();
+}
+
+on key 'E'
+{
+  PlayEngineSound();
+}
+
+on sysvar sysvar::Sim_AcceleratorPedal
+{
+  if (@this > 3.0 && g_SoundPlaying == 0 && @sysvar::Sim_IgnitionState >= 2)
+  {
+    g_SoundPlaying = 1;
+    PlayEngineSound();
+    setTimer(t_SoundCooldown, 15000); // 15s cooldown
+  }
+  else if (@this <= 1.0)
+  {
+    // Throttle released: allow re-trigger on next pedal press
+    g_SoundPlaying = 0;
+    cancelTimer(t_SoundCooldown);
+  }
 }
 
 void ToggleIgnition()
@@ -239,26 +293,6 @@ on key 'i'
 on key 'I'
 {
   ToggleIgnition();
-}
-
-on key 'e'
-{
-  PlayEngineSound();
-}
-
-on key 'E'
-{
-  PlayEngineSound();
-}
-
-on sysvar sysvar::Sim_AcceleratorPedal
-{
-  if (@this > 20.0 && g_SoundPlaying == 0 && @sysvar::Sim_IgnitionState >= 2)
-  {
-    g_SoundPlaying = 1;
-    PlayEngineSound();
-    setTimer(t_SoundCooldown, 20000); // 20s cooldown matching track duration
-  }
 }
 
 void ToggleVoltage()
