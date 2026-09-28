@@ -70,7 +70,11 @@ variables
   // Vehicle Power & Sound State Tracking
   int g_IgnitionActive = 1;
   int g_SoundPlaying = 0;
-  msTimer t_SoundCooldown;
+}
+
+on preStart
+{
+  @sysvar::Sim_BatteryVoltage = 13.8;
 }
 
 on start
@@ -84,6 +88,7 @@ on start
   write(" Key 'E': Play Realistic Multi-Gear Engine Acceleration Sound.");
   write("===================================================================");
   g_ScanState = STATE_IDLE;
+  @sysvar::Sim_BatteryVoltage = 13.8;
   if (@sysvar::Sim_IgnitionState >= 2)
   {
     g_IgnitionActive = 1;
@@ -160,6 +165,11 @@ on timer t_Monitor100ms
     sysSetVariableString(sysvar::RCA_Metric_Preconditions, "PASS: KL15 ON / Vbatt OK");
   }
 
+  if (g_SoundPlaying == 1)
+  {
+    UpdateEngineAudioSync();
+  }
+
   setTimer(t_Monitor100ms, 100);
 }
 
@@ -185,32 +195,77 @@ on key 'b'
   }
 }
 
-void PlayEngineSound()
+void UpdateEngineAudioSync()
 {
+  dword fh;
+  char buf[128];
+  int active;
   long res;
-  write("\n>>> [AUDIO] Playing realistic multi-gear engine acceleration sound (Audio/engine_accel_gearchange.wav)...");
-  // 1. Primary: Silent Python GUI process (zero console window, completely benign to AV)
-  res = sysExec("pythonw.exe", "Scripts\\engine_sound_realtime.py --play");
-  if (res == 0)
+
+  if (@sysvar::Sim_IgnitionState >= 2 && @sysvar::Sim_BrakePedal == 0 && @sysvar::Sim_AcceleratorPedal > 3.0)
   {
-    // 2. Python Windows launcher (in C:\Windows\pyw.exe)
-    res = sysExec("pyw.exe", "Scripts\\engine_sound_realtime.py --play");
+    active = 1;
   }
-  if (res == 0)
+  else
   {
-    // 3. Fallback to standard Python
-    res = sysExec("python.exe", "Scripts\\engine_sound_realtime.py --play");
+    active = 0;
   }
-  if (res == 0)
+
+  // Update dynamic throttle & vehicle telemetry state in control file
+  fh = openFileWrite("Scripts/engine_sound_ctl.txt", 2);
+  if (fh != 0)
   {
-    // 4. Benign batch / PowerShell fallback (no bypass flags, no vbs)
-    sysExec("cmd.exe", "/c Scripts\\play_engine_sound.bat");
+    snprintf(buf, elcount(buf), "%d %.1f %d %.1f\n", 
+             active, 
+             @sysvar::Sim_AcceleratorPedal, 
+             @sysvar::Disp_CurrentGear, 
+             @sysvar::Disp_VehicleSpeed);
+    fileWriteStr(fh, buf);
+    fileClose(fh);
+  }
+
+  if (active == 1 && g_SoundPlaying == 0)
+  {
+    g_SoundPlaying = 1;
+    write("\n>>> [AUDIO] Accelerator applied (%.1f%%, Gear %d) - Synchronized audio started.", 
+          @sysvar::Sim_AcceleratorPedal, @sysvar::Disp_CurrentGear);
+    // 1. Silent Python GUI process (zero console window, completely benign to AV)
+    res = sysExec("pythonw.exe", "Scripts\\engine_sound_realtime.py --sync");
+    if (res == 0)
+    {
+      // 2. Python Windows launcher (in C:\Windows\pyw.exe)
+      res = sysExec("pyw.exe", "Scripts\\engine_sound_realtime.py --sync");
+    }
+    if (res == 0)
+    {
+      // 3. Fallback to standard Python
+      res = sysExec("python.exe", "Scripts\\engine_sound_realtime.py --sync");
+    }
+    if (res == 0)
+    {
+      // 4. Benign batch / PowerShell fallback
+      sysExec("cmd.exe", "/c Scripts\\play_engine_sound.bat --sync");
+    }
+  }
+  else if (active == 0 && g_SoundPlaying == 1)
+  {
+    g_SoundPlaying = 0;
+    write("\n>>> [AUDIO] Accelerator released (0%%) - Cutting engine roar; decelerating to idle.");
   }
 }
 
-on timer t_SoundCooldown
+void PlayEngineSound()
 {
-  g_SoundPlaying = 0;
+  // Toggle throttle pedal to 60% for audible acceleration rev test
+  if (@sysvar::Sim_AcceleratorPedal < 10.0)
+  {
+    @sysvar::Sim_AcceleratorPedal = 60.0;
+  }
+  else
+  {
+    @sysvar::Sim_AcceleratorPedal = 0.0;
+  }
+  UpdateEngineAudioSync();
 }
 
 on key 'a'
@@ -225,6 +280,7 @@ on key 'a'
     @sysvar::Sim_AcceleratorPedal = 0.0;
     write("\n>>> [THROTTLE] Key A: Accelerator released to 0%. Coasting...");
   }
+  UpdateEngineAudioSync();
 }
 
 on key 'A'
@@ -239,6 +295,7 @@ on key 'A'
     @sysvar::Sim_AcceleratorPedal = 0.0;
     write("\n>>> [THROTTLE] Key A: Accelerator released to 0%. Coasting...");
   }
+  UpdateEngineAudioSync();
 }
 
 on key 'e'
@@ -253,18 +310,12 @@ on key 'E'
 
 on sysvar sysvar::Sim_AcceleratorPedal
 {
-  if (@this > 3.0 && g_SoundPlaying == 0 && @sysvar::Sim_IgnitionState >= 2)
-  {
-    g_SoundPlaying = 1;
-    PlayEngineSound();
-    setTimer(t_SoundCooldown, 15000); // 15s cooldown
-  }
-  else if (@this <= 1.0)
-  {
-    // Throttle released: allow re-trigger on next pedal press
-    g_SoundPlaying = 0;
-    cancelTimer(t_SoundCooldown);
-  }
+  UpdateEngineAudioSync();
+}
+
+on sysvar sysvar::Sim_BrakePedal
+{
+  UpdateEngineAudioSync();
 }
 
 void ToggleIgnition()
@@ -283,6 +334,7 @@ void ToggleIgnition()
     write("\n>>> [VEHICLE STATE] Ignition switched ON (KL15 active).");
     sysSetVariableString(sysvar::Panel_Scenario_Info, "Vehicle ON: Ignition set to RUN (KL15 active). Diagnostic operations enabled.");
   }
+  UpdateEngineAudioSync();
 }
 
 on sysvar sysvar::Sim_IgnitionState
@@ -295,10 +347,12 @@ on sysvar sysvar::Sim_IgnitionState
   else if (@this >= 2)
   {
     g_IgnitionActive = 1;
+    UpdateEngineAudioSync();
   }
   else if (@this == 0)
   {
     g_IgnitionActive = 0;
+    UpdateEngineAudioSync();
   }
 }
 
@@ -851,6 +905,8 @@ void ResetEntireNetwork()
   @sysvar::Disp_CurrentGear = 1;
   @sysvar::Disp_MIL = 0;
   @sysvar::Disp_ESP_Fault = 0;
+  @sysvar::Sim_BatteryVoltage = 13.8;
+  UpdateEngineAudioSync();
 
   // 3. Broadcast UDS Service 0x14 (ClearDiagnosticInformation) via 0x7DF
   msg_Req_Func.byte(0) = 0x04; // Single Frame length 4

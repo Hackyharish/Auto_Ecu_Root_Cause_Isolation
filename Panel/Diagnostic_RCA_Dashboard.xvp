@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <Panel Type="Vector.CANalyzer.Panels.PanelSerializer, Vector.CANalyzer.Panels.Serializer, Version=19.5.44.0, Culture=neutral, PublicKeyToken=null">
   <Object Type="Vector.CANalyzer.Panels.Runtime.Panel, Vector.CANalyzer.Panels.Common, Version=18.0.150.0, Culture=neutral, PublicKeyToken=null" Name="Panel" ControlName="Diagnostic_RCA_Dashboard">
     <Object Type="Vector.CANalyzer.Panels.Design.GroupBoxControl, Vector.CANalyzer.Panels.CommonControls, Version=18.0.150.0, Culture=neutral, PublicKeyToken=null" Name="Grp_Guidance" ControlName="Grp_Guidance">
@@ -186,7 +186,7 @@
         <Property Name="Font">Consolas, 9.5pt, style=Bold</Property>
         <Property Name="BackColor">15, 23, 42</Property>
         <Property Name="ForeColor">250, 204, 21</Property>
-        <Property Name="ReadOnly">True</Property>
+        <Property Name="ReadOnly">False</Property>
       </Object>
       <Object Type="Vector.CANalyzer.Panels.Design.ButtonControl, Vector.CANalyzer.Panels.CommonControls, Version=18.0.150.0, Culture=neutral, PublicKeyToken=null" Name="Btn_AutoTest" ControlName="Button AutoTest">
         <Property Name="Name">Btn_AutoTest</Property>
