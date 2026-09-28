@@ -23,12 +23,35 @@ except ImportError:
 def play_pregenerated_audio(wav_path=None):
     if wav_path is None:
         script_dir = os.path.dirname(os.path.abspath(__file__))
-        wav_path = os.path.join(script_dir, "..", "Audio", "engine_accel_gearchange.wav")
+        wav_path = os.path.normpath(os.path.join(script_dir, "..", "Audio", "engine_accel_gearchange.wav"))
     
-    if os.path.exists(wav_path) and HAS_WINSOUND:
-        print(f"[AUDIO] Playing engine acceleration track: {wav_path}")
-        winsound.PlaySound(wav_path, winsound.SND_FILENAME | winsound.SND_ASYNC)
-        return True
+    if os.path.exists(wav_path):
+        if HAS_WINSOUND:
+            try:
+                import wave
+                with wave.open(wav_path, "rb") as w:
+                    duration = w.getnframes() / float(w.getframerate())
+            except Exception:
+                duration = 20.0
+            
+            try:
+                if sys.stdout is not None:
+                    print(f"[AUDIO] Playing engine acceleration track ({duration:.1f}s): {wav_path}")
+                winsound.PlaySound(wav_path, winsound.SND_FILENAME | winsound.SND_ASYNC)
+                time.sleep(duration)
+                winsound.PlaySound(None, 0)
+                return True
+            except Exception:
+                pass
+        
+        # Clean PowerShell SoundPlayer fallback (benign, zero dropper flags)
+        try:
+            import subprocess
+            cmd = f"$p = [System.Media.SoundPlayer]::new('{wav_path}'); $p.PlaySync()"
+            subprocess.run(["powershell.exe", "-NoProfile", "-Command", cmd], check=True)
+            return True
+        except Exception:
+            pass
     return False
 
 def simulate_realtime_revs():

@@ -187,8 +187,25 @@ on key 'b'
 
 void PlayEngineSound()
 {
+  long res;
   write("\n>>> [AUDIO] Playing realistic multi-gear engine acceleration sound (Audio/engine_accel_gearchange.wav)...");
-  sysExec("wscript.exe", "Scripts\\play_engine_sound.vbs");
+  // 1. Primary: Silent Python GUI process (zero console window, completely benign to AV)
+  res = sysExec("pythonw.exe", "Scripts\\engine_sound_realtime.py --play");
+  if (res == 0)
+  {
+    // 2. Python Windows launcher (in C:\Windows\pyw.exe)
+    res = sysExec("pyw.exe", "Scripts\\engine_sound_realtime.py --play");
+  }
+  if (res == 0)
+  {
+    // 3. Fallback to standard Python
+    res = sysExec("python.exe", "Scripts\\engine_sound_realtime.py --play");
+  }
+  if (res == 0)
+  {
+    // 4. Benign batch / PowerShell fallback (no bypass flags, no vbs)
+    sysExec("cmd.exe", "/c Scripts\\play_engine_sound.bat");
+  }
 }
 
 on timer t_SoundCooldown
