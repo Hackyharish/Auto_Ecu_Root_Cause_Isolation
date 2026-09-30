@@ -404,6 +404,11 @@ on sysvar sysvar::Trigger_RCA_Scan
 {
   if (@sysvar::Trigger_RCA_Scan == 1)
   {
+    if (@sysvar::Sim_IgnitionState >= 2 && @sysvar::Sim_AcceleratorPedal < 10.0)
+    {
+      @sysvar::Sim_AcceleratorPedal = 45.0; // Increase speed first
+      UpdateEngineAudioSync();
+    }
     StartAutomatedRCA();
     @sysvar::Trigger_RCA_Scan = 0; // Reset trigger pulse
   }
@@ -422,12 +427,49 @@ on key '0'
   ResetEntireNetwork();
 }
 
+on key 't'
+{
+  write("\n>>> [AUTO TEST] Key T: Ensuring engine ON, accelerating vehicle to driving speed, and starting scan...");
+  if (@sysvar::Sim_IgnitionState < 2)
+  {
+    @sysvar::Sim_IgnitionState = 2;
+    @sysvar::Sim_BatteryVoltage = 13.8;
+  }
+  if (@sysvar::Sim_AcceleratorPedal < 10.0)
+  {
+    @sysvar::Sim_AcceleratorPedal = 45.0;
+    UpdateEngineAudioSync();
+  }
+  StartAutomatedRCA();
+}
+
+on key 'T'
+{
+  write("\n>>> [AUTO TEST] Key T: Ensuring engine ON, accelerating vehicle to driving speed, and starting scan...");
+  if (@sysvar::Sim_IgnitionState < 2)
+  {
+    @sysvar::Sim_IgnitionState = 2;
+    @sysvar::Sim_BatteryVoltage = 13.8;
+  }
+  if (@sysvar::Sim_AcceleratorPedal < 10.0)
+  {
+    @sysvar::Sim_AcceleratorPedal = 45.0;
+    UpdateEngineAudioSync();
+  }
+  StartAutomatedRCA();
+}
+
 // -----------------------------------------------------------------------------
 // Scenario Trigger Handlers (Keyboard and Panel Buttons)
 // -----------------------------------------------------------------------------
 on key '1'
 {
   write("\n>>> [FAULT INJECTION] Key 1: Left Front Wheel Speed Sensor Open (ABS).");
+  if (@sysvar::Sim_IgnitionState >= 2 && @sysvar::Sim_AcceleratorPedal < 10.0)
+  {
+    @sysvar::Sim_AcceleratorPedal = 45.0; // Increase speed first
+    UpdateEngineAudioSync();
+  }
   @sysvar::Fault_ABS_WheelSpeedFL = 1;
 }
 
@@ -442,6 +484,11 @@ on sysvar sysvar::Fault_ABS_WheelSpeedFL
 on key '2'
 {
   write("\n>>> [FAULT INJECTION] Key 2: Throttle Position Sensor Low Circuit (ECM).");
+  if (@sysvar::Sim_IgnitionState >= 2 && @sysvar::Sim_AcceleratorPedal < 10.0)
+  {
+    @sysvar::Sim_AcceleratorPedal = 45.0;
+    UpdateEngineAudioSync();
+  }
   @sysvar::Fault_ECM_ThrottleSensor = 1;
 }
 
@@ -456,6 +503,11 @@ on sysvar sysvar::Fault_ECM_ThrottleSensor
 on key '3'
 {
   write("\n>>> [FAULT INJECTION] Key 3: Complete ECM Node Communication Cutoff.");
+  if (@sysvar::Sim_IgnitionState >= 2 && @sysvar::Sim_AcceleratorPedal < 10.0)
+  {
+    @sysvar::Sim_AcceleratorPedal = 45.0;
+    UpdateEngineAudioSync();
+  }
   @sysvar::Fault_Node_Cutoff_ECM = 1;
 }
 
@@ -470,6 +522,11 @@ on sysvar sysvar::Fault_Node_Cutoff_ECM
 on key '4'
 {
   write("\n>>> [FAULT INJECTION] Key 4: Engine Coolant Over-Temperature Fault (ECM).");
+  if (@sysvar::Sim_IgnitionState >= 2 && @sysvar::Sim_AcceleratorPedal < 10.0)
+  {
+    @sysvar::Sim_AcceleratorPedal = 45.0;
+    UpdateEngineAudioSync();
+  }
   @sysvar::Fault_ECM_CoolantTemp = 1;
 }
 
@@ -484,6 +541,11 @@ on sysvar sysvar::Fault_ECM_CoolantTemp
 on key '5'
 {
   write("\n>>> [FAULT INJECTION] Key 5: Brake Pedal Switch Stuck High/Active (BCM).");
+  if (@sysvar::Sim_IgnitionState >= 2 && @sysvar::Sim_AcceleratorPedal < 10.0)
+  {
+    @sysvar::Sim_AcceleratorPedal = 45.0;
+    UpdateEngineAudioSync();
+  }
   @sysvar::Fault_BCM_BrakeSwitch = 1;
 }
 
@@ -498,6 +560,11 @@ on sysvar sysvar::Fault_BCM_BrakeSwitch
 on key '6'
 {
   write("\n>>> [FAULT INJECTION] Key 6: Complete ABS Node Communication Cutoff.");
+  if (@sysvar::Sim_IgnitionState >= 2 && @sysvar::Sim_AcceleratorPedal < 10.0)
+  {
+    @sysvar::Sim_AcceleratorPedal = 45.0;
+    UpdateEngineAudioSync();
+  }
   @sysvar::Fault_Node_Cutoff_ABS = 1;
 }
 

@@ -102,12 +102,29 @@ void LogHtmlFooter()
 // TEST CASES (Vector CANoe Test Feature Set)
 // -----------------------------------------------------------------------------
 
+void AccelerateVehicleToDrivingSpeed(double targetPedal, long durationMs)
+{
+  @sysvar::Sim_IgnitionState = 2;       // Engine ON (KL15 active)
+  @sysvar::Sim_BatteryVoltage = 13.8;   // Nominal Battery Voltage
+  @sysvar::Sim_BrakePedal = 0;          // Release brake pedal
+  @sysvar::Sim_AcceleratorPedal = targetPedal; // Apply throttle demand
+  testWaitForTimeout(durationMs);       // Wait for vehicle speed & engine RPM to ramp up
+}
+
+void CooldownVehicleStandstill()
+{
+  @sysvar::Sim_AcceleratorPedal = 0.0;  // Release throttle
+  @sysvar::Fault_Reset_All = 1;         // Clear injected faults & reset network
+  testWaitForTimeout(250);
+}
+
 testcase TC_01_Precondition_Rejection()
 {
   char resDTC[32];
 
   // Turn Ignition OFF
   @sysvar::Sim_IgnitionState = 0;
+  @sysvar::Sim_AcceleratorPedal = 0.0;
   @sysvar::Trigger_RCA_Scan = 1;
   testWaitForTimeout(200);
 
@@ -134,11 +151,14 @@ testcase TC_02_Scenario1_ABS_WSS()
 {
   char resDTC[32];
 
-  // Inject Scenario 1
+  // 1. Ensure Engine is ON and increase speed first
+  AccelerateVehicleToDrivingSpeed(45.0, 400);
+
+  // 2. Inject Scenario 1 (FL Wheel Speed Sensor Open at speed)
   @sysvar::Fault_ABS_WheelSpeedFL = 1;
   testWaitForTimeout(200);
 
-  // Trigger RCA Scan
+  // 3. Trigger RCA Scan
   @sysvar::Trigger_RCA_Scan = 1;
   testWaitForTimeout(250);
 
@@ -155,14 +175,17 @@ testcase TC_02_Scenario1_ABS_WSS()
   }
 
   @sysvar::Fault_ABS_WheelSpeedFL = 0;
-  @sysvar::Fault_Reset_All = 1;
-  testWaitForTimeout(250);
+  CooldownVehicleStandstill();
 }
 
 testcase TC_03_Scenario2_ECM_TPS()
 {
   char resDTC[32];
 
+  // 1. Ensure Engine is ON and increase speed first
+  AccelerateVehicleToDrivingSpeed(45.0, 400);
+
+  // 2. Inject Scenario 2 (Throttle Position Sensor Low)
   @sysvar::Fault_ECM_ThrottleSensor = 1;
   testWaitForTimeout(200);
 
@@ -182,14 +205,17 @@ testcase TC_03_Scenario2_ECM_TPS()
   }
 
   @sysvar::Fault_ECM_ThrottleSensor = 0;
-  @sysvar::Fault_Reset_All = 1;
-  testWaitForTimeout(250);
+  CooldownVehicleStandstill();
 }
 
 testcase TC_04_Scenario3_ECM_Node_Dropout()
 {
   char resDTC[32];
 
+  // 1. Ensure Engine is ON and increase speed first
+  AccelerateVehicleToDrivingSpeed(45.0, 400);
+
+  // 2. Inject Scenario 3 (Complete ECM Node Loss at speed)
   @sysvar::Fault_Node_Cutoff_ECM = 1;
   testWaitForTimeout(350);
 
@@ -209,14 +235,17 @@ testcase TC_04_Scenario3_ECM_Node_Dropout()
   }
 
   @sysvar::Fault_Node_Cutoff_ECM = 0;
-  @sysvar::Fault_Reset_All = 1;
-  testWaitForTimeout(250);
+  CooldownVehicleStandstill();
 }
 
 testcase TC_05_Scenario4_Coolant_Overheat()
 {
   char resDTC[32];
 
+  // 1. Ensure Engine is ON and increase speed first
+  AccelerateVehicleToDrivingSpeed(45.0, 400);
+
+  // 2. Inject Scenario 4 (Coolant Overheat at speed)
   @sysvar::Fault_ECM_CoolantTemp = 1;
   testWaitForTimeout(200);
 
@@ -236,14 +265,17 @@ testcase TC_05_Scenario4_Coolant_Overheat()
   }
 
   @sysvar::Fault_ECM_CoolantTemp = 0;
-  @sysvar::Fault_Reset_All = 1;
-  testWaitForTimeout(250);
+  CooldownVehicleStandstill();
 }
 
 testcase TC_06_Scenario5_BCM_Brake_Switch()
 {
   char resDTC[32];
 
+  // 1. Ensure Engine is ON and increase speed first
+  AccelerateVehicleToDrivingSpeed(45.0, 400);
+
+  // 2. Inject Scenario 5 (Brake Switch Stuck High during vehicle motion)
   @sysvar::Fault_BCM_BrakeSwitch = 1;
   testWaitForTimeout(200);
 
@@ -263,14 +295,17 @@ testcase TC_06_Scenario5_BCM_Brake_Switch()
   }
 
   @sysvar::Fault_BCM_BrakeSwitch = 0;
-  @sysvar::Fault_Reset_All = 1;
-  testWaitForTimeout(250);
+  CooldownVehicleStandstill();
 }
 
 testcase TC_07_Scenario6_ABS_Node_Dropout()
 {
   char resDTC[32];
 
+  // 1. Ensure Engine is ON and increase speed first
+  AccelerateVehicleToDrivingSpeed(45.0, 400);
+
+  // 2. Inject Scenario 6 (Complete ABS Node Dropout at speed)
   @sysvar::Fault_Node_Cutoff_ABS = 1;
   testWaitForTimeout(350);
 
@@ -290,8 +325,7 @@ testcase TC_07_Scenario6_ABS_Node_Dropout()
   }
 
   @sysvar::Fault_Node_Cutoff_ABS = 0;
-  @sysvar::Fault_Reset_All = 1;
-  testWaitForTimeout(250);
+  CooldownVehicleStandstill();
 }
 
 // -----------------------------------------------------------------------------
