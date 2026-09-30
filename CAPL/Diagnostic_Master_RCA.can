@@ -202,6 +202,7 @@ void UpdateEngineAudioSync()
   int active;
   long res;
   long len;
+  char absCfgDir[512];
   char absScript[512];
   char absDir[512];
   char absCtl[512];
@@ -217,21 +218,27 @@ void UpdateEngineAudioSync()
     active = 0;
   }
 
-  // Resolve absolute paths based on active CANoe configuration location
-  if (getAbsFilePath("Scripts\\engine_sound_realtime.py", absScript, elCount(absScript)) == 0)
+  // Resolve project configuration root directory
+  absCfgDir[0] = '\0';
+  getAbsFilePath("", absCfgDir, elCount(absCfgDir));
+  len = strlen(absCfgDir);
+  if (len > 0)
   {
+    if (absCfgDir[len - 1] == '\\' || absCfgDir[len - 1] == '/')
+    {
+      absCfgDir[len - 1] = '\0';
+    }
+    snprintf(absScript, elCount(absScript), "%s\\Scripts\\engine_sound_realtime.py", absCfgDir);
+    snprintf(absDir, elCount(absDir), "%s\\Scripts", absCfgDir);
+    snprintf(absCtl, elCount(absCtl), "%s\\Scripts\\engine_sound_ctl.txt", absCfgDir);
+    snprintf(absBat, elCount(absBat), "%s\\Scripts\\play_engine_sound.bat", absCfgDir);
+  }
+  else
+  {
+    // Fallback if getAbsFilePath("") is empty
     strncpy(absScript, "Scripts\\engine_sound_realtime.py", elCount(absScript));
-  }
-  if (getAbsFilePath("Scripts", absDir, elCount(absDir)) == 0)
-  {
     strncpy(absDir, "Scripts", elCount(absDir));
-  }
-  if (getAbsFilePath("Scripts\\engine_sound_ctl.txt", absCtl, elCount(absCtl)) == 0)
-  {
     strncpy(absCtl, "Scripts\\engine_sound_ctl.txt", elCount(absCtl));
-  }
-  if (getAbsFilePath("Scripts\\play_engine_sound.bat", absBat, elCount(absBat)) == 0)
-  {
     strncpy(absBat, "Scripts\\play_engine_sound.bat", elCount(absBat));
   }
 
@@ -258,32 +265,43 @@ void UpdateEngineAudioSync()
   if (active == 1 && g_SoundPlaying == 0)
   {
     g_SoundPlaying = 1;
-    snprintf(cmdArgs, elCount(cmdArgs), "\"%s\" --sync --pedal %.1f --gear %d --speed %.1f", 
+    write("\n>>> [AUDIO] Accelerator applied (%.1f%%, Gear %d) - Launching audio sync...", 
+          @sysvar::Sim_AcceleratorPedal, @sysvar::Disp_CurrentGear);
+
+    // CRITICAL Win32: First token in cmdArgs is argv[0] (executable name)
+    snprintf(cmdArgs, elCount(cmdArgs), "pythonw.exe \"%s\" --sync --pedal %.1f --gear %d --speed %.1f", 
              absScript, 
              @sysvar::Sim_AcceleratorPedal, 
              @sysvar::Disp_CurrentGear, 
              @sysvar::Disp_VehicleSpeed);
-
-    write("\n>>> [AUDIO] Accelerator applied (%.1f%%, Gear %d) - Launching audio sync...", 
-          @sysvar::Sim_AcceleratorPedal, @sysvar::Disp_CurrentGear);
 
     // 1. Silent Python GUI process with explicit working directory
     res = sysExec("pythonw.exe", cmdArgs, absDir);
     if (res == 0)
     {
       // 2. Python Windows launcher
+      snprintf(cmdArgs, elCount(cmdArgs), "pyw.exe \"%s\" --sync --pedal %.1f --gear %d --speed %.1f", 
+               absScript, 
+               @sysvar::Sim_AcceleratorPedal, 
+               @sysvar::Disp_CurrentGear, 
+               @sysvar::Disp_VehicleSpeed);
       res = sysExec("pyw.exe", cmdArgs, absDir);
     }
     if (res == 0)
     {
       // 3. Fallback to standard Python
+      snprintf(cmdArgs, elCount(cmdArgs), "python.exe \"%s\" --sync --pedal %.1f --gear %d --speed %.1f", 
+               absScript, 
+               @sysvar::Sim_AcceleratorPedal, 
+               @sysvar::Disp_CurrentGear, 
+               @sysvar::Disp_VehicleSpeed);
       res = sysExec("python.exe", cmdArgs, absDir);
     }
     if (res == 0)
     {
-      // 4. Benign batch / PowerShell fallback
+      // 4. Benign batch fallback
       char cmdBat[1024];
-      snprintf(cmdBat, elCount(cmdBat), "/c \"%s\" --sync --pedal %.1f --gear %d --speed %.1f", 
+      snprintf(cmdBat, elCount(cmdBat), "cmd.exe /c \"%s\" --sync --pedal %.1f --gear %d --speed %.1f", 
                absBat, 
                @sysvar::Sim_AcceleratorPedal, 
                @sysvar::Disp_CurrentGear, 

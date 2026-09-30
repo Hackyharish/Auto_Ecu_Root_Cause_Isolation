@@ -105,6 +105,8 @@ def sync_engine_audio(init_pedal=45.0, init_gear=1, init_speed=0.0):
     start_time = time.time()
     last_gear = current_gear
     inactive_count = 0
+    # Startup grace period: ignore stale inactive signals for the first 0.8s if launched with active pedal
+    grace_period = 0.8 if float(init_pedal) > 3.0 else 0.0
 
     while True:
         time.sleep(0.06) # 60ms polling
@@ -122,10 +124,10 @@ def sync_engine_audio(init_pedal=45.0, init_gear=1, init_speed=0.0):
         active, pedal, gear, speed = read_ctl()
         
         # Throttle released or brake pressed
-        # Require 2 consecutive inactive reads to avoid transient empty file race conditions
-        if active == 0:
+        # Only evaluate cutoff outside the startup grace period, requiring 3 consecutive inactive reads (180ms)
+        if active == 0 and (time.time() - start_time) > grace_period:
             inactive_count += 1
-            if inactive_count >= 2:
+            if inactive_count >= 3:
                 log_debug(f"Throttle released (inactive_count={inactive_count}), cutting audio.")
                 if HAS_WINSOUND:
                     try:

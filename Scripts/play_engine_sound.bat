@@ -25,4 +25,4 @@ if %ERRORLEVEL% equ 0 (
     exit /b 0
 )
 
-powershell.exe -NoProfile -Command "$p = (Resolve-Path '%~dp0..\Audio\engine_gear1.wav').Path; [System.Media.SoundPlayer]::new($p).PlaySync()"
+powershell.exe -NoProfile -WindowStyle Hidden -Command "$p = (Resolve-Path '%~dp0..\Audio\engine_gear1.wav').Path; [System.Media.SoundPlayer]::new($p).PlaySync()"
