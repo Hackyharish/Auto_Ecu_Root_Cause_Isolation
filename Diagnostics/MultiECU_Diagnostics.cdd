@@ -161,7 +161,7 @@
 
       <dtc-catalog>
         <!-- SCENARIO 1 (PRIMARY ROOT CAUSE) -->
-        <dtc code="0xC00351" display-code="C0035-13" asil="ASIL D" category="PrimaryRootCause">
+        <dtc code="0xC00351" trouble-code="12583761" display-code="C0035-13" asil="ASIL D" category="PrimaryRootCause">
           <text>Left Front Wheel Speed Sensor - Circuit Open</text>
           <symptom-classification>Chassis Functional Safety Critical</symptom-classification>
           <downstream-cascades>
@@ -175,8 +175,14 @@
           </freeze-frame-dids>
         </dtc>
 
+        <!-- SCENARIO 6 (ABS DROPOUT) -->
+        <dtc code="0xD12100" trouble-code="13705472" display-code="U0121-00" asil="ASIL D" category="PrimaryRootCause">
+          <text>Lost Communication with Anti-Lock Brake System (ABS) Module</text>
+          <pruning-rule>Suppressed when ABS Cutoff is active</pruning-rule>
+        </dtc>
+
         <!-- SCENARIO 3 (SECONDARY CASCADE SYMPTOM OF ECM CUTOFF) -->
-        <dtc code="0xD10000" display-code="U0100-00" asil="QM" category="SecondarySymptom">
+        <dtc code="0xD10000" trouble-code="13697024" display-code="U0100-00" asil="QM" category="SecondarySymptom">
           <text>Lost Communication with Engine Control Module (ECM/PCM)</text>
           <pruning-rule>Suppressed when ECM Cutoff / Bus Off is active</pruning-rule>
         </dtc>
@@ -194,7 +200,7 @@
 
       <dtc-catalog>
         <!-- SCENARIO 2 (PRIMARY ROOT CAUSE) -->
-        <dtc code="0x012212" display-code="P0122-12" asil="ASIL D" category="PrimaryRootCause">
+        <dtc code="0x012212" trouble-code="74258" display-code="P0122-12" asil="ASIL D" category="PrimaryRootCause">
           <text>Throttle / Pedal Position Sensor 'A' Circuit Low Input</text>
           <downstream-cascades>
             <cascade target-ecu="TCM" dtc="U0401-86" description="Invalid Throttle Data From ECM"/>
@@ -207,7 +213,7 @@
         </dtc>
 
         <!-- SCENARIO 4 (PRIMARY ROOT CAUSE) -->
-        <dtc code="0x021700" display-code="P0217-00" asil="ASIL B" category="PrimaryRootCause">
+        <dtc code="0x021700" trouble-code="136960" display-code="P0217-00" asil="ASIL B" category="PrimaryRootCause">
           <text>Engine Coolant Over-Temperature Condition</text>
           <downstream-cascades>
             <cascade target-ecu="TCM" dtc="U0401-82" description="Engine Temp Out of Range"/>
@@ -221,19 +227,25 @@
         </dtc>
 
         <!-- SCENARIO 1 (SECONDARY CASCADE SYMPTOM OF ABS WSS) -->
-        <dtc code="0x050000" display-code="P0500-00" asil="QM" category="SecondarySymptom">
+        <dtc code="0x050000" trouble-code="327680" display-code="P0500-00" asil="QM" category="SecondarySymptom">
           <text>Vehicle Speed Sensor 'A' Signal Range / Missing Data</text>
           <pruning-rule>Suppressed when C0035-13 is active on ABS</pruning-rule>
         </dtc>
 
         <!-- SCENARIO 5 (SECONDARY CASCADE SYMPTOM OF BCM BRAKE SWITCH) -->
-        <dtc code="0x050400" display-code="P0504-00" asil="QM" category="SecondarySymptom">
+        <dtc code="0x050400" trouble-code="328704" display-code="P0504-00" asil="QM" category="SecondarySymptom">
           <text>Brake Switch 'A' / 'B' Correlation Plausibility Conflict</text>
           <pruning-rule>Suppressed when B1318-11 is active on BCM</pruning-rule>
         </dtc>
 
+        <!-- SCENARIO 3 (ECM DROPOUT) -->
+        <dtc code="0xD10000" trouble-code="13697024" display-code="U0100-00" asil="ASIL D" category="PrimaryRootCause">
+          <text>Lost Communication with Engine Control Module (ECM/PCM)</text>
+          <pruning-rule>Suppressed when ECM Cutoff / Bus Off is active</pruning-rule>
+        </dtc>
+
         <!-- SCENARIO 6 (SECONDARY CASCADE SYMPTOM OF ABS CUTOFF) -->
-        <dtc code="0xD12100" display-code="U0121-00" asil="QM" category="SecondarySymptom">
+        <dtc code="0xD12100" trouble-code="13705472" display-code="U0121-00" asil="QM" category="SecondarySymptom">
           <text>Lost Communication with Anti-Lock Brake System (ABS) Module</text>
           <pruning-rule>Suppressed when ABS Node Cutoff is active</pruning-rule>
         </dtc>
@@ -251,37 +263,37 @@
 
       <dtc-catalog>
         <!-- SCENARIO 1 (SECONDARY CASCADE SYMPTOM) -->
-        <dtc code="0xD41581" display-code="U0415-81" asil="QM" category="SecondarySymptom">
+        <dtc code="0xD41581" trouble-code="13899137" display-code="U0415-81" asil="QM" category="SecondarySymptom">
           <text>Invalid Data Received From Anti-Lock Brake System (ABS) Control Module</text>
           <pruning-rule>Suppressed when C0035-13 is active on ABS</pruning-rule>
         </dtc>
 
         <!-- SCENARIO 2 (SECONDARY CASCADE SYMPTOM) -->
-        <dtc code="0xD40186" display-code="U0401-86" asil="QM" category="SecondarySymptom">
+        <dtc code="0xD40186" trouble-code="13894022" display-code="U0401-86" asil="QM" category="SecondarySymptom">
           <text>Invalid Data Received From ECM/PCM - Throttle Sensor Signal Invalid</text>
           <pruning-rule>Suppressed when P0122-12 is active on ECM</pruning-rule>
         </dtc>
 
         <!-- SCENARIO 4 (SECONDARY CASCADE SYMPTOM) -->
-        <dtc code="0xD40182" display-code="U0401-82" asil="QM" category="SecondarySymptom">
+        <dtc code="0xD40182" trouble-code="13894018" display-code="U0401-82" asil="QM" category="SecondarySymptom">
           <text>Invalid Data Received From ECM/PCM - Coolant Temperature Plausibility</text>
           <pruning-rule>Suppressed when P0217-00 is active on ECM</pruning-rule>
         </dtc>
 
         <!-- SCENARIO 5 (SECONDARY CASCADE SYMPTOM) -->
-        <dtc code="0xD42281" display-code="U0422-81" asil="QM" category="SecondarySymptom">
+        <dtc code="0xD42281" trouble-code="13902465" display-code="U0422-81" asil="QM" category="SecondarySymptom">
           <text>Invalid Data Received From Body Control Module (BCM) - Brake Signal Conflict</text>
           <pruning-rule>Suppressed when B1318-11 is active on BCM</pruning-rule>
         </dtc>
 
         <!-- SCENARIO 3 (SECONDARY CASCADE SYMPTOM OF ECM DROPOUT) -->
-        <dtc code="0xD10000" display-code="U0100-00" asil="QM" category="SecondarySymptom">
+        <dtc code="0xD10000" trouble-code="13697024" display-code="U0100-00" asil="QM" category="SecondarySymptom">
           <text>Lost Communication with ECM/PCM</text>
           <pruning-rule>Suppressed when ECM Cutoff / Bus Off is active</pruning-rule>
         </dtc>
 
         <!-- SCENARIO 6 (SECONDARY CASCADE SYMPTOM OF ABS DROPOUT) -->
-        <dtc code="0xD12100" display-code="U0121-00" asil="QM" category="SecondarySymptom">
+        <dtc code="0xD12100" trouble-code="13705472" display-code="U0121-00" asil="QM" category="SecondarySymptom">
           <text>Lost Communication with ABS Control Module</text>
           <pruning-rule>Suppressed when ABS Cutoff is active</pruning-rule>
         </dtc>
@@ -299,7 +311,7 @@
 
       <dtc-catalog>
         <!-- SCENARIO 5 (PRIMARY ROOT CAUSE) -->
-        <dtc code="0x931811" display-code="B1318-11" asil="ASIL B" category="PrimaryRootCause">
+        <dtc code="0x931811" trouble-code="9640017" display-code="B1318-11" asil="ASIL B" category="PrimaryRootCause">
           <text>Brake Pedal Switch Circuit Short to Battery / Stuck Active</text>
           <downstream-cascades>
             <cascade target-ecu="ECM" dtc="P0504-00" description="Brake/Throttle Plausibility Conflict"/>
@@ -313,13 +325,13 @@
         </dtc>
 
         <!-- SCENARIO 4 (SECONDARY CASCADE SYMPTOM) -->
-        <dtc code="0x90A200" display-code="B10A2-00" asil="QM" category="SecondarySymptom">
+        <dtc code="0x90A200" trouble-code="9478656" display-code="B10A2-00" asil="QM" category="SecondarySymptom">
           <text>High Engine Coolant Temperature Warning Light Request Failed</text>
           <pruning-rule>Suppressed when P0217-00 is active on ECM</pruning-rule>
         </dtc>
 
         <!-- SCENARIO 3 (SECONDARY CASCADE SYMPTOM OF ECM DROPOUT) -->
-        <dtc code="0xD10000" display-code="U0100-00" asil="QM" category="SecondarySymptom">
+        <dtc code="0xD10000" trouble-code="13697024" display-code="U0100-00" asil="QM" category="SecondarySymptom">
           <text>Lost Communication with Engine Control Module (ECM/PCM)</text>
           <pruning-rule>Suppressed when ECM Cutoff / Bus Off is active</pruning-rule>
         </dtc>

@@ -208,7 +208,7 @@
           <REQUEST ID="REQ_DiagnosticSessionControl">
             <SHORT-NAME>REQ_DiagnosticSessionControl</SHORT-NAME>
             <PARAMS>
-              <PARAM ID="PARAM_REQ_SID_10" SEMANTIC="SERVICE-ID" xsi:type="CODED-CONST">
+              <PARAM SEMANTIC="SERVICE-ID" xsi:type="CODED-CONST">
                 <SHORT-NAME>SID</SHORT-NAME>
                 <BYTE-POSITION>0</BYTE-POSITION>
                 <CODED-VALUE>16</CODED-VALUE>
@@ -223,7 +223,7 @@
           <REQUEST ID="REQ_ECUReset">
             <SHORT-NAME>REQ_ECUReset</SHORT-NAME>
             <PARAMS>
-              <PARAM ID="PARAM_REQ_SID_11" SEMANTIC="SERVICE-ID" xsi:type="CODED-CONST">
+              <PARAM SEMANTIC="SERVICE-ID" xsi:type="CODED-CONST">
                 <SHORT-NAME>SID</SHORT-NAME>
                 <BYTE-POSITION>0</BYTE-POSITION>
                 <CODED-VALUE>17</CODED-VALUE>
@@ -238,7 +238,7 @@
           <REQUEST ID="REQ_ClearDiagnosticInformation">
             <SHORT-NAME>REQ_ClearDiagnosticInformation</SHORT-NAME>
             <PARAMS>
-              <PARAM ID="PARAM_REQ_SID_14" SEMANTIC="SERVICE-ID" xsi:type="CODED-CONST">
+              <PARAM SEMANTIC="SERVICE-ID" xsi:type="CODED-CONST">
                 <SHORT-NAME>SID</SHORT-NAME>
                 <BYTE-POSITION>0</BYTE-POSITION>
                 <CODED-VALUE>20</CODED-VALUE>
@@ -253,7 +253,7 @@
           <REQUEST ID="REQ_ReadDTCInformation">
             <SHORT-NAME>REQ_ReadDTCInformation</SHORT-NAME>
             <PARAMS>
-              <PARAM ID="PARAM_REQ_SID_19" SEMANTIC="SERVICE-ID" xsi:type="CODED-CONST">
+              <PARAM SEMANTIC="SERVICE-ID" xsi:type="CODED-CONST">
                 <SHORT-NAME>SID</SHORT-NAME>
                 <BYTE-POSITION>0</BYTE-POSITION>
                 <CODED-VALUE>25</CODED-VALUE>
@@ -268,7 +268,7 @@
           <REQUEST ID="REQ_ReadDataByIdentifier">
             <SHORT-NAME>REQ_ReadDataByIdentifier</SHORT-NAME>
             <PARAMS>
-              <PARAM ID="PARAM_REQ_SID_22" SEMANTIC="SERVICE-ID" xsi:type="CODED-CONST">
+              <PARAM SEMANTIC="SERVICE-ID" xsi:type="CODED-CONST">
                 <SHORT-NAME>SID</SHORT-NAME>
                 <BYTE-POSITION>0</BYTE-POSITION>
                 <CODED-VALUE>34</CODED-VALUE>
@@ -283,7 +283,7 @@
           <REQUEST ID="REQ_TesterPresent">
             <SHORT-NAME>REQ_TesterPresent</SHORT-NAME>
             <PARAMS>
-              <PARAM ID="PARAM_REQ_SID_3E" SEMANTIC="SERVICE-ID" xsi:type="CODED-CONST">
+              <PARAM SEMANTIC="SERVICE-ID" xsi:type="CODED-CONST">
                 <SHORT-NAME>SID</SHORT-NAME>
                 <BYTE-POSITION>0</BYTE-POSITION>
                 <CODED-VALUE>62</CODED-VALUE>
@@ -300,7 +300,7 @@
           <POS-RESPONSE ID="POS_DiagnosticSessionControl">
             <SHORT-NAME>POS_DiagnosticSessionControl</SHORT-NAME>
             <PARAMS>
-              <PARAM ID="PARAM_POS_RSID_50" SEMANTIC="SERVICE-ID" xsi:type="CODED-CONST">
+              <PARAM SEMANTIC="SERVICE-ID" xsi:type="CODED-CONST">
                 <SHORT-NAME>RSID</SHORT-NAME>
                 <BYTE-POSITION>0</BYTE-POSITION>
                 <CODED-VALUE>80</CODED-VALUE>
@@ -315,7 +315,7 @@
           <POS-RESPONSE ID="POS_ECUReset">
             <SHORT-NAME>POS_ECUReset</SHORT-NAME>
             <PARAMS>
-              <PARAM ID="PARAM_POS_RSID_51" SEMANTIC="SERVICE-ID" xsi:type="CODED-CONST">
+              <PARAM SEMANTIC="SERVICE-ID" xsi:type="CODED-CONST">
                 <SHORT-NAME>RSID</SHORT-NAME>
                 <BYTE-POSITION>0</BYTE-POSITION>
                 <CODED-VALUE>81</CODED-VALUE>
@@ -330,7 +330,7 @@
           <POS-RESPONSE ID="POS_ClearDiagnosticInformation">
             <SHORT-NAME>POS_ClearDiagnosticInformation</SHORT-NAME>
             <PARAMS>
-              <PARAM ID="PARAM_POS_RSID_54" SEMANTIC="SERVICE-ID" xsi:type="CODED-CONST">
+              <PARAM SEMANTIC="SERVICE-ID" xsi:type="CODED-CONST">
                 <SHORT-NAME>RSID</SHORT-NAME>
                 <BYTE-POSITION>0</BYTE-POSITION>
                 <CODED-VALUE>84</CODED-VALUE>
@@ -345,7 +345,7 @@
           <POS-RESPONSE ID="POS_ReadDTCInformation">
             <SHORT-NAME>POS_ReadDTCInformation</SHORT-NAME>
             <PARAMS>
-              <PARAM ID="PARAM_POS_RSID_59" SEMANTIC="SERVICE-ID" xsi:type="CODED-CONST">
+              <PARAM SEMANTIC="SERVICE-ID" xsi:type="CODED-CONST">
                 <SHORT-NAME>RSID</SHORT-NAME>
                 <BYTE-POSITION>0</BYTE-POSITION>
                 <CODED-VALUE>89</CODED-VALUE>
@@ -360,7 +360,7 @@
           <POS-RESPONSE ID="POS_ReadDataByIdentifier">
             <SHORT-NAME>POS_ReadDataByIdentifier</SHORT-NAME>
             <PARAMS>
-              <PARAM ID="PARAM_POS_RSID_62" SEMANTIC="SERVICE-ID" xsi:type="CODED-CONST">
+              <PARAM SEMANTIC="SERVICE-ID" xsi:type="CODED-CONST">
                 <SHORT-NAME>RSID</SHORT-NAME>
                 <BYTE-POSITION>0</BYTE-POSITION>
                 <CODED-VALUE>98</CODED-VALUE>
@@ -375,7 +375,7 @@
           <POS-RESPONSE ID="POS_TesterPresent">
             <SHORT-NAME>POS_TesterPresent</SHORT-NAME>
             <PARAMS>
-              <PARAM ID="PARAM_POS_RSID_7E" SEMANTIC="SERVICE-ID" xsi:type="CODED-CONST">
+              <PARAM SEMANTIC="SERVICE-ID" xsi:type="CODED-CONST">
                 <SHORT-NAME>RSID</SHORT-NAME>
                 <BYTE-POSITION>0</BYTE-POSITION>
                 <CODED-VALUE>126</CODED-VALUE>
@@ -398,7 +398,7 @@
           <p>Chassis control module responsible for wheel speed sensing and ABS/ESP intervention.</p>
         </DESC>
         <PARENT-REFS>
-          <PARENT-REF ID-REF="BV_UDS_Base"/>
+          <PARENT-REF xsi:type="BASE-VARIANT-REF" ID-REF="BV_UDS_Base"/>
         </PARENT-REFS>
         <DIAG-DATA-DICTIONARY-SPEC>
           <DTC-DOPS>
@@ -438,7 +438,7 @@
           <p>Powertrain controller managing engine throttle, ignition, and fuel injection.</p>
         </DESC>
         <PARENT-REFS>
-          <PARENT-REF ID-REF="BV_UDS_Base"/>
+          <PARENT-REF xsi:type="BASE-VARIANT-REF" ID-REF="BV_UDS_Base"/>
         </PARENT-REFS>
         <DIAG-DATA-DICTIONARY-SPEC>
           <DTC-DOPS>
@@ -496,7 +496,7 @@
           <p>Automatic transmission controller computing shift schedules and gear selections.</p>
         </DESC>
         <PARENT-REFS>
-          <PARENT-REF ID-REF="BV_UDS_Base"/>
+          <PARENT-REF xsi:type="BASE-VARIANT-REF" ID-REF="BV_UDS_Base"/>
         </PARENT-REFS>
         <DIAG-DATA-DICTIONARY-SPEC>
           <DTC-DOPS>
@@ -548,7 +548,7 @@
           <p>Body electronics controller handling lighting, brake pedals, and gateway signals.</p>
         </DESC>
         <PARENT-REFS>
-          <PARENT-REF ID-REF="BV_UDS_Base"/>
+          <PARENT-REF xsi:type="BASE-VARIANT-REF" ID-REF="BV_UDS_Base"/>
         </PARENT-REFS>
         <DIAG-DATA-DICTIONARY-SPEC>
           <DTC-DOPS>
