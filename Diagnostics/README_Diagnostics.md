@@ -9,6 +9,7 @@ This directory contains the official diagnostic descriptions for the Multi-ECU R
 | File | Format | Purpose | Compatibility |
 |---|---|---|---|
 | [`MultiECU_Diagnostics.cdd`](MultiECU_Diagnostics.cdd) | Vector CANdela (.cdd XML) | Native Vector CANoe diagnostic specification | Vector CANoe 17/18/19, CANdelaStudio, CANape |
+| [`MultiECU_Diagnostics.pdx`](MultiECU_Diagnostics.pdx) | ASAM MCD-2D Container (PDX) | Standard packed ODX container (ZIP + index.xml + odx-d) | Vector CANoe, ODXStudio, DTS Monaco, CANape |
 | [`MultiECU_Diagnostics.odx`](MultiECU_Diagnostics.odx) | ASAM MCD-2D (ODX 2.2.0) | Vendor-neutral open XML diagnostic exchange | CANoe, INCA, Softing DTS, ODX Studio |
 | [`README_Diagnostics.md`](README_Diagnostics.md) | Markdown | Architecture & CANoe configuration guide | Technical documentation |
 
@@ -63,16 +64,16 @@ This directory contains the official diagnostic descriptions for the Multi-ECU R
 
 ---
 
-## 5. How to Load CDD in Vector CANoe
-
+## 5. How to Load CDD or PDX in Vector CANoe
+ 
 To enable symbolic decoding and the CANoe Fault Memory GUI:
 
 1. Open **Vector CANoe** with `Project.cfg`.
 2. On the top ribbon, navigate to: **Diagnostics** &rarr; **Diagnostic / ISO TP Configuration**.
 3. Under the CAN network (`Powertrain_Body_Network`):
    - Right-click and choose **Add Diagnostic Description...**
-   - Browse and select [`MultiECU_Diagnostics.cdd`](MultiECU_Diagnostics.cdd).
-4. Assign the diagnostic descriptions to the respective simulated nodes (`ECM`, `TCM`, `ABS`, `BCM`).
+   - Browse and select [`MultiECU_Diagnostics.pdx`](MultiECU_Diagnostics.pdx) (or [`MultiECU_Diagnostics.cdd`](MultiECU_Diagnostics.cdd)).
+4. Assign the diagnostic descriptions / ECU variants to the respective simulated nodes (`ECM`, `TCM`, `ABS`, `BCM`).
 5. In CANoe:
    - **Trace Window:** Raw UDS frames (`03 19 02 09`) will now symbolically display service names, sub-functions, and decoded DTC names.
    - **Diagnostic Console (`Diagnostics &rarr; Diagnostic Console`):** Allows sending single requests directly via GUI.
