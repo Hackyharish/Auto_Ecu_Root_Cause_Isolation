@@ -202,6 +202,11 @@ void UpdateEngineAudioSync()
   int active;
   long res;
   long len;
+  char absScript[512];
+  char absDir[512];
+  char absCtl[512];
+  char absBat[512];
+  char cmdArgs[1024];
 
   if (@sysvar::Sim_IgnitionState >= 2 && @sysvar::Sim_BrakePedal == 0 && @sysvar::Sim_AcceleratorPedal > 3.0)
   {
@@ -212,11 +217,29 @@ void UpdateEngineAudioSync()
     active = 0;
   }
 
+  // Resolve absolute paths based on active CANoe configuration location
+  if (getAbsFilePath("Scripts\\engine_sound_realtime.py", absScript, elCount(absScript)) == 0)
+  {
+    strncpy(absScript, "Scripts\\engine_sound_realtime.py", elCount(absScript));
+  }
+  if (getAbsFilePath("Scripts", absDir, elCount(absDir)) == 0)
+  {
+    strncpy(absDir, "Scripts", elCount(absDir));
+  }
+  if (getAbsFilePath("Scripts\\engine_sound_ctl.txt", absCtl, elCount(absCtl)) == 0)
+  {
+    strncpy(absCtl, "Scripts\\engine_sound_ctl.txt", elCount(absCtl));
+  }
+  if (getAbsFilePath("Scripts\\play_engine_sound.bat", absBat, elCount(absBat)) == 0)
+  {
+    strncpy(absBat, "Scripts\\play_engine_sound.bat", elCount(absBat));
+  }
+
   // Update dynamic throttle & vehicle telemetry state in control file
-  fh = openFileWrite("Scripts\\engine_sound_ctl.txt", 2);
+  fh = openFileWrite(absCtl, 2);
   if (fh == 0)
   {
-    fh = openFileWrite("Scripts/engine_sound_ctl.txt", 2);
+    fh = openFileWrite("Scripts\\engine_sound_ctl.txt", 2);
   }
   if (fh != 0)
   {
@@ -235,24 +258,47 @@ void UpdateEngineAudioSync()
   if (active == 1 && g_SoundPlaying == 0)
   {
     g_SoundPlaying = 1;
-    write("\n>>> [AUDIO] Accelerator applied (%.1f%%, Gear %d) - Synchronized audio started.", 
+    snprintf(cmdArgs, elCount(cmdArgs), "\"%s\" --sync --pedal %.1f --gear %d --speed %.1f", 
+             absScript, 
+             @sysvar::Sim_AcceleratorPedal, 
+             @sysvar::Disp_CurrentGear, 
+             @sysvar::Disp_VehicleSpeed);
+
+    write("\n>>> [AUDIO] Accelerator applied (%.1f%%, Gear %d) - Launching audio sync...", 
           @sysvar::Sim_AcceleratorPedal, @sysvar::Disp_CurrentGear);
-    // 1. Silent Python GUI process (zero console window, completely benign to AV)
-    res = sysExec("pythonw.exe", "Scripts\\engine_sound_realtime.py --sync");
+
+    // 1. Silent Python GUI process with explicit working directory
+    res = sysExec("pythonw.exe", cmdArgs, absDir);
     if (res == 0)
     {
-      // 2. Python Windows launcher (in C:\Windows\pyw.exe)
-      res = sysExec("pyw.exe", "Scripts\\engine_sound_realtime.py --sync");
+      // 2. Python Windows launcher
+      res = sysExec("pyw.exe", cmdArgs, absDir);
     }
     if (res == 0)
     {
       // 3. Fallback to standard Python
-      res = sysExec("python.exe", "Scripts\\engine_sound_realtime.py --sync");
+      res = sysExec("python.exe", cmdArgs, absDir);
     }
     if (res == 0)
     {
       // 4. Benign batch / PowerShell fallback
-      sysExec("cmd.exe", "/c Scripts\\play_engine_sound.bat --sync");
+      char cmdBat[1024];
+      snprintf(cmdBat, elCount(cmdBat), "/c \"%s\" --sync --pedal %.1f --gear %d --speed %.1f", 
+               absBat, 
+               @sysvar::Sim_AcceleratorPedal, 
+               @sysvar::Disp_CurrentGear, 
+               @sysvar::Disp_VehicleSpeed);
+      res = sysExec("cmd.exe", cmdBat, absDir);
+    }
+
+    if (res == 0)
+    {
+      g_SoundPlaying = 0;
+      write(">>> [AUDIO ERROR] Failed to dispatch audio process. Check Scripts/play_engine_sound.bat");
+    }
+    else
+    {
+      write(">>> [AUDIO STATUS] Audio process started successfully (res=%d).", res);
     }
   }
   else if (active == 0 && g_SoundPlaying == 1)

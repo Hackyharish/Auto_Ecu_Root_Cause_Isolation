@@ -41,3 +41,6 @@ _PythonTypeLib_*/
 __pycache__/
 SynchronizedFiles/
 *_TypeLibraries/
+*.pid
+*.log
+Scripts/engine_sound_ctl.txt
