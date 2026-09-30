@@ -5,8 +5,8 @@
      Specification: ISO 22901-1 (ODX) / ISO 14229-1:2013 (UDS) / ISO 15765-2 (DoCAN)
      Author: IVN Capstone Team | Tata Technologies TechPulse
      ========================================================================= -->
-<ODX MODEL-VERSION="2.2.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="odx.xsd">
-  <DIAG-LAYER-CONTAINER ID="DLC_MultiECU_Diagnostics">
+<ODX MODEL-VERSION="2.2.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="odx.xsd" xml:lang="en-US">
+  <DIAG-LAYER-CONTAINER ID="DLC_MultiECU_Diagnostics" xml:lang="en-US">
     <SHORT-NAME>MultiECU_Diagnostics_Container</SHORT-NAME>
     <LONG-NAME>In-Vehicle Multi-ECU Diagnostic Description</LONG-NAME>
     <DESC>
