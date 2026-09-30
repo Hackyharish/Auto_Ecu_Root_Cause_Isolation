@@ -201,6 +201,7 @@ void UpdateEngineAudioSync()
   char buf[128];
   int active;
   long res;
+  long len;
 
   if (@sysvar::Sim_IgnitionState >= 2 && @sysvar::Sim_BrakePedal == 0 && @sysvar::Sim_AcceleratorPedal > 3.0)
   {
@@ -212,15 +213,22 @@ void UpdateEngineAudioSync()
   }
 
   // Update dynamic throttle & vehicle telemetry state in control file
-  fh = openFileWrite("Scripts/engine_sound_ctl.txt", 2);
+  fh = openFileWrite("Scripts\\engine_sound_ctl.txt", 2);
+  if (fh == 0)
+  {
+    fh = openFileWrite("Scripts/engine_sound_ctl.txt", 2);
+  }
   if (fh != 0)
   {
-    snprintf(buf, elcount(buf), "%d %.1f %d %.1f\n", 
-             active, 
-             @sysvar::Sim_AcceleratorPedal, 
-             @sysvar::Disp_CurrentGear, 
-             @sysvar::Disp_VehicleSpeed);
-    fileWriteStr(fh, buf);
+    len = snprintf(buf, elCount(buf), "%d %.1f %d %.1f\n", 
+                   active, 
+                   @sysvar::Sim_AcceleratorPedal, 
+                   @sysvar::Disp_CurrentGear, 
+                   @sysvar::Disp_VehicleSpeed);
+    if (len > 0)
+    {
+      filePutString(buf, len, fh);
+    }
     fileClose(fh);
   }
 
