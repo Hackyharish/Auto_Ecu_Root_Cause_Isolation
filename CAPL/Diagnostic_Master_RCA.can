@@ -67,9 +67,8 @@ variables
   char g_FreezeFrameText[128];
   char g_ASIL[32];
 
-  // Vehicle Power & Sound State Tracking
+  // Vehicle Power State Tracking
   int g_IgnitionActive = 1;
-  int g_SoundPlaying = 0;
 }
 
 on preStart
@@ -85,7 +84,6 @@ on start
   write(" Panel: Press 'Reset All Faults' or key '0' to clear all faults.");
   write(" Keys '1'-'6': Trigger Scenarios 1 to 6.");
   write(" Key 'I': Toggle Ignition (OFF/RUN). Key 'V': Toggle Battery Voltage.");
-  write(" Key 'E': Play Realistic Multi-Gear Engine Acceleration Sound.");
   write("===================================================================");
   g_ScanState = STATE_IDLE;
   @sysvar::Sim_BatteryVoltage = 13.8;
@@ -97,7 +95,6 @@ on start
   {
     g_IgnitionActive = 0;
   }
-  g_SoundPlaying = 0;
   setTimer(t_Monitor100ms, 100);
 }
 
@@ -165,11 +162,6 @@ on timer t_Monitor100ms
     sysSetVariableString(sysvar::RCA_Metric_Preconditions, "PASS: KL15 ON / Vbatt OK");
   }
 
-  if (g_SoundPlaying == 1)
-  {
-    UpdateEngineAudioSync();
-  }
-
   setTimer(t_Monitor100ms, 100);
 }
 
@@ -195,164 +187,18 @@ on key 'b'
   }
 }
 
-void UpdateEngineAudioSync()
-{
-  dword fh;
-  char buf[128];
-  int active;
-  long res;
-  long len;
-  char absCfgDir[512];
-  char absScript[512];
-  char absDir[512];
-  char absCtl[512];
-  char absBat[512];
-  char cmdArgs[1024];
-
-  if (@sysvar::Sim_IgnitionState >= 2 && @sysvar::Sim_BrakePedal == 0 && @sysvar::Sim_AcceleratorPedal > 3.0)
-  {
-    active = 1;
-  }
-  else
-  {
-    active = 0;
-  }
-
-  // Resolve project configuration root directory
-  absCfgDir[0] = '\0';
-  getAbsFilePath("", absCfgDir, elCount(absCfgDir));
-  len = strlen(absCfgDir);
-  if (len > 0)
-  {
-    if (absCfgDir[len - 1] == '\\' || absCfgDir[len - 1] == '/')
-    {
-      absCfgDir[len - 1] = '\0';
-    }
-    snprintf(absScript, elCount(absScript), "%s\\Scripts\\engine_sound_realtime.py", absCfgDir);
-    snprintf(absDir, elCount(absDir), "%s\\Scripts", absCfgDir);
-    snprintf(absCtl, elCount(absCtl), "%s\\Scripts\\engine_sound_ctl.txt", absCfgDir);
-    snprintf(absBat, elCount(absBat), "%s\\Scripts\\play_engine_sound.bat", absCfgDir);
-  }
-  else
-  {
-    // Fallback if getAbsFilePath("") is empty
-    strncpy(absScript, "Scripts\\engine_sound_realtime.py", elCount(absScript));
-    strncpy(absDir, "Scripts", elCount(absDir));
-    strncpy(absCtl, "Scripts\\engine_sound_ctl.txt", elCount(absCtl));
-    strncpy(absBat, "Scripts\\play_engine_sound.bat", elCount(absBat));
-  }
-
-  // Update dynamic throttle & vehicle telemetry state in control file
-  fh = openFileWrite(absCtl, 2);
-  if (fh == 0)
-  {
-    fh = openFileWrite("Scripts\\engine_sound_ctl.txt", 2);
-  }
-  if (fh != 0)
-  {
-    len = snprintf(buf, elCount(buf), "%d %.1f %d %.1f\n", 
-                   active, 
-                   @sysvar::Sim_AcceleratorPedal, 
-                   @sysvar::Disp_CurrentGear, 
-                   @sysvar::Disp_VehicleSpeed);
-    if (len > 0)
-    {
-      filePutString(buf, len, fh);
-    }
-    fileClose(fh);
-  }
-
-  if (active == 1 && g_SoundPlaying == 0)
-  {
-    g_SoundPlaying = 1;
-    write("\n>>> [AUDIO] Accelerator applied (%.1f%%, Gear %d) - Launching audio sync...", 
-          @sysvar::Sim_AcceleratorPedal, @sysvar::Disp_CurrentGear);
-
-    // CRITICAL Win32: First token in cmdArgs is argv[0] (executable name)
-    snprintf(cmdArgs, elCount(cmdArgs), "pythonw.exe \"%s\" --sync --pedal %.1f --gear %d --speed %.1f", 
-             absScript, 
-             @sysvar::Sim_AcceleratorPedal, 
-             @sysvar::Disp_CurrentGear, 
-             @sysvar::Disp_VehicleSpeed);
-
-    // 1. Silent Python GUI process with explicit working directory
-    res = sysExec("pythonw.exe", cmdArgs, absDir);
-    if (res == 0)
-    {
-      // 2. Python Windows launcher
-      snprintf(cmdArgs, elCount(cmdArgs), "pyw.exe \"%s\" --sync --pedal %.1f --gear %d --speed %.1f", 
-               absScript, 
-               @sysvar::Sim_AcceleratorPedal, 
-               @sysvar::Disp_CurrentGear, 
-               @sysvar::Disp_VehicleSpeed);
-      res = sysExec("pyw.exe", cmdArgs, absDir);
-    }
-    if (res == 0)
-    {
-      // 3. Fallback to standard Python
-      snprintf(cmdArgs, elCount(cmdArgs), "python.exe \"%s\" --sync --pedal %.1f --gear %d --speed %.1f", 
-               absScript, 
-               @sysvar::Sim_AcceleratorPedal, 
-               @sysvar::Disp_CurrentGear, 
-               @sysvar::Disp_VehicleSpeed);
-      res = sysExec("python.exe", cmdArgs, absDir);
-    }
-    if (res == 0)
-    {
-      // 4. Benign batch fallback
-      char cmdBat[1024];
-      snprintf(cmdBat, elCount(cmdBat), "cmd.exe /c \"%s\" --sync --pedal %.1f --gear %d --speed %.1f", 
-               absBat, 
-               @sysvar::Sim_AcceleratorPedal, 
-               @sysvar::Disp_CurrentGear, 
-               @sysvar::Disp_VehicleSpeed);
-      res = sysExec("cmd.exe", cmdBat, absDir);
-    }
-
-    if (res == 0)
-    {
-      g_SoundPlaying = 0;
-      write(">>> [AUDIO ERROR] Failed to dispatch audio process. Check Scripts/play_engine_sound.bat");
-    }
-    else
-    {
-      write(">>> [AUDIO STATUS] Audio process started successfully (res=%d).", res);
-    }
-  }
-  else if (active == 0 && g_SoundPlaying == 1)
-  {
-    g_SoundPlaying = 0;
-    write("\n>>> [AUDIO] Accelerator released (0%%) - Cutting engine roar; decelerating to idle.");
-  }
-}
-
-void PlayEngineSound()
-{
-  // Toggle throttle pedal to 60% for audible acceleration rev test
-  if (@sysvar::Sim_AcceleratorPedal < 10.0)
-  {
-    @sysvar::Sim_AcceleratorPedal = 60.0;
-  }
-  else
-  {
-    @sysvar::Sim_AcceleratorPedal = 0.0;
-  }
-  UpdateEngineAudioSync();
-}
-
 on key 'a'
 {
   if (@sysvar::Sim_AcceleratorPedal < 10.0)
   {
     @sysvar::Sim_AcceleratorPedal = 65.0;
-    write("\n>>> [THROTTLE] Key A: Accelerator applied to 65%. Engine revving...");
+    write("\n>>> [THROTTLE] Key A: Accelerator applied to 65%.");
   }
   else
   {
     @sysvar::Sim_AcceleratorPedal = 0.0;
-    write("\n>>> [THROTTLE] Key A: Accelerator released to 0%. Coasting...");
+    write("\n>>> [THROTTLE] Key A: Accelerator released to 0%.");
   }
-  UpdateEngineAudioSync();
 }
 
 on key 'A'
@@ -360,34 +206,13 @@ on key 'A'
   if (@sysvar::Sim_AcceleratorPedal < 10.0)
   {
     @sysvar::Sim_AcceleratorPedal = 65.0;
-    write("\n>>> [THROTTLE] Key A: Accelerator applied to 65%. Engine revving...");
+    write("\n>>> [THROTTLE] Key A: Accelerator applied to 65%.");
   }
   else
   {
     @sysvar::Sim_AcceleratorPedal = 0.0;
-    write("\n>>> [THROTTLE] Key A: Accelerator released to 0%. Coasting...");
+    write("\n>>> [THROTTLE] Key A: Accelerator released to 0%.");
   }
-  UpdateEngineAudioSync();
-}
-
-on key 'e'
-{
-  PlayEngineSound();
-}
-
-on key 'E'
-{
-  PlayEngineSound();
-}
-
-on sysvar sysvar::Sim_AcceleratorPedal
-{
-  UpdateEngineAudioSync();
-}
-
-on sysvar sysvar::Sim_BrakePedal
-{
-  UpdateEngineAudioSync();
 }
 
 void ToggleIgnition()
@@ -406,7 +231,6 @@ void ToggleIgnition()
     write("\n>>> [VEHICLE STATE] Ignition switched ON (KL15 active).");
     sysSetVariableString(sysvar::Panel_Scenario_Info, "Vehicle ON: Ignition set to RUN (KL15 active). Diagnostic operations enabled.");
   }
-  UpdateEngineAudioSync();
 }
 
 on sysvar sysvar::Sim_IgnitionState
@@ -419,12 +243,10 @@ on sysvar sysvar::Sim_IgnitionState
   else if (@this >= 2)
   {
     g_IgnitionActive = 1;
-    UpdateEngineAudioSync();
   }
   else if (@this == 0)
   {
     g_IgnitionActive = 0;
-    UpdateEngineAudioSync();
   }
 }
 
@@ -471,7 +293,6 @@ on sysvar sysvar::Trigger_RCA_Scan
     if (@sysvar::Sim_IgnitionState >= 2 && @sysvar::Sim_AcceleratorPedal < 10.0)
     {
       @sysvar::Sim_AcceleratorPedal = 45.0; // Increase speed first
-      UpdateEngineAudioSync();
     }
     StartAutomatedRCA();
     @sysvar::Trigger_RCA_Scan = 0; // Reset trigger pulse
@@ -502,7 +323,6 @@ on key 't'
   if (@sysvar::Sim_AcceleratorPedal < 10.0)
   {
     @sysvar::Sim_AcceleratorPedal = 45.0;
-    UpdateEngineAudioSync();
   }
   StartAutomatedRCA();
 }
@@ -518,7 +338,6 @@ on key 'T'
   if (@sysvar::Sim_AcceleratorPedal < 10.0)
   {
     @sysvar::Sim_AcceleratorPedal = 45.0;
-    UpdateEngineAudioSync();
   }
   StartAutomatedRCA();
 }
@@ -532,7 +351,6 @@ on key '1'
   if (@sysvar::Sim_IgnitionState >= 2 && @sysvar::Sim_AcceleratorPedal < 10.0)
   {
     @sysvar::Sim_AcceleratorPedal = 45.0; // Increase speed first
-    UpdateEngineAudioSync();
   }
   @sysvar::Fault_ABS_WheelSpeedFL = 1;
 }
@@ -551,7 +369,6 @@ on key '2'
   if (@sysvar::Sim_IgnitionState >= 2 && @sysvar::Sim_AcceleratorPedal < 10.0)
   {
     @sysvar::Sim_AcceleratorPedal = 45.0;
-    UpdateEngineAudioSync();
   }
   @sysvar::Fault_ECM_ThrottleSensor = 1;
 }
@@ -570,7 +387,6 @@ on key '3'
   if (@sysvar::Sim_IgnitionState >= 2 && @sysvar::Sim_AcceleratorPedal < 10.0)
   {
     @sysvar::Sim_AcceleratorPedal = 45.0;
-    UpdateEngineAudioSync();
   }
   @sysvar::Fault_Node_Cutoff_ECM = 1;
 }
@@ -589,7 +405,6 @@ on key '4'
   if (@sysvar::Sim_IgnitionState >= 2 && @sysvar::Sim_AcceleratorPedal < 10.0)
   {
     @sysvar::Sim_AcceleratorPedal = 45.0;
-    UpdateEngineAudioSync();
   }
   @sysvar::Fault_ECM_CoolantTemp = 1;
 }
@@ -608,7 +423,6 @@ on key '5'
   if (@sysvar::Sim_IgnitionState >= 2 && @sysvar::Sim_AcceleratorPedal < 10.0)
   {
     @sysvar::Sim_AcceleratorPedal = 45.0;
-    UpdateEngineAudioSync();
   }
   @sysvar::Fault_BCM_BrakeSwitch = 1;
 }
@@ -627,7 +441,6 @@ on key '6'
   if (@sysvar::Sim_IgnitionState >= 2 && @sysvar::Sim_AcceleratorPedal < 10.0)
   {
     @sysvar::Sim_AcceleratorPedal = 45.0;
-    UpdateEngineAudioSync();
   }
   @sysvar::Fault_Node_Cutoff_ABS = 1;
 }
@@ -1045,7 +858,6 @@ void ResetEntireNetwork()
   @sysvar::Disp_MIL = 0;
   @sysvar::Disp_ESP_Fault = 0;
   @sysvar::Sim_BatteryVoltage = 13.8;
-  UpdateEngineAudioSync();
 
   // 3. Broadcast UDS Service 0x14 (ClearDiagnosticInformation) via 0x7DF
   msg_Req_Func.byte(0) = 0x04; // Single Frame length 4
