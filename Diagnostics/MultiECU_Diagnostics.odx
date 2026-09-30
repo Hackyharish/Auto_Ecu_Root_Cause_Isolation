@@ -397,9 +397,6 @@
         <DESC>
           <p>Chassis control module responsible for wheel speed sensing and ABS/ESP intervention.</p>
         </DESC>
-        <PARENT-REFS>
-          <PARENT-REF xsi:type="BASE-VARIANT-REF" ID-REF="BV_UDS_Base"/>
-        </PARENT-REFS>
         <DIAG-DATA-DICTIONARY-SPEC>
           <DTC-DOPS>
             <DTC-DOP ID="DTC_DOP_ABS">
@@ -428,6 +425,9 @@
             </DTC-DOP>
           </DTC-DOPS>
         </DIAG-DATA-DICTIONARY-SPEC>
+        <PARENT-REFS>
+          <PARENT-REF xsi:type="BASE-VARIANT-REF" ID-REF="BV_UDS_Base"/>
+        </PARENT-REFS>
       </ECU-VARIANT>
 
       <!-- 2. ECM ECU Variant -->
@@ -437,9 +437,6 @@
         <DESC>
           <p>Powertrain controller managing engine throttle, ignition, and fuel injection.</p>
         </DESC>
-        <PARENT-REFS>
-          <PARENT-REF xsi:type="BASE-VARIANT-REF" ID-REF="BV_UDS_Base"/>
-        </PARENT-REFS>
         <DIAG-DATA-DICTIONARY-SPEC>
           <DTC-DOPS>
             <DTC-DOP ID="DTC_DOP_ECM">
@@ -486,6 +483,9 @@
             </DTC-DOP>
           </DTC-DOPS>
         </DIAG-DATA-DICTIONARY-SPEC>
+        <PARENT-REFS>
+          <PARENT-REF xsi:type="BASE-VARIANT-REF" ID-REF="BV_UDS_Base"/>
+        </PARENT-REFS>
       </ECU-VARIANT>
 
       <!-- 3. TCM ECU Variant -->
@@ -495,9 +495,6 @@
         <DESC>
           <p>Automatic transmission controller computing shift schedules and gear selections.</p>
         </DESC>
-        <PARENT-REFS>
-          <PARENT-REF xsi:type="BASE-VARIANT-REF" ID-REF="BV_UDS_Base"/>
-        </PARENT-REFS>
         <DIAG-DATA-DICTIONARY-SPEC>
           <DTC-DOPS>
             <DTC-DOP ID="DTC_DOP_TCM">
@@ -538,6 +535,9 @@
             </DTC-DOP>
           </DTC-DOPS>
         </DIAG-DATA-DICTIONARY-SPEC>
+        <PARENT-REFS>
+          <PARENT-REF xsi:type="BASE-VARIANT-REF" ID-REF="BV_UDS_Base"/>
+        </PARENT-REFS>
       </ECU-VARIANT>
 
       <!-- 4. BCM ECU Variant -->
@@ -547,9 +547,6 @@
         <DESC>
           <p>Body electronics controller handling lighting, brake pedals, and gateway signals.</p>
         </DESC>
-        <PARENT-REFS>
-          <PARENT-REF xsi:type="BASE-VARIANT-REF" ID-REF="BV_UDS_Base"/>
-        </PARENT-REFS>
         <DIAG-DATA-DICTIONARY-SPEC>
           <DTC-DOPS>
             <DTC-DOP ID="DTC_DOP_BCM">
@@ -578,6 +575,9 @@
             </DTC-DOP>
           </DTC-DOPS>
         </DIAG-DATA-DICTIONARY-SPEC>
+        <PARENT-REFS>
+          <PARENT-REF xsi:type="BASE-VARIANT-REF" ID-REF="BV_UDS_Base"/>
+        </PARENT-REFS>
       </ECU-VARIANT>
     </ECU-VARIANTS>
   </DIAG-LAYER-CONTAINER>
