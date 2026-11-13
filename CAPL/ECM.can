@@ -119,7 +119,7 @@ on timer t_ECM_10ms
       g_EngineRPM = 850.0 + (@sysvar::Disp_VehicleSpeed * 10.0);
     }
   }
-  else if (@sysvar::Sim_BrakePedal == 1 || @sysvar::Sim_AcceleratorPedal <= 0.0)
+  else if (@sysvar::Sim_BrakePedal == 1 || @sysvar::Sim_AcceleratorPedal <= 0.0 || g_Fault_BrakeConflictActive == 1 || @sysvar::Fault_BCM_BrakeSwitch == 1)
   {
     g_ThrottlePos = 0.0;
     g_EngineTorque = 0.0;
@@ -130,7 +130,7 @@ on timer t_ECM_10ms
     }
     else
     {
-      g_EngineStatus = 2; // COASTING
+      g_EngineStatus = 2; // COASTING / ASIL-D BRAKE-THROTTLE OVERRIDE
       // Gradual RPM wind-down following vehicle coast-down
       g_EngineRPM = 850.0 + (@sysvar::Disp_VehicleSpeed * 10.0);
     }
@@ -160,8 +160,16 @@ on timer t_ECM_10ms
     }
     else if (currentGear == 3)
     {
-      // Gear 3: 50 - 75 km/h -> drops to 1950 RPM, climbs to 3250 RPM
-      g_EngineRPM = 1950.0 + ((currentSpeed - 50.0) / 25.0) * (3250.0 - 1950.0);
+      // Gear 3: 50 - 75 km/h -> drops to 1950 RPM, climbs to 3250 RPM (with overspeed protection)
+      if (currentSpeed <= 75.0)
+      {
+        g_EngineRPM = 1950.0 + ((currentSpeed - 50.0) / 25.0) * (3250.0 - 1950.0);
+      }
+      else
+      {
+        g_EngineRPM = 3250.0 + ((currentSpeed - 75.0) / 25.0) * 400.0;
+        if (g_EngineRPM > 4200.0) g_EngineRPM = 4200.0;
+      }
     }
     else if (currentGear == 4)
     {

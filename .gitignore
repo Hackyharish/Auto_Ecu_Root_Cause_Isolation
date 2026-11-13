@@ -43,3 +43,15 @@ SynchronizedFiles/
 *_TypeLibraries/
 *.pid
 *.log
+
+# LaTeX auxiliary files
+*.aux
+*.out
+*.toc
+*.nav
+*.snm
+*.lof
+*.lot
+*.synctex.gz
+*.fls
+*.fdb_latexmk

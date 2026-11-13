@@ -182,9 +182,26 @@ on timer t_TCM_20ms
   }
   else if (g_DegradedMode == 1)
   {
-    g_CurrentGear = 5; // DBC enum D3
-    g_TargetGear = 5;
-    @sysvar::Disp_CurrentGear = 3; // Lock display to 3rd gear limp mode
+    // In degraded limp mode, prevent mechanical engine over-revving.
+    // Downshift to 3rd gear only when vehicle speed is within safe 3rd gear range (<= 75 km/h).
+    if (g_RxVehicleSpeed <= 75.0)
+    {
+      g_CurrentGear = 5; // DBC enum D3
+      g_TargetGear = 5;
+      @sysvar::Disp_CurrentGear = 3; // Lock display to 3rd gear limp mode
+    }
+    else if (g_RxVehicleSpeed <= 100.0)
+    {
+      g_CurrentGear = 6; // DBC enum D4
+      g_TargetGear = 6;
+      @sysvar::Disp_CurrentGear = 4; // Hold 4th gear
+    }
+    else
+    {
+      g_CurrentGear = 7; // DBC enum D5
+      g_TargetGear = 7;
+      @sysvar::Disp_CurrentGear = 5; // Hold 5th gear until vehicle decelerates
+    }
   }
   else
   {
