@@ -12,7 +12,6 @@
 \usepackage{amsmath,amssymb}
 \usepackage{graphicx}
 \usepackage{tcolorbox}
-\usepackage{multimedia}
 \usepackage{hyperref}
 
 % Graphicspath
@@ -86,15 +85,15 @@
   \vskip0pt%
 }
 
-% Slide title helper
+% Slide title helper (positive top space so zero top clipping occurs!)
 \newcommand{\slidetitle}[2]{%
-  \vspace{-0.24cm}
-  {\Large\bfseries\color{vectorred}#1}\\[1pt]
+  \vspace{0.08cm}
+  {\Large\bfseries\color{vectorred}#1}\\[2pt]
   {\footnotesize\color{slategrey}#2}
-  \vspace{0.12cm}
+  \vspace{0.10cm}
 }
 
-% Custom TikZ Macros for Slide 4 Message Banners (Matching slide_3.png crisp style)
+% Custom TikZ Macros for Message Banners
 \newcommand{\msgRight}[8]{
   \begin{scope}[shift={(#1,#2)}]
     \draw[line width=1.1pt, fill=white, draw=black] (0, -0.24) rectangle (1.18, 0.24);
@@ -121,39 +120,39 @@
 % SLIDE 1: Project Title and Student Details
 % =============================================================================
 \begin{frame}[t]
-\vspace{-0.10cm}
+\vspace{0.12cm}
 \centering
 
 \begin{tcolorbox}[colback=vectorred!10, colframe=vectorred!25, boxrule=0.5pt, arc=4pt, width=10.6cm, left=8pt, right=8pt, top=2.5pt, bottom=2.5pt]
   \centering\scriptsize\bfseries\color{vectorred} IN-VEHICLE NETWORKING (IVN) CAPSTONE PROJECT \quad\textbullet\quad B.TECH SEMESTER 7
 \end{tcolorbox}
 
-\vspace{0.20cm}
+\vspace{0.18cm}
 \resizebox{0.96\textwidth}{!}{\LARGE\bfseries\color{vectorred} Automated Root Cause Isolation in Multi-ECU Networks}\\[6pt]
 {\large\bfseries\color{slatedark} Signal Dependency Mapping \& UDS Diagnostics in Vector CANoe 19}\\[5pt]
 {\small\color{slategrey} Compliant with ISO 14229-1 (UDS) \textbullet{} ISO 15765-2 (DoCAN) \textbullet{} ISO 26262 ASIL-D \textbullet{} ISO 11898-1}
 
-\vspace{0.28cm}
+\vspace{0.24cm}
 
 \begin{tcolorbox}[
   colback=cardbg, colframe=vectorred!70, boxrule=1.0pt, arc=7pt,
-  width=11.4cm, left=14pt, right=14pt, top=6pt, bottom=6pt,
+  width=11.4cm, left=14pt, right=14pt, top=5pt, bottom=5pt,
   colbacktitle=vectorred, coltitle=white,
   toptitle=3pt, bottomtitle=3pt,
   title={\centering\scriptsize\bfseries STUDENT DETAILS}
 ]
   \small\color{slatedark}
   \begin{tabular}{@{}ll@{}}
-    \textbf{Name:}        & Harish R \\[2pt]
-    \textbf{Roll Number:} & CB.EN.U4EEE23112 \\[2pt]
-    \textbf{Degree:}      & Bachelor of Technology (B.Tech) \\[2pt]
-    \textbf{Department:}  & Department of Electrical \& Electronics Engineering \\[2pt]
-    \textbf{Institution:} & Amrita School of Engineering, Coimbatore \\[2pt]
+    \textbf{Name:}        & Harish R \\[1.5pt]
+    \textbf{Roll Number:} & CB.EN.U4EEE23112 \\[1.5pt]
+    \textbf{Degree:}      & Bachelor of Technology (B.Tech) \\[1.5pt]
+    \textbf{Department:}  & Department of Electrical \& Electronics Engineering \\[1.5pt]
+    \textbf{Institution:} & Amrita School of Engineering, Coimbatore \\[1.5pt]
     \textbf{University:}  & Amrita Vishwa Vidyapeetham
   \end{tabular}
 \end{tcolorbox}
 
-\vspace{0.20cm}
+\vspace{0.16cm}
 {\footnotesize\color{slategrey}\textbf{Industry Collaboration:} Tata Technologies (TechPulse Program) \quad\textbullet\quad \textbf{Platform:} Vector CANoe 19}
 
 \end{frame}
@@ -167,10 +166,10 @@
 \begin{columns}[T,totalwidth=\textwidth]
 
   \begin{column}{0.485\textwidth}
-    \begin{tcolorbox}[cardstyle, colframe=vectorred!75, colbacktitle=vectorred!8, height=5.55cm,
+    \begin{tcolorbox}[cardstyle, colframe=vectorred!75, colbacktitle=vectorred!8, height=5.32cm,
       title={\normalsize\bfseries\color{vectorred} The Problem: Cascading Alarm Floods}]
-      \footnotesize\color{slatedark}\raggedright
-      \begin{itemize}\setlength{\itemsep}{2.5pt}\setlength{\leftmargini}{10pt}
+      \footnotesize\color{slatedark}\raggedright\vspace{-4pt}
+      \begin{itemize}\setlength{\itemsep}{1.5pt}\setlength{\leftmargini}{10pt}
         \item \textbf{Dense Coupling:} Modern vehicles host 70--100 ECUs exchanging thousands of cross-dependent CAN signals.
         \item \textbf{Symptom Alarm Floods:} Single sensor or ECU faults starve healthy downstream nodes, triggering dozens of secondary DTCs.
         \item \textbf{Misdiagnosis \& Cost:} Technicians replace healthy ECUs, inflating warranty costs and extending vehicle downtime.
@@ -180,10 +179,10 @@
   \end{column}
 
   \begin{column}{0.485\textwidth}
-    \begin{tcolorbox}[cardstyle, colframe=accentblue!75, colbacktitle=accentblue!8, height=5.55cm,
+    \begin{tcolorbox}[cardstyle, colframe=accentblue!75, colbacktitle=accentblue!8, height=5.32cm,
       title={\normalsize\bfseries\color{accentblue} Project Objectives \& Contributions}]
-      \footnotesize\color{slatedark}\raggedright
-      \begin{itemize}\setlength{\itemsep}{2.5pt}\setlength{\leftmargini}{10pt}
+      \footnotesize\color{slatedark}\raggedright\vspace{-4pt}
+      \begin{itemize}\setlength{\itemsep}{1.5pt}\setlength{\leftmargini}{10pt}
         \item \textbf{DAG Signal Modeling:} Formulate in-vehicle signal flows as a Directed Acyclic Graph $G=(V, E)$ capturing causal links.
         \item \textbf{On-Bus Pruning Engine:} Implement in-degree topological filtering in CAPL to isolate root causes in real time.
         \item \textbf{Deterministic Timing:} Achieve disambiguation in $<50$ ms, within the ISO 26262 ASIL-D 100 ms FTTI bound.
@@ -194,23 +193,72 @@
 
 \end{columns}
 
-\vspace{0.12cm}
-\begin{tcolorbox}[colback=slategrey!10, colframe=cardborder, boxrule=0.7pt, arc=4pt, left=6pt, right=6pt, top=3.5pt, bottom=3.5pt]
+\vspace{0.08cm}
+\begin{tcolorbox}[colback=slategrey!10, colframe=cardborder, boxrule=0.7pt, arc=4pt, left=6pt, right=6pt, top=3pt, bottom=3pt]
   \centering\scriptsize\color{slatedark}
-  \textbf{Target Scope:} 4 Distributed ECUs (ECM, ABS, TCM, BCM) \quad\textbullet\quad 15 CAN Messages \quad\textbullet\quad 43 Powertrain \& Chassis Signals \quad\textbullet\quad 500 kbps CAN
+  \textbf{Target Scope:} 4 ECUs (ECM, ABS, TCM, BCM) \textbullet{} 15 CAN Messages \textbullet{} 43 Powertrain \& Chassis Signals \textbullet{} 500 kbps CAN
 \end{tcolorbox}
 
 \end{frame}
 
 % =============================================================================
-% SLIDE 3: System Architecture & Block Diagram (Full-Page Orthogonal Layout)
+% SLIDE 3: CAN Network Message and Signal Structure (Interchanged to Page 3)
+% =============================================================================
+\begin{frame}[t]
+\slidetitle{Node, Message and Signal Structure}{Vehicle E/E Architecture \textbullet{} High-Speed CAN 500 kbps (ISO 11898-1) \textbullet{} CAN Arbitration Priority Ordering}
+
+\centering
+\vspace{-0.04cm}
+\resizebox{!}{6.02cm}{%
+\begin{tikzpicture}[x=1cm, y=1cm]
+
+  % 5 Nodes Across Top
+  \node[draw=none, fill=nodetester, rounded corners=7pt, minimum width=2.72cm, minimum height=1.28cm, text=white, align=center] (n_diag) at (1.36, 4.30) {\textbf{\normalsize DIAG}\\[2pt]\scriptsize Diagnostic Master};
+  \node[draw=none, fill=nodeabs,    rounded corners=7pt, minimum width=2.72cm, minimum height=1.28cm, text=white, align=center] (n_abs)  at (4.38, 4.30) {\textbf{\normalsize ABS / ESP}\\[2pt]\scriptsize Chassis / ESC};
+  \node[draw=none, fill=nodetcm,    rounded corners=7pt, minimum width=2.72cm, minimum height=1.28cm, text=white, align=center] (n_tcm)  at (7.40, 4.30) {\textbf{\normalsize TCM}\\[2pt]\scriptsize Gearbox};
+  \node[draw=none, fill=nodeecm,    rounded corners=7pt, minimum width=2.72cm, minimum height=1.28cm, text=nodeecmtext, align=center] (n_ecm)  at (10.42, 4.30) {\textbf{\normalsize ECM}\\[2pt]\scriptsize Engine};
+  \node[draw=none, fill=nodebcm,    rounded corners=7pt, minimum width=2.72cm, minimum height=1.28cm, text=white, align=center] (n_bcm)  at (13.44, 4.30) {\textbf{\normalsize BCM}\\[2pt]\scriptsize Body Gateway};
+
+  % Bus Line & Drop Dots
+  \draw[line width=2.6pt, color=busline] (0.00, 3.16) -- (14.80, 3.16);
+  \foreach \x in {1.36, 4.38, 7.40, 10.42, 13.44} {
+    \draw[line width=1.8pt, color=busline] (\x, 3.66) -- (\x, 3.16);
+    \fill[busline] (\x, 3.16) circle (0.11);
+  }
+
+  % Message Banners (Exact CAN IDs, Payloads & Cycle Times matching DBC & CAPL!)
+  \msgRight{0.40}{2.44}{0x200}{Wheel speed FL, FR, RL, RR (10 ms)}{5.25}{nodeabs}{white}{nodetcm}
+  \msgLeft {7.65}{2.44}{0x100}{Engine speed, throttle, torque (10 ms)}{5.35}{nodeecm}{nodeecmtext}{nodetcm}
+
+  \msgRight{0.40}{1.68}{0x205}{Vehicle speed, yaw rate, brake (20 ms)}{5.25}{nodeabs}{white}{nodetcm}
+  \msgLeft {7.65}{1.68}{0x105}{Coolant temp, fuel rate, MIL (50 ms)}{5.35}{nodeecm}{nodeecmtext}{nodetcm}
+
+  \msgRight{4.30}{0.92}{0x300}{Current gear, target, clutch status (20 ms)}{5.55}{nodetcm}{white}{nodeecm}
+
+  \msgLeft {7.45}{0.16}{0x400}{Ignition state, brake sw, hazard (50 ms)}{5.55}{nodebcm}{white}{nodetcm}
+
+  \msgRight{0.40}{-0.60}{0x7DF}{UDS Functional Request: Session, DTC Inquiry (0x10, 0x19, 0x14, 0x22) [Event]}{12.15}{nodetester}{white}{nodeabs}
+
+  % Priority Rule & Physical UDS Mapping Footer (Verified 100% against CAPL & DBC!)
+  \node[draw=cardborder, fill=cardbg, rounded corners=4pt, inner sep=5pt, minimum width=14.8cm, font=\scriptsize, text=slatedark, align=center] at (7.40, -1.56) {
+    \textbf{CAN Priority:} Lower ID = Higher Priority (\textbf{0x100 $>$ 0x105 $>$ 0x200 $>$ 0x205 $>$ 0x300 $>$ 0x400 $>$ 0x7DF $>$ 0x7E0--0x7E3 $>$ 0x7E8--0x7EB})\\[3pt]
+    \textbf{15 Messages \textbullet{} 43 Signals} \quad\textbar\quad \textbf{Physical UDS:} ECM (0x7E0/0x7E8) \textbullet{} TCM (0x7E1/0x7E9) \textbullet{} ABS (0x7E2/0x7EA) \textbullet{} BCM (0x7E3/0x7EB)
+  };
+
+\end{tikzpicture}%
+}
+
+\end{frame}
+
+% =============================================================================
+% SLIDE 4: System Architecture & Block Diagram (Interchanged to Page 4)
 % =============================================================================
 \begin{frame}[t]
 \slidetitle{Detailed System Architecture}{Multi-Layer Automotive E/E Simulation Architecture in Vector CANoe 19}
 
 \centering
-\vspace{-0.16cm}
-\resizebox{\textwidth}{!}{%
+\vspace{-0.06cm}
+\resizebox{!}{6.02cm}{%
 \begin{tikzpicture}[x=1cm, y=1cm, >={Stealth[length=5pt, width=3.5pt]}]
 
   % LAYER 1 (Top): Balanced Wide Stimulus & HMI Cards
@@ -234,7 +282,7 @@
     \end{tabular}
   };
 
-  % LAYER 2 (Middle): 4 Evenly Spaced ECUs (Generous vertical gap for arrows!)
+  % LAYER 2 (Middle): 4 Evenly Spaced ECUs
   \node[draw=nodebcm, fill=nodebcm!10, rounded corners=5pt, line width=1.1pt, minimum width=3.25cm, minimum height=1.52cm] (bcm) at (1.95, 2.42) {};
   \node[font=\bfseries\footnotesize, text=nodebcm, anchor=north] at ($(bcm.north)+(0,-0.06)$) {BCM (0x400)};
   \node[font=\scriptsize, text=slatedark, align=center, anchor=center] at ($(bcm.center)+(0,-0.16)$) {Brake Switch, Ignition\\Hazard State\\UDS: 0x7E3 / 0x7EB};
@@ -251,11 +299,11 @@
   \node[font=\bfseries\footnotesize, text=nodetcm, anchor=north] at ($(tcm.north)+(0,-0.06)$) {TCM (0x300)};
   \node[font=\scriptsize, text=slatedark, align=center, anchor=center] at ($(tcm.center)+(0,-0.16)$) {Current Gear, Clutch\\Limp Shift Lock\\UDS: 0x7E1 / 0x7E9};
 
-  % HIGH-SPEED CAN BUS BAR (0.76cm gap above and 0.72cm gap below -> clean arrow stems!)
+  % HIGH-SPEED CAN BUS BAR
   \filldraw[fill=slatedark!85, draw=slatedark, rounded corners=2.5pt] (0.15, 0.50) rectangle (15.05, 0.90);
   \node[font=\bfseries\footnotesize, text=white] at (7.60, 0.70) {HIGH-SPEED CAN BUS (ISO 11898-1 \textbar{} 500 kbps \textbar{} 15 Messages \textbar{} 43 Signals)};
 
-  % ECU <-> Bus orthogonal bidirectional arrows (0.76cm stem -> zero collision!)
+  % ECU <-> Bus bidirectional arrows
   \draw[line width=1.2pt, <->, color=nodebcm]   (bcm.south) -- (1.95, 0.90);
   \draw[line width=1.2pt, <->, color=nodeabs]   (abs.south) -- (5.72, 0.90);
   \draw[line width=1.2pt, <->, color=vectorred] (ecm.south) -- (9.48, 0.90);
@@ -265,66 +313,17 @@
   \node[draw=nodetester, fill=nodetester!8, rounded corners=6pt, line width=1.1pt, minimum width=14.9cm, minimum height=1.42cm] (diag_box) at (7.60, -0.92) {};
   \node[font=\bfseries\small, text=nodetester, anchor=north] at ($(diag_box.north)+(0,-0.06)$) {DIAGNOSTIC MASTER \& TOPOLOGICAL ROOT CAUSE ISOLATION ENGINE};
   \node[font=\scriptsize, text=slatedark, align=center, anchor=center] at ($(diag_box.center)+(0,-0.16)$) {
-    \textbf{ISO 14229-1 (UDS 0x19 02, Mask 0x08):} Periodic 10 ms Functional Broadcast Interrogation over 0x7DF\\[2pt]
+    \textbf{ISO 14229-1 (UDS 0x19 02, Mask 0x09):} Functional Broadcast 0x7DF + Physical ECU Polling (0x7E0--0x7E3)\\[2pt]
     \textbf{DAG Engine:} Directed Acyclic Graph $G=(V, E)$ \textbullet{} In-Degree $\deg_S^-(v_i) = 0$ \textbullet{} 42.50 ms Latency ($<8~\mu$s MCU Exec)
   };
 
-  % Clean Bus <-> Master arrow (0.71cm stem!)
+  % Bus <-> Master arrow
   \draw[line width=1.4pt, <->, color=nodetester] (7.60, 0.50) -- (diag_box.north);
 
-  % Clean Non-Overlapping Inter-Layer Links (long crisp stems!)
+  % Inter-Layer Links
   \draw[line width=1.1pt, ->, dashed, color=accentamber!90] (1.95, 3.945) -- (bcm.north);
   \draw[line width=1.1pt, ->, dashed, color=accentamber!90] (5.72, 3.945) -- (abs.north);
   \draw[line width=1.1pt, ->, dashed, color=accentgreen!80] (diag_box.east) -- (15.45, -0.92) |- (hmi_box.east);
-
-\end{tikzpicture}%
-}
-
-\end{frame}
-
-% =============================================================================
-% SLIDE 4: CAN Network Message and Signal Structure (Full-Page slide_3.png Layout)
-% =============================================================================
-\begin{frame}[t]
-\slidetitle{Node, Message and Signal Structure}{Vehicle E/E Architecture \textbullet{} High-Speed CAN 500 kbps (ISO 11898-1) \textbullet{} CAN Arbitration Priority Ordering}
-
-\centering
-\vspace{-0.06cm}
-\resizebox{\textwidth}{!}{%
-\begin{tikzpicture}[x=1cm, y=1cm]
-
-  % 5 Nodes Across Top (Spanning full 14.8cm width & full height edge-to-edge!)
-  \node[draw=none, fill=nodetester, rounded corners=7pt, minimum width=2.72cm, minimum height=1.34cm, text=white, align=center] (n_diag) at (1.36, 4.38) {\textbf{\normalsize DIAG}\\[2pt]\scriptsize Diagnostic Master};
-  \node[draw=none, fill=nodeabs,    rounded corners=7pt, minimum width=2.72cm, minimum height=1.34cm, text=white, align=center] (n_abs)  at (4.38, 4.38) {\textbf{\normalsize ABS / ESP}\\[2pt]\scriptsize Chassis / ESC};
-  \node[draw=none, fill=nodetcm,    rounded corners=7pt, minimum width=2.72cm, minimum height=1.34cm, text=white, align=center] (n_tcm)  at (7.40, 4.38) {\textbf{\normalsize TCM}\\[2pt]\scriptsize Gearbox};
-  \node[draw=none, fill=nodeecm,    rounded corners=7pt, minimum width=2.72cm, minimum height=1.34cm, text=nodeecmtext, align=center] (n_ecm)  at (10.42, 4.38) {\textbf{\normalsize ECM}\\[2pt]\scriptsize Engine};
-  \node[draw=none, fill=nodebcm,    rounded corners=7pt, minimum width=2.72cm, minimum height=1.34cm, text=white, align=center] (n_bcm)  at (13.44, 4.38) {\textbf{\normalsize BCM}\\[2pt]\scriptsize Body Gateway};
-
-  % Bus Line & Drop Dots
-  \draw[line width=2.6pt, color=busline] (0.00, 3.22) -- (14.80, 3.22);
-  \foreach \x in {1.36, 4.38, 7.40, 10.42, 13.44} {
-    \draw[line width=1.8pt, color=busline] (\x, 3.71) -- (\x, 3.22);
-    \fill[busline] (\x, 3.22) circle (0.11);
-  }
-
-  % Message Banners (Tall clean pitch filling full vertical page height!)
-  \msgRight{0.40}{2.48}{0x200}{Wheel speed FL, FR, RL, RR (10 ms)}{5.25}{nodeabs}{white}{nodetcm}
-  \msgLeft {7.65}{2.48}{0x100}{Engine speed, throttle, torque (10 ms)}{5.35}{nodeecm}{nodeecmtext}{nodetcm}
-
-  \msgRight{0.40}{1.70}{0x205}{Vehicle speed, yaw rate, brake (20 ms)}{5.25}{nodeabs}{white}{nodetcm}
-  \msgLeft {7.65}{1.70}{0x105}{Coolant temp, fuel rate, MIL (50 ms)}{5.35}{nodeecm}{nodeecmtext}{nodetcm}
-
-  \msgRight{4.30}{0.92}{0x300}{Current gear, target, clutch status (20 ms)}{5.55}{nodetcm}{white}{nodeecm}
-
-  \msgLeft {7.45}{0.14}{0x400}{Ignition state, brake sw, hazard (50 ms)}{5.55}{nodebcm}{white}{nodetcm}
-
-  \msgRight{0.40}{-0.64}{0x7DF}{UDS Functional Request: Session, DTC Inquiry (0x10, 0x19, 0x22) [Event]}{12.15}{nodetester}{white}{nodeabs}
-
-  % Priority Rule & Physical UDS Mapping Footer (Anchored near bottom footline!)
-  \node[draw=cardborder, fill=cardbg, rounded corners=4pt, inner sep=5.5pt, minimum width=14.8cm, font=\scriptsize, text=slatedark, align=center] at (7.40, -1.62) {
-    \textbf{CAN Priority:} Lower ID = Higher Bus Priority (\textbf{0x100 $>$ 0x105 $>$ 0x200 $>$ 0x205 $>$ 0x300 $>$ 0x400 $>$ 0x7DF $>$ 0x7E0--0x7EB})\\[3pt]
-    \textbf{15 Messages \textbullet{} 43 Signals} \quad\textbar\quad \textbf{Physical UDS:} ECM (0x7E0/0x7E8) \textbullet{} TCM (0x7E1/0x7E9) \textbullet{} ABS (0x7E2/0x7EA) \textbullet{} BCM (0x7E3/0x7EB)
-  };
 
 \end{tikzpicture}%
 }
@@ -339,47 +338,46 @@
 
 \begin{columns}[T,totalwidth=\textwidth]
 
-  % Column 1: DAG Formulation & Math (Fits comfortably inside 6.40cm card!)
+  % Column 1: DAG Formulation & Math
   \begin{column}{0.485\textwidth}
-    \begin{tcolorbox}[cardstyle, colframe=vectorred!70, colbacktitle=vectorred!8, height=6.40cm,
+    \begin{tcolorbox}[cardstyle, colframe=vectorred!70, colbacktitle=vectorred!8, height=5.95cm,
       title={\normalsize\bfseries\color{vectorred} 1. Graph Formulation \& In-Degree}]
       \footnotesize\color{slatedark}\raggedright
       DAG $G = (V, E)$ models causal fault dependencies:
       \vspace{-3pt}
-      \begin{itemize}\setlength{\itemsep}{1.5pt}\setlength{\leftmargini}{10pt}
+      \begin{itemize}\setlength{\itemsep}{1pt}\setlength{\leftmargini}{10pt}
         \item \textbf{Vertices:} $V=\{v_1{=}\text{ECM}, v_2{=}\text{ABS}, v_3{=}\text{TCM}, v_4{=}\text{BCM}\}$.
         \item \textbf{Edges:} $(v_i, v_j) \in E \iff v_j$ reads signals from $v_i$.
         \item \textbf{Failure Set ($S$):} Active DTC ECUs via UDS 0x19 02.
       \end{itemize}
-      \vspace{-2pt}
-      \vspace{2pt}
+      \vspace{-3pt}
       \textbf{Restricted In-Degree Metric:}\par
-      \vspace{2pt}
+      \vspace{1pt}
       {\centering$\displaystyle \deg_S^-(v_i) = \sum_{v_j \in S} A_{ji}$\par}
-      \vspace{4pt}
+      \vspace{3pt}
       \textbf{Isolation Decision Rule:}\par
-      \vspace{2pt}
+      \vspace{1pt}
       {\centering$\deg_S^-(v_i) = 0 \implies \text{\textbf{Root Cause Node}}$\par}
-      \vspace{2pt}
+      \vspace{1pt}
       {\centering$\deg_S^-(v_i) \ge 1 \implies \text{\textbf{Suppressed Symptom DTC}}$\par}
     \end{tcolorbox}
   \end{column}
 
   % Column 2: Visual Topology & Algorithmic Workflow
   \begin{column}{0.485\textwidth}
-    \begin{tcolorbox}[cardstyle, colframe=accentblue!70, colbacktitle=accentblue!8, height=6.40cm,
+    \begin{tcolorbox}[cardstyle, colframe=accentblue!70, colbacktitle=accentblue!8, height=5.95cm,
       title={\normalsize\bfseries\color{accentblue} 2. Topology \& Algorithmic Workflow}]
       \centering
       \vspace{1pt}
       \begin{tikzpicture}[
           x=1cm, y=1cm,
-          ecunode/.style={circle, draw=slatedark, fill=accentblue!12, line width=0.9pt, font=\sffamily\footnotesize\bfseries, text=slatedark, align=center, minimum size=0.86cm, inner sep=1pt},
+          ecunode/.style={circle, draw=slatedark, fill=accentblue!12, line width=0.9pt, font=\sffamily\footnotesize\bfseries, text=slatedark, align=center, minimum size=0.82cm, inner sep=1pt},
           edgearr/.style={-{Stealth[length=5pt, width=3.5pt]}, line width=0.9pt, draw=slatedark},
           edgelabel/.style={font=\sffamily\scriptsize, fill=cardbg, inner sep=1pt, rounded corners=2pt, text=slatedark}
       ]
-        \node[ecunode] (bcm) at (0, 2.05) {BCM};
-        \node[ecunode] (abs) at (-1.95, 1.02) {ABS};
-        \node[ecunode] (ecm) at (1.95, 1.02) {ECM};
+        \node[ecunode] (bcm) at (0, 1.90) {BCM};
+        \node[ecunode] (abs) at (-1.90, 0.95) {ABS};
+        \node[ecunode] (ecm) at (1.90, 0.95) {ECM};
         \node[ecunode] (tcm) at (0, 0) {TCM};
 
         \draw[edgearr] (bcm) -- (abs) node[edgelabel, midway, above left] {Brake Sw};
@@ -389,11 +387,11 @@
         \draw[edgearr] (ecm) -- (tcm) node[edgelabel, midway, below right] {RPM / Torque};
       \end{tikzpicture}
 
-      \vspace{4pt}
+      \vspace{3pt}
       \begin{minipage}{0.96\linewidth}
         \footnotesize\color{slatedark}\raggedright
-        \textbf{Execution Steps:}\\[2pt]
-        1. Poll all ECUs via UDS 0x19 02 (mask 0x08).\\
+        \textbf{Execution Steps:}\\[1pt]
+        1. Poll all ECUs via UDS 0x19 02 (mask 0x09).\\
         2. Populate active DTC nodes into subgraph $S$.\\
         3. Compute in-degree $\deg_S^-(v)$ via matrix lookup.\\
         4. Isolate $\deg_S^-(v) = 0$ as Root Cause; prune rest.
@@ -414,24 +412,24 @@
 \begin{columns}[T,totalwidth=\textwidth]
 
   \begin{column}{0.46\textwidth}
-    \begin{tcolorbox}[cardstyle, colframe=vectorred!70, colbacktitle=vectorred!8, height=6.35cm,
+    \begin{tcolorbox}[cardstyle, colframe=vectorred!70, colbacktitle=vectorred!8, height=5.95cm,
       title={\normalsize\bfseries\color{vectorred} Virtual Network Environment}]
       \footnotesize\color{slatedark}\raggedright
       \vspace{-2pt}
-      \begin{itemize}\setlength{\itemsep}{1.5pt}\setlength{\leftmargini}{10pt}
+      \begin{itemize}\setlength{\itemsep}{1pt}\setlength{\leftmargini}{10pt}
         \item \textbf{Vector CANoe 19 Engine:} Simulates complete 500 kbps CAN bus with event-driven CAPL node logic.
         \item \textbf{Realistic Vehicle Physics:} 4-wheel speeds, engine dynamics, gear shifts, and hydraulic braking.
         \item \textbf{Interactive Fault Injection:} Toggle switches inject open circuits, sensor shorts, and node dropouts.
-        \item \textbf{Automated UDS Master:} Periodic CAPL timer polls 0x7DF every 10 ms; parses 0x59 into DAG bitmasks.
+        \item \textbf{Automated UDS Master:} Periodic CAPL timer polls 0x7DF/0x7E0--0x7E3; parses 0x59 into DAG bitmasks.
         \item \textbf{Zero-Jitter Execution:} Disambiguation runs in $<8~\mu$s with zero scheduling overhead.
       \end{itemize}
     \end{tcolorbox}
   \end{column}
 
   \begin{column}{0.52\textwidth}
-    \begin{tcolorbox}[whitecard, height=6.35cm]
+    \begin{tcolorbox}[whitecard, height=5.95cm]
       \centering
-      \includegraphics[width=\linewidth, height=4.65cm, keepaspectratio]{PANEL_NORMAL.png}\\[6pt]
+      \includegraphics[width=\linewidth, height=4.45cm, keepaspectratio]{PANEL_NORMAL.png}\\[6pt]
       \footnotesize\color{slategrey}
       \textbf{CANoe 19 Cockpit HMI:} Fault-free cruise at 160.0 km/h (4200 RPM, 5th gear D5), showing healthy green status across all 4 ECUs.
     \end{tcolorbox}
@@ -450,10 +448,10 @@
 \begin{columns}[T,totalwidth=\textwidth]
 
   \begin{column}{0.485\textwidth}
-    \begin{tcolorbox}[cardstyle, colframe=vectorred!70, colbacktitle=vectorred!8, height=5.25cm,
+    \begin{tcolorbox}[cardstyle, colframe=vectorred!70, colbacktitle=vectorred!8, height=5.12cm,
       title={\footnotesize\bfseries\color{vectorred} Scenario 1: Wheel Speed Sensor Open (ASIL-D)}]
       \centering
-      \includegraphics[width=\linewidth, height=2.65cm, keepaspectratio]{WSS_SENSOR_OPEN/PANEL.jpg}\\[4pt]
+      \includegraphics[width=\linewidth, height=2.36cm, keepaspectratio]{WSS_SENSOR_OPEN/PANEL.jpg}\\[3pt]
       \begin{minipage}{0.98\linewidth}
         \scriptsize\color{slatedark}\raggedright
         \textbf{Raw Codes:} ABS (C0035-13), ECM (P0500-00), TCM (U0415-81).\\[2pt]
@@ -463,10 +461,10 @@
   \end{column}
 
   \begin{column}{0.485\textwidth}
-    \begin{tcolorbox}[cardstyle, colframe=accentblue!70, colbacktitle=accentblue!8, height=5.25cm,
+    \begin{tcolorbox}[cardstyle, colframe=accentblue!70, colbacktitle=accentblue!8, height=5.12cm,
       title={\footnotesize\bfseries\color{accentblue} Scenario 5: Brake Switch Stuck Closed (ASIL-B)}]
       \centering
-      \includegraphics[width=\linewidth, height=2.65cm, keepaspectratio]{BRAKE_SWITCH_STUCK/PANEL.jpg}\\[4pt]
+      \includegraphics[width=\linewidth, height=2.36cm, keepaspectratio]{BRAKE_SWITCH_STUCK/PANEL.jpg}\\[3pt]
       \begin{minipage}{0.98\linewidth}
         \scriptsize\color{slatedark}\raggedright
         \textbf{Raw Codes:} BCM (B1318-11), ECM (P0504-00), TCM (U0422-81).\\[2pt]
@@ -477,8 +475,8 @@
 
 \end{columns}
 
-\vspace{0.12cm}
-\begin{tcolorbox}[colback=slategrey!10, colframe=cardborder, boxrule=0.7pt, arc=4pt, left=8pt, right=8pt, top=4pt, bottom=4pt]
+\vspace{0.08cm}
+\begin{tcolorbox}[colback=slategrey!10, colframe=cardborder, boxrule=0.7pt, arc=4pt, left=6pt, right=6pt, top=3pt, bottom=3pt]
   \centering\scriptsize\color{slatedark}
   \textbf{Other Tested Scenarios:} Sc. 2 (Throttle Low P0122-12, 1200 rpm limp) \quad\textbar\quad Sc. 3 (Coolant Overheat P0217-00, 125$^\circ$C) \quad\textbar\quad Sc. 4 \& 6 (ABS U0121-00 / ECM U0100-00 Bus-Off)
 \end{tcolorbox}
@@ -486,144 +484,75 @@
 \end{frame}
 
 % =============================================================================
-% SLIDE 8: Video Demonstration & Demo Walkthrough (Embedded Video Player)
+% SLIDE 8: Full-Page Video Demonstration Only (Direct Launch Action!)
 % =============================================================================
 \begin{frame}[t]
-\slidetitle{Project Video Demonstration \& Scenario Cue Sheet}{Full Vector CANoe 19 Test Execution \textbullet{} 1080p 30fps Recording (17m 57s)}
+\slidetitle{Project Video Demonstration}{Vector CANoe 19 Live Simulation Execution \textbullet{} 1080p Full HD (30 fps) \textbullet{} 17m 57s}
 
-\begin{columns}[T,totalwidth=\textwidth]
-
-  % Left Column: Embedded Playable Video Poster
-  \begin{column}{0.48\textwidth}
-    \begin{tcolorbox}[cardstyle, colframe=vectorred, height=6.10cm]
-      \centering
-      \textbf{\small\color{vectorred} Embedded Video Demonstration}\\[4pt]
-      \href{run:../CB.EN.U4EEE23112_IVN_VIDEO.mp4}{%
-        \movie[autostart=false,showcontrols=true,poster]{%
-          \begin{tikzpicture}
-            \node[inner sep=0pt] (vid) {\includegraphics[width=0.98\linewidth, height=3.95cm, keepaspectratio]{video_poster.jpg}};
-            \fill[vectorred, opacity=0.90] (vid.center) circle (0.48cm);
-            \fill[white] ($(vid.center)+(-0.11,-0.19)$) -- ($(vid.center)+(0.23,0)$) -- ($(vid.center)+(-0.11,0.19)$) -- cycle;
-          \end{tikzpicture}%
-        }{../CB.EN.U4EEE23112_IVN_VIDEO.mp4}%
-      }\\[5pt]
-      \scriptsize\color{slatedark}
-      \texttt{\textbf{CB.EN.U4EEE23112\_IVN\_VIDEO.mp4}}\\[2pt]
-      1080p Full HD (30 fps) \quad\textbullet\quad 17 min 57 sec \quad\textbullet\quad 357.5 MB\\[2pt]
-      {\color{vectorred}\textbf{Click video frame to launch playback}}
-    \end{tcolorbox}
-  \end{column}
-
-  % Right Column: Video Breakdown Timeline Table
-  \begin{column}{0.50\textwidth}
-    \begin{tcolorbox}[whitecard, height=6.10cm]
-      \textbf{\small\color{slatedark} Video Scenario Breakdown \& Cue Sheet}\\[5pt]
-      \resizebox{\linewidth}{!}{%
-      \scriptsize
-      \setlength{\tabcolsep}{3pt}
-      \renewcommand{\arraystretch}{1.42}
-      \begin{tabular}{@{}lll@{}}
-        \toprule
-        \textbf{Timestamp} & \textbf{Phase} & \textbf{Key Observation / Proof Point} \\
-        \midrule
-        \textbf{00:00--02:45} & Baseline        & Nominal driving, zero DTCs \\
-        \textbf{02:45--05:30} & Sc. 1 (WSS)     & Speed drops, ABS C0035-13 isolated \\
-        \textbf{05:30--08:15} & Sc. 2 (APP)     & Throttle 0\%, ECM P0122-12 isolated \\
-        \textbf{08:15--11:00} & Sc. 3 (Coolant) & 125$^\circ$C limit, ECM P0217-00 isolated \\
-        \textbf{11:00--13:45} & Sc. 4 \& 6      & Node cutoffs: U0121 / U0100 isolated \\
-        \textbf{13:45--17:57} & Sc. 5 (Brake)   & BTO coastdown, BCM B1318-11 isolated \\
-        \bottomrule
-      \end{tabular}%
-      }\\[8pt]
-      \footnotesize\color{slategrey}\raggedright
-      Each recorded test proves periodic UDS Service 0x19 02 interrogation, real-time DAG pruning, and downstream DTC suppression in Vector CANoe 19.
-    \end{tcolorbox}
-  \end{column}
-
-\end{columns}
+\begin{tcolorbox}[cardstyle, colframe=vectorred, height=5.95cm, left=6pt, right=6pt, top=5pt, bottom=4pt]
+  \centering
+  \href{run:../CB.EN.U4EEE23112_IVN_VIDEO.mp4}{%
+    \begin{tikzpicture}
+      \node[inner sep=0pt] (vid) {\includegraphics[width=0.96\linewidth, height=4.95cm, keepaspectratio]{video_poster.jpg}};
+      \fill[vectorred, opacity=0.92] (vid.center) circle (0.62cm);
+      \fill[white] ($(vid.center)+(-0.15,-0.25)$) -- ($(vid.center)+(0.30,0)$) -- ($(vid.center)+(-0.15,0.25)$) -- cycle;
+    \end{tikzpicture}%
+  }\\[4pt]
+  \footnotesize\color{slatedark}
+  \href{run:../CB.EN.U4EEE23112_IVN_VIDEO.mp4}{\textbf{\color{vectorred}CLICK HERE TO PLAY VIDEO:}} \texttt{CB.EN.U4EEE23112\_IVN\_VIDEO.mp4} \quad\textbullet\quad 17 min 57 sec \quad\textbullet\quad 357.5 MB
+\end{tcolorbox}
 
 \end{frame}
 
 % =============================================================================
-% SLIDE 9: Quantitative Results & State-of-the-Art Benchmark
+% SLIDE 9: Experimental Results & Performance Summary (Table I Only)
 % =============================================================================
 \begin{frame}[t]
-\slidetitle{Experimental Results \& State-of-the-Art Benchmark}{100\% Isolation Accuracy \textbullet{} 63.9\% DTC Suppression \textbullet{} 42.50 ms Interrogation Latency}
+\slidetitle{Experimental Results \& Performance Summary}{100\% Isolation Accuracy \textbullet{} 63.9\% DTC Flood Suppression \textbullet{} 42.50 ms Interrogation Latency}
 
-\begin{columns}[T,totalwidth=\textwidth]
+\begin{tcolorbox}[whitecard, colframe=vectorred!70, colbacktitle=vectorred!8, height=4.15cm,
+  title={\small\bfseries\color{vectorred} Table I: Quantitative Root Cause Isolation Performance Across All 6 Failure Modes}]
+  \centering
+  \resizebox{0.99\linewidth}{!}{%
+  \footnotesize
+  \setlength{\tabcolsep}{6pt}
+  \renewcommand{\arraystretch}{1.22}
+  \begin{tabular}{@{}lcccccc@{}}
+    \toprule
+    \textbf{Injected Failure Scenario} & \textbf{ASIL} & \textbf{Isolated Root Cause} & \textbf{Raw DTCs} & \textbf{Suppressed} & \textbf{Efficiency} & \textbf{Latency} \\
+    \midrule
+    1: WSS FL Sensor Open Circuit & ASIL D & ABS (C0035-13) & 3 & 2 & 66.7\% & 42.10 ms \\
+    2: Throttle Position Sensor Low & ASIL D & ECM (P0122-12) & 2 & 1 & 50.0\% & 41.80 ms \\
+    3: Engine Coolant Overheat (125$^\circ$C) & ASIL B & ECM (P0217-00) & 3 & 2 & 66.7\% & 40.50 ms \\
+    4: ABS Transceiver Node Cutoff & ASIL D & ABS (U0121-00) & 3 & 2 & 66.7\% & 45.20 ms \\
+    5: Brake Switch Stuck Closed & ASIL B & BCM (B1318-11) & 3 & 2 & 66.7\% & 42.40 ms \\
+    6: ECM Transceiver Node Cutoff & ASIL D & ECM (U0100-00) & 3 & 2 & 66.7\% & 43.00 ms \\
+    \midrule
+    \textbf{Average / Total} & \textbf{ASIL B--D} & \textbf{100\% True-Positive} & \textbf{2.8 (17)} & \textbf{1.8 (11)} & \textbf{63.9\%} & \textbf{42.50 ms} \\
+    \bottomrule
+  \end{tabular}%
+  }
+\end{tcolorbox}
 
-  \begin{column}{0.485\textwidth}
-    \begin{tcolorbox}[whitecard, colframe=vectorred!70, colbacktitle=vectorred!8, height=4.35cm,
-      title={\footnotesize\bfseries\color{vectorred} Table I: Scenario Performance (6 Failure Modes)}]
-      \centering
-      \resizebox{\linewidth}{!}{%
-      \scriptsize
-      \setlength{\tabcolsep}{3pt}
-      \renewcommand{\arraystretch}{1.24}
-      \begin{tabular}{@{}lcccc@{}}
-        \toprule
-        \textbf{Scenario} & \textbf{ASIL} & \textbf{Raw} & \textbf{Suppressed} & \textbf{Latency} \\
-        \midrule
-        1: WSS Open Circuit    & D & 3 & 2 (66.7\%) & 42.10 ms \\
-        2: Throttle Sensor Low & D & 2 & 1 (50.0\%) & 41.80 ms \\
-        3: Coolant Overheat    & B & 3 & 2 (66.7\%) & 40.50 ms \\
-        4: ABS Node Cutoff     & D & 3 & 2 (66.7\%) & 45.20 ms \\
-        5: Brake Switch Stuck  & B & 3 & 2 (66.7\%) & 42.40 ms \\
-        6: ECM Node Cutoff     & D & 3 & 2 (66.7\%) & 43.00 ms \\
-        \midrule
-        \textbf{Avg / Total} & \textbf{B--D} & \textbf{2.8 (17)} & \textbf{1.8 (63.9\%)} & \textbf{42.50 ms} \\
-        \bottomrule
-      \end{tabular}%
-      }
-    \end{tcolorbox}
-  \end{column}
-
-  \begin{column}{0.485\textwidth}
-    \begin{tcolorbox}[whitecard, colframe=accentblue!70, colbacktitle=accentblue!8, height=4.35cm,
-      title={\footnotesize\bfseries\color{accentblue} Table II: State-of-the-Art Comparative Benchmark}]
-      \centering
-      \resizebox{\linewidth}{!}{%
-      \scriptsize
-      \setlength{\tabcolsep}{2.6pt}
-      \renewcommand{\arraystretch}{1.24}
-      \begin{tabular}{@{}llccc@{}}
-        \toprule
-        \textbf{Framework} & \textbf{Method} & \textbf{Order} & \textbf{Latency} & \textbf{RAM} \\
-        \midrule
-        Lin \emph{et al.} (2023)  & Matrix Rules   & $O(N^2)$       & 120 ms  & 12.4 KB \\
-        Liu \emph{et al.} (2023)  & Bayesian DAG   & $O(2^k |V|)$   & 340 ms  & 45.2 KB \\
-        Wang \emph{et al.} (2023) & Wire Topo      & $O(N)$         & 210 ms  & 8.6 KB  \\
-        Lu \emph{et al.} (2025)   & CNN-LSTM       & High           & 85 ms   & 5.8 MB  \\
-        Bohne \emph{et al.} (2023)& Neuro-Sym      & NP-Hard        & 1250 ms & 22.1 MB \\
-        \midrule
-        \textbf{This Work}        & \textbf{DAG}   & $\mathbf{O(|V|{+}|E|)}$ & \textbf{42.5 ms} & $\mathbf{<320}$ \textbf{B} \\
-        \bottomrule
-      \end{tabular}%
-      }
-    \end{tcolorbox}
-  \end{column}
-
-\end{columns}
-
-\vspace{0.20cm}
+\vspace{0.16cm}
 \begin{columns}[T,totalwidth=\textwidth]
   \begin{column}{0.235\textwidth}
-    \begin{tcolorbox}[cardstyle, colframe=accentgreen!70, left=4pt, right=4pt, top=5pt, bottom=5pt, height=1.45cm]
+    \begin{tcolorbox}[cardstyle, colframe=accentgreen!70, left=4pt, right=4pt, top=5pt, bottom=5pt, height=1.42cm]
       \centering{\large\bfseries\color{accentgreen} 100\%}\\[2pt]\scriptsize\color{slatedark}\textbf{Root Cause Accuracy}\\(6 / 6 Scenarios)
     \end{tcolorbox}
   \end{column}
   \begin{column}{0.235\textwidth}
-    \begin{tcolorbox}[cardstyle, colframe=vectorred!70, left=4pt, right=4pt, top=5pt, bottom=5pt, height=1.45cm]
+    \begin{tcolorbox}[cardstyle, colframe=vectorred!70, left=4pt, right=4pt, top=5pt, bottom=5pt, height=1.42cm]
       \centering{\large\bfseries\color{vectorred} 63.9\%}\\[2pt]\scriptsize\color{slatedark}\textbf{DTC Flood Reduction}\\(11 of 17 Pruned)
     \end{tcolorbox}
   \end{column}
   \begin{column}{0.235\textwidth}
-    \begin{tcolorbox}[cardstyle, colframe=accentblue!70, left=4pt, right=4pt, top=5pt, bottom=5pt, height=1.45cm]
+    \begin{tcolorbox}[cardstyle, colframe=accentblue!70, left=4pt, right=4pt, top=5pt, bottom=5pt, height=1.42cm]
       \centering{\large\bfseries\color{accentblue} 42.50 ms}\\[2pt]\scriptsize\color{slatedark}\textbf{Avg Isolation Latency}\\(ISO 26262 FTTI $<100$ ms)
     \end{tcolorbox}
   \end{column}
   \begin{column}{0.235\textwidth}
-    \begin{tcolorbox}[cardstyle, colframe=nodetester!70, left=4pt, right=4pt, top=5pt, bottom=5pt, height=1.45cm]
+    \begin{tcolorbox}[cardstyle, colframe=nodetester!70, left=4pt, right=4pt, top=5pt, bottom=5pt, height=1.42cm]
       \centering{\large\bfseries\color{nodetester} $<8~\mu$s}\\[2pt]\scriptsize\color{slatedark}\textbf{AURIX TC397 Exec}\\(1840 cyc \textbar{} 320 B mem)
     \end{tcolorbox}
   \end{column}
@@ -640,10 +569,10 @@
 \begin{columns}[T,totalwidth=\textwidth]
 
   \begin{column}{0.485\textwidth}
-    \begin{tcolorbox}[cardstyle, colframe=vectorred!70, colbacktitle=vectorred!8, height=5.20cm,
+    \begin{tcolorbox}[cardstyle, colframe=vectorred!70, colbacktitle=vectorred!8, height=5.12cm,
       title={\normalsize\bfseries\color{vectorred} Key Engineering Learnings}]
-      \footnotesize\color{slatedark}\raggedright
-      \begin{itemize}\setlength{\itemsep}{3.5pt}\setlength{\leftmargini}{10pt}
+      \footnotesize\color{slatedark}\raggedright\vspace{-4pt}
+      \begin{itemize}\setlength{\itemsep}{2pt}\setlength{\leftmargini}{10pt}
         \item \textbf{Causal Over Rule-Based:} In-degree topological pruning eliminates cascading symptom DTCs without maintaining brittle static rule tables.
         \item \textbf{Functional Safety Guarantee:} Cross-checking mechanical sensors (0.8 bar hydraulic pressure) against electrical contacts plus BTO prevents phantom braking and overspeed.
         \item \textbf{Embedded Determinism:} Linear $O(|V| + |E|)$ complexity runs in $<8~\mu$s on automotive silicon with 100\% deterministic fail-safe behavior under ISO 26262.
@@ -652,10 +581,10 @@
   \end{column}
 
   \begin{column}{0.485\textwidth}
-    \begin{tcolorbox}[cardstyle, colframe=accentblue!70, colbacktitle=accentblue!8, height=5.20cm,
+    \begin{tcolorbox}[cardstyle, colframe=accentblue!70, colbacktitle=accentblue!8, height=5.12cm,
       title={\normalsize\bfseries\color{accentblue} Zonal Scalability \& Future Roadmap}]
-      \footnotesize\color{slatedark}\raggedright
-      \begin{itemize}\setlength{\itemsep}{3.5pt}\setlength{\leftmargini}{10pt}
+      \footnotesize\color{slatedark}\raggedright\vspace{-4pt}
+      \begin{itemize}\setlength{\itemsep}{2pt}\setlength{\leftmargini}{10pt}
         \item \textbf{Zonal E/E Readiness:} Adjacency bitmasks map directly onto high-speed zonal gateways and central compute clusters with $<320$ bytes memory for 50 nodes.
         \item \textbf{Future Extensions:} Dynamic DAG generation from vendor DBC/ARXML databases, ISO 13400 DoIP over gigabit Automotive Ethernet, and CAN-XL physical transceivers.
       \end{itemize}
@@ -664,8 +593,8 @@
 
 \end{columns}
 
-\vspace{0.15cm}
-\begin{tcolorbox}[colback=accentgreen!12, colframe=accentgreen!60, boxrule=0.9pt, arc=5pt, left=10pt, right=10pt, top=7pt, bottom=7pt]
+\vspace{0.08cm}
+\begin{tcolorbox}[colback=accentgreen!12, colframe=accentgreen!60, boxrule=0.9pt, arc=5pt, left=10pt, right=10pt, top=6pt, bottom=6pt]
   \centering\normalsize\bfseries\color{accentgreen!90!black}
   THANK YOU! \quad\textbullet\quad OPEN FOR EVALUATOR QUESTIONS \& DISCUSSION
 \end{tcolorbox}
