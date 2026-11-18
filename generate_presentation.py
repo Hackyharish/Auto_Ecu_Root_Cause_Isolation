@@ -379,7 +379,7 @@ beamer_code = r"""\documentclass[aspectratio=169,10pt]{beamer}
   \node[font=\bfseries\small, text=nodetester, anchor=north] at ($(diag_box.north)+(0,-0.06)$) {DIAGNOSTIC MASTER \& TOPOLOGICAL ROOT CAUSE ISOLATION ENGINE};
   \node[font=\scriptsize, text=slatedark, align=center, anchor=center] at ($(diag_box.center)+(0,-0.16)$) {
     \textbf{ISO 14229-1 (UDS 0x19 02, Mask 0x09):} Functional Broadcast 0x7DF + Physical ECU Polling (0x7E0--0x7E3)\\[2pt]
-    \textbf{DAG Engine:} Directed Acyclic Graph $G=(V, E)$ \textbullet{} In-Degree $\deg_S^-(v_i) = 0$ \textbullet{} 42.50 ms Latency ($<8~\mu$s MCU Exec)
+    \textbf{DAG Engine:} Directed Acyclic Graph $G=(V, E)$ \textbullet{} In-Degree $\deg_S^-(v_i) = 0$ \textbullet{} Linear $O(|V|+|E|)$ Pruning
   };
 
   % Bus <-> Master arrow
@@ -600,24 +600,19 @@ beamer_code = r"""\documentclass[aspectratio=169,10pt]{beamer}
 
 \vspace{0.16cm}
 \begin{columns}[T,totalwidth=\textwidth]
-  \begin{column}{0.235\textwidth}
+  \begin{column}{0.315\textwidth}
     \begin{tcolorbox}[cardstyle, colframe=accentgreen!70, left=4pt, right=4pt, top=5pt, bottom=5pt, height=1.42cm]
       \centering{\large\bfseries\color{accentgreen} 100\%}\\[2pt]\scriptsize\color{slatedark}\textbf{Root Cause Accuracy}\\(6 / 6 Scenarios)
     \end{tcolorbox}
   \end{column}
-  \begin{column}{0.235\textwidth}
+  \begin{column}{0.315\textwidth}
     \begin{tcolorbox}[cardstyle, colframe=vectorred!70, left=4pt, right=4pt, top=5pt, bottom=5pt, height=1.42cm]
       \centering{\large\bfseries\color{vectorred} 63.9\%}\\[2pt]\scriptsize\color{slatedark}\textbf{DTC Flood Reduction}\\(11 of 17 Pruned)
     \end{tcolorbox}
   \end{column}
-  \begin{column}{0.235\textwidth}
+  \begin{column}{0.315\textwidth}
     \begin{tcolorbox}[cardstyle, colframe=accentblue!70, left=4pt, right=4pt, top=5pt, bottom=5pt, height=1.42cm]
       \centering{\large\bfseries\color{accentblue} 42.50 ms}\\[2pt]\scriptsize\color{slatedark}\textbf{Avg Isolation Latency}\\(ISO 26262 FTTI $<100$ ms)
-    \end{tcolorbox}
-  \end{column}
-  \begin{column}{0.235\textwidth}
-    \begin{tcolorbox}[cardstyle, colframe=nodetester!70, left=4pt, right=4pt, top=5pt, bottom=5pt, height=1.42cm]
-      \centering{\large\bfseries\color{nodetester} $<8~\mu$s}\\[2pt]\scriptsize\color{slatedark}\textbf{AURIX TC397 Exec}\\(1840 cyc \textbar{} 320 B mem)
     \end{tcolorbox}
   \end{column}
 \end{columns}
@@ -639,7 +634,7 @@ beamer_code = r"""\documentclass[aspectratio=169,10pt]{beamer}
       \begin{itemize}\setlength{\itemsep}{2pt}\setlength{\leftmargini}{10pt}
         \item \textbf{Causal Over Rule-Based:} In-degree topological pruning eliminates cascading symptom DTCs without maintaining brittle static rule tables.
         \item \textbf{Functional Safety Guarantee:} Cross-checking mechanical sensors (0.8 bar hydraulic pressure) against electrical contacts plus BTO prevents phantom braking and overspeed.
-        \item \textbf{Embedded Determinism:} Linear $O(|V| + |E|)$ complexity runs in $<8~\mu$s on automotive silicon with 100\% deterministic fail-safe behavior under ISO 26262.
+        \item \textbf{Embedded Determinism:} Linear $O(|V| + |E|)$ graph evaluation executes without dynamic allocation or backtracking under ISO 26262.
       \end{itemize}
     \end{tcolorbox}
   \end{column}
@@ -649,7 +644,7 @@ beamer_code = r"""\documentclass[aspectratio=169,10pt]{beamer}
       title={\normalsize\bfseries\color{accentblue} Zonal Scalability \& Future Roadmap}]
       \footnotesize\color{slatedark}\raggedright\vspace{-4pt}
       \begin{itemize}\setlength{\itemsep}{2pt}\setlength{\leftmargini}{10pt}
-        \item \textbf{Zonal E/E Readiness:} Adjacency bitmasks map directly onto high-speed zonal gateways and central compute clusters with $<320$ bytes memory for 50 nodes.
+        \item \textbf{Zonal E/E Readiness:} Static bitmask adjacency tables map directly onto high-speed zonal gateways and central compute clusters.
         \item \textbf{Future Extensions:} Dynamic DAG generation from vendor DBC/ARXML databases, ISO 13400 DoIP over gigabit Automotive Ethernet, and CAN-XL physical transceivers.
       \end{itemize}
     \end{tcolorbox}
