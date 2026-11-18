@@ -96,27 +96,6 @@ beamer_code = r"""\documentclass[aspectratio=169,10pt]{beamer}
   \vspace{0.10cm}
 }
 
-% Custom TikZ Macros for Message Banners
-\newcommand{\msgRight}[8]{
-  \begin{scope}[shift={(#1,#2)}]
-    \draw[line width=1.1pt, fill=white, draw=black] (0, -0.24) rectangle (1.18, 0.24);
-    \node[font=\bfseries\scriptsize, text=black, inner sep=0pt] at (0.59, 0) {#3};
-    \draw[line width=1.1pt, fill=#6, draw=black] (1.18, -0.24) rectangle ({1.18+#5}, 0.24);
-    \node[font=\bfseries\scriptsize, text=#7, inner sep=0pt] at ({1.18 + #5/2}, 0) {#4};
-    \draw[line width=1.1pt, fill=#8, draw=black] ({1.18+#5}, -0.24) -- ({1.18+#5+0.42}, 0) -- ({1.18+#5}, 0.24) -- cycle;
-  \end{scope}
-}
-
-\newcommand{\msgLeft}[8]{
-  \begin{scope}[shift={(#1,#2)}]
-    \draw[line width=1.1pt, fill=#8, draw=black] (0, 0) -- (0.42, -0.24) -- (0.42, 0.24) -- cycle;
-    \draw[line width=1.1pt, fill=#6, draw=black] (0.42, -0.24) rectangle ({0.42+#5}, 0.24);
-    \node[font=\bfseries\scriptsize, text=#7, inner sep=0pt] at ({0.42 + #5/2}, 0) {#4};
-    \draw[line width=1.1pt, fill=white, draw=black] ({0.42+#5}, -0.24) rectangle ({0.42+#5+1.18}, 0.24);
-    \node[font=\bfseries\scriptsize, text=black, inner sep=0pt] at ({0.42+#5+0.59}, 0) {#3};
-  \end{scope}
-}
-
 \begin{document}
 
 % =============================================================================
@@ -208,44 +187,128 @@ beamer_code = r"""\documentclass[aspectratio=169,10pt]{beamer}
 % SLIDE 3: CAN Network Message and Signal Structure (Interchanged to Page 3)
 % =============================================================================
 \begin{frame}[t]
-\slidetitle{Node, Message and Signal Structure}{Vehicle E/E Architecture \textbullet{} High-Speed CAN 500 kbps (ISO 11898-1) \textbullet{} CAN Arbitration Priority Ordering}
+\slidetitle{Node, Message and Signal Structure}{Vehicle E/E Architecture \textbullet{} High-Speed CAN 500 kbps (ISO 11898-1) \textbullet{} Verified DBC/CAPL Message Flows}
 
 \centering
-\vspace{-0.04cm}
+\vspace{-0.06cm}
 \resizebox{!}{6.02cm}{%
 \begin{tikzpicture}[x=1cm, y=1cm]
 
-  % 5 Nodes Across Top
-  \node[draw=none, fill=nodetester, rounded corners=7pt, minimum width=2.72cm, minimum height=1.28cm, text=white, align=center] (n_diag) at (1.36, 4.30) {\textbf{\normalsize DIAG}\\[2pt]\scriptsize Diagnostic Master};
-  \node[draw=none, fill=nodeabs,    rounded corners=7pt, minimum width=2.72cm, minimum height=1.28cm, text=white, align=center] (n_abs)  at (4.38, 4.30) {\textbf{\normalsize ABS / ESP}\\[2pt]\scriptsize Chassis / ESC};
-  \node[draw=none, fill=nodetcm,    rounded corners=7pt, minimum width=2.72cm, minimum height=1.28cm, text=white, align=center] (n_tcm)  at (7.40, 4.30) {\textbf{\normalsize TCM}\\[2pt]\scriptsize Gearbox};
-  \node[draw=none, fill=nodeecm,    rounded corners=7pt, minimum width=2.72cm, minimum height=1.28cm, text=nodeecmtext, align=center] (n_ecm)  at (10.42, 4.30) {\textbf{\normalsize ECM}\\[2pt]\scriptsize Engine};
-  \node[draw=none, fill=nodebcm,    rounded corners=7pt, minimum width=2.72cm, minimum height=1.28cm, text=white, align=center] (n_bcm)  at (13.44, 4.30) {\textbf{\normalsize BCM}\\[2pt]\scriptsize Body Gateway};
+  % 5 Nodes Across Top (3.70 cm center-to-center pitch -> exact lifeline alignment)
+  \node[draw=none, fill=nodetester, rounded corners=7pt, minimum width=3.15cm, minimum height=1.18cm, text=white, align=center] (n_diag) at (1.60, 4.55) {\textbf{\normalsize DIAG}\\[2pt]\scriptsize Diagnostic Master};
+  \node[draw=none, fill=nodeabs,    rounded corners=7pt, minimum width=3.15cm, minimum height=1.18cm, text=white, align=center] (n_abs)  at (5.30, 4.55) {\textbf{\normalsize ABS / ESP}\\[2pt]\scriptsize Chassis / ESC};
+  \node[draw=none, fill=nodetcm,    rounded corners=7pt, minimum width=3.15cm, minimum height=1.18cm, text=white, align=center] (n_tcm)  at (9.00, 4.55) {\textbf{\normalsize TCM}\\[2pt]\scriptsize Gearbox};
+  \node[draw=none, fill=nodeecm,    rounded corners=7pt, minimum width=3.15cm, minimum height=1.18cm, text=nodeecmtext, align=center] (n_ecm)  at (12.70, 4.55) {\textbf{\normalsize ECM}\\[2pt]\scriptsize Engine};
+  \node[draw=none, fill=nodebcm,    rounded corners=7pt, minimum width=3.15cm, minimum height=1.18cm, text=white, align=center] (n_bcm)  at (16.40, 4.55) {\textbf{\normalsize BCM}\\[2pt]\scriptsize Body Gateway};
 
-  % Bus Line & Drop Dots
-  \draw[line width=2.6pt, color=busline] (0.00, 3.16) -- (14.80, 3.16);
-  \foreach \x in {1.36, 4.38, 7.40, 10.42, 13.44} {
-    \draw[line width=1.8pt, color=busline] (\x, 3.66) -- (\x, 3.16);
-    \fill[busline] (\x, 3.16) circle (0.11);
+  % Bus Line, Drop Dots & Subtle Vertical Lifelines
+  \draw[line width=2.6pt, color=busline] (0.00, 3.54) -- (18.00, 3.54);
+  \foreach \x in {1.60, 5.30, 9.00, 12.70, 16.40} {
+    \draw[line width=1.8pt, color=busline] (\x, 3.96) -- (\x, 3.54);
+    \fill[busline] (\x, 3.54) circle (0.11);
+    \draw[line width=0.8pt, dashed, color=busline!40] (\x, 3.54) -- (\x, -2.02);
   }
 
-  % Message Banners (Exact CAN IDs, Payloads & Cycle Times matching DBC & CAPL!)
-  \msgRight{0.40}{2.44}{0x200}{Wheel speed FL, FR, RL, RR (10 ms)}{5.25}{nodeabs}{white}{nodetcm}
-  \msgLeft {7.65}{2.44}{0x100}{Engine speed, throttle, torque (10 ms)}{5.35}{nodeecm}{nodeecmtext}{nodetcm}
+  % Row 1 (y=2.95): 0x100 ECM -> TCM [arrowhead = TCM Crimson]
+  \begin{scope}[shift={(0, 2.95)}]
+    \draw[line width=1.05pt, fill=nodetcm, draw=black] (9.00, 0) -- (9.38, -0.21) -- (9.38, 0.21) -- cycle;
+    \draw[line width=1.05pt, fill=nodeecm, draw=black] (9.38, -0.21) rectangle (12.70, 0.21);
+    \node[font=\bfseries\tiny, text=nodeecmtext, align=center, inner sep=0pt] at (11.04, 0) {Engine speed, throttle,\\[-1pt]torque, status (10 ms)};
+    \draw[line width=1.05pt, fill=white, draw=black] (12.70, -0.21) rectangle (13.78, 0.21);
+    \node[font=\bfseries\scriptsize, text=black, inner sep=0pt] at (13.24, 0) {0x100};
+  \end{scope}
 
-  \msgRight{0.40}{1.68}{0x205}{Vehicle speed, yaw rate, brake (20 ms)}{5.25}{nodeabs}{white}{nodetcm}
-  \msgLeft {7.65}{1.68}{0x105}{Coolant temp, fuel rate, MIL (50 ms)}{5.35}{nodeecm}{nodeecmtext}{nodetcm}
+  % Row 2 (y=2.36): 0x105 ECM -> TCM [Crimson] & BCM [Slate Blue]
+  \begin{scope}[shift={(0, 2.36)}]
+    \draw[line width=1.05pt, fill=nodetcm, draw=black] (9.00, 0) -- (9.38, -0.21) -- (9.38, 0.21) -- cycle;
+    \draw[line width=1.05pt, fill=nodeecm, draw=black] (9.38, -0.21) rectangle (16.02, 0.21);
+    \draw[line width=1.05pt, fill=nodebcm, draw=black] (16.40, 0) -- (16.02, -0.21) -- (16.02, 0.21) -- cycle;
+    \draw[line width=1.05pt, fill=white, draw=black] (12.16, -0.21) rectangle (13.24, 0.21);
+    \node[font=\bfseries\scriptsize, text=black, inner sep=0pt] at (12.70, 0) {0x105};
+    \node[font=\bfseries\scriptsize, text=nodeecmtext, inner sep=0pt] at (10.77, 0) {Coolant temp (50 ms)};
+    \node[font=\bfseries\scriptsize, text=nodeecmtext, inner sep=0pt] at (14.63, 0) {Temp, fuel, MIL};
+  \end{scope}
 
-  \msgRight{4.30}{0.92}{0x300}{Current gear, target, clutch status (20 ms)}{5.55}{nodetcm}{white}{nodeecm}
+  % Row 3 (y=1.77): 0x200 ABS -> TCM [arrowhead = TCM Crimson]
+  \begin{scope}[shift={(0, 1.77)}]
+    \draw[line width=1.05pt, fill=white, draw=black] (4.22, -0.21) rectangle (5.30, 0.21);
+    \node[font=\bfseries\scriptsize, text=black, inner sep=0pt] at (4.76, 0) {0x200};
+    \draw[line width=1.05pt, fill=nodeabs, draw=black] (5.30, -0.21) rectangle (8.62, 0.21);
+    \node[font=\bfseries\tiny, text=white, align=center, inner sep=0pt] at (6.96, 0) {Wheel speed FL, FR,\\[-1pt]RL, RR (10 ms)};
+    \draw[line width=1.05pt, fill=nodetcm, draw=black] (9.00, 0) -- (8.62, -0.21) -- (8.62, 0.21) -- cycle;
+  \end{scope}
 
-  \msgLeft {7.45}{0.16}{0x400}{Ignition state, brake sw, hazard (50 ms)}{5.55}{nodebcm}{white}{nodetcm}
+  % Row 4 (y=1.18): 0x205 ABS -> TCM (tap) -> ECM [arrowhead = ECM Light Grey]
+  \begin{scope}[shift={(0, 1.18)}]
+    \draw[line width=1.05pt, fill=white, draw=black] (4.22, -0.21) rectangle (5.30, 0.21);
+    \node[font=\bfseries\scriptsize, text=black, inner sep=0pt] at (4.76, 0) {0x205};
+    \draw[line width=1.05pt, fill=nodeabs, draw=black] (5.30, -0.21) rectangle (12.32, 0.21);
+    \node[font=\bfseries\scriptsize, text=white, inner sep=0pt] at (8.81, 0) {Vehicle speed, yaw rate, brake pressure, ESP (20 ms)};
+    \filldraw[fill=nodetcm, draw=black, line width=0.8pt] (9.00, 0.21) circle (0.09);
+    \draw[line width=1.05pt, fill=nodeecm, draw=black] (12.70, 0) -- (12.32, -0.21) -- (12.32, 0.21) -- cycle;
+  \end{scope}
 
-  \msgRight{0.40}{-0.60}{0x7DF}{UDS Functional Request: Session, DTC Inquiry (0x10, 0x19, 0x14, 0x22) [Event]}{12.15}{nodetester}{white}{nodeabs}
+  % Row 5 (y=0.59): 0x300 TCM -> ECM (tap) -> BCM [arrowhead = BCM Slate Blue]
+  \begin{scope}[shift={(0, 0.59)}]
+    \draw[line width=1.05pt, fill=white, draw=black] (7.92, -0.21) rectangle (9.00, 0.21);
+    \node[font=\bfseries\scriptsize, text=black, inner sep=0pt] at (8.46, 0) {0x300};
+    \draw[line width=1.05pt, fill=nodetcm, draw=black] (9.00, -0.21) rectangle (16.02, 0.21);
+    \node[font=\bfseries\scriptsize, text=white, inner sep=0pt] at (12.51, 0) {Current gear, target, clutch, oil temp (20 ms)};
+    \filldraw[fill=nodeecm, draw=black, line width=0.8pt] (12.70, 0.21) circle (0.09);
+    \draw[line width=1.05pt, fill=nodebcm, draw=black] (16.40, 0) -- (16.02, -0.21) -- (16.02, 0.21) -- cycle;
+  \end{scope}
 
-  % Priority Rule & Physical UDS Mapping Footer (Verified 100% against CAPL & DBC!)
-  \node[draw=cardborder, fill=cardbg, rounded corners=4pt, inner sep=5pt, minimum width=14.8cm, font=\scriptsize, text=slatedark, align=center] at (7.40, -1.56) {
-    \textbf{CAN Priority:} Lower ID = Higher Priority (\textbf{0x100 $>$ 0x105 $>$ 0x200 $>$ 0x205 $>$ 0x300 $>$ 0x400 $>$ 0x7DF $>$ 0x7E0--0x7E3 $>$ 0x7E8--0x7EB})\\[3pt]
-    \textbf{15 Messages \textbullet{} 43 Signals} \quad\textbar\quad \textbf{Physical UDS:} ECM (0x7E0/0x7E8) \textbullet{} TCM (0x7E1/0x7E9) \textbullet{} ABS (0x7E2/0x7EA) \textbullet{} BCM (0x7E3/0x7EB)
+  % Row 6 (y=0.00): 0x400 BCM -> ECM (tap), TCM (tap), ABS [arrowhead = ABS Charcoal]
+  \begin{scope}[shift={(0, 0.00)}]
+    \draw[line width=1.05pt, fill=nodeabs, draw=black] (5.30, 0) -- (5.68, -0.21) -- (5.68, 0.21) -- cycle;
+    \draw[line width=1.05pt, fill=nodebcm, draw=black] (5.68, -0.21) rectangle (16.40, 0.21);
+    \node[font=\bfseries\scriptsize, text=white, inner sep=0pt] at (11.04, 0) {Ignition state, brake switch, hazard status (50 ms)};
+    \filldraw[fill=nodetcm, draw=black, line width=0.8pt] (9.00, 0.21) circle (0.09);
+    \filldraw[fill=nodeecm, draw=black, line width=0.8pt] (12.70, 0.21) circle (0.09);
+    \draw[line width=1.05pt, fill=white, draw=black] (16.40, -0.21) rectangle (17.48, 0.21);
+    \node[font=\bfseries\scriptsize, text=black, inner sep=0pt] at (16.94, 0) {0x400};
+  \end{scope}
+
+  % Row 7 (y=-0.59): 0x7DF DIAG -> ABS, TCM, ECM, BCM [arrowhead = BCM Slate Blue]
+  \begin{scope}[shift={(0, -0.59)}]
+    \draw[line width=1.05pt, fill=white, draw=black] (0.52, -0.21) rectangle (1.60, 0.21);
+    \node[font=\bfseries\scriptsize, text=black, inner sep=0pt] at (1.06, 0) {0x7DF};
+    \draw[line width=1.05pt, fill=nodetester, draw=black] (1.60, -0.21) rectangle (16.02, 0.21);
+    \node[font=\bfseries\scriptsize, text=white, inner sep=0pt] at (8.81, 0) {UDS Functional Broadcast: Extended Session (0x10 03), Clear DTC (0x14) [Event]};
+    \filldraw[fill=nodeabs, draw=black, line width=0.8pt] (5.30, 0.21) circle (0.09);
+    \filldraw[fill=nodetcm, draw=black, line width=0.8pt] (9.00, 0.21) circle (0.09);
+    \filldraw[fill=nodeecm, draw=black, line width=0.8pt] (12.70, 0.21) circle (0.09);
+    \draw[line width=1.05pt, fill=nodebcm, draw=black] (16.40, 0) -- (16.02, -0.21) -- (16.02, 0.21) -- cycle;
+  \end{scope}
+
+  % Row 8 (y=-1.18): 0x7E0-0x7E3 DIAG -> Physical ECUs [arrowhead = BCM Slate Blue]
+  \begin{scope}[shift={(0, -1.18)}]
+    \draw[line width=1.05pt, fill=white, draw=black] (0.28, -0.21) rectangle (1.60, 0.21);
+    \node[font=\bfseries\scriptsize, text=black, inner sep=0pt] at (0.94, 0) {0x7E0--3};
+    \draw[line width=1.05pt, fill=nodetester, draw=black] (1.60, -0.21) rectangle (16.02, 0.21);
+    \node[font=\bfseries\scriptsize, text=white, inner sep=0pt] at (8.81, 0) {UDS Physical Requests: DTC Inquiry 0x19 02 (ABS 0x7E2, TCM 0x7E1, ECM 0x7E0, BCM 0x7E3)};
+    \filldraw[fill=nodeabs, draw=black, line width=0.8pt] (5.30, 0.21) circle (0.09);
+    \filldraw[fill=nodetcm, draw=black, line width=0.8pt] (9.00, 0.21) circle (0.09);
+    \filldraw[fill=nodeecm, draw=black, line width=0.8pt] (12.70, 0.21) circle (0.09);
+    \draw[line width=1.05pt, fill=nodebcm, draw=black] (16.40, 0) -- (16.02, -0.21) -- (16.02, 0.21) -- cycle;
+  \end{scope}
+
+  % Row 9 (y=-1.77): 0x7E8-0x7EB All ECUs -> DIAG [arrowhead = DIAG Purple]
+  \begin{scope}[shift={(0, -1.77)}]
+    \draw[line width=1.05pt, fill=nodetester, draw=black] (1.60, 0) -- (1.98, -0.21) -- (1.98, 0.21) -- cycle;
+    \draw[line width=1.05pt, fill=slategrey!85, draw=black] (1.98, -0.21) rectangle (16.40, 0.21);
+    \node[font=\bfseries\scriptsize, text=white, inner sep=0pt] at (9.19, 0) {UDS Physical Responses: 0x50, 0x59 Confirmed DTCs (ECM 0x7E8, TCM 0x7E9, ABS 0x7EA, BCM 0x7EB)};
+    \filldraw[fill=nodeabs, draw=black, line width=0.8pt] (5.30, 0.21) circle (0.09);
+    \filldraw[fill=nodetcm, draw=black, line width=0.8pt] (9.00, 0.21) circle (0.09);
+    \filldraw[fill=nodeecm, draw=black, line width=0.8pt] (12.70, 0.21) circle (0.09);
+    \draw[line width=1.05pt, fill=white, draw=black] (16.40, -0.21) rectangle (17.72, 0.21);
+    \node[font=\bfseries\scriptsize, text=black, inner sep=0pt] at (17.06, 0) {0x7E8--B};
+  \end{scope}
+
+  % Priority Rule & Legend Footer (Verified 100% against CAPL & DBC!)
+  \node[draw=cardborder, fill=cardbg, rounded corners=4pt, inner sep=4pt, minimum width=18.0cm, font=\scriptsize, text=slatedark, align=center] at (9.00, -2.54) {
+    \textbf{CAN Priority:} \textbf{0x100 $>$ 0x105 $>$ 0x200 $>$ 0x205 $>$ 0x300 $>$ 0x400 $>$ 0x7DF $>$ 0x7E0--0x7E3 $>$ 0x7E8--0x7EB} \quad\textbar\quad \textbf{15 Messages \textbullet{} 43 Signals}\\[2pt]
+    \textbf{Legend:} Banner Fill = Transmitter ECU \quad\textbullet\quad Arrowhead Color = Target Destination ECU \quad\textbullet\quad Top Dot = Subscriber / Multi-ECU Node
   };
 
 \end{tikzpicture}%
@@ -374,20 +437,20 @@ beamer_code = r"""\documentclass[aspectratio=169,10pt]{beamer}
       \vspace{1pt}
       \begin{tikzpicture}[
           x=1cm, y=1cm,
-          ecunode/.style={circle, draw=slatedark, fill=accentblue!12, line width=0.9pt, font=\sffamily\footnotesize\bfseries, text=slatedark, align=center, minimum size=0.82cm, inner sep=1pt},
-          edgearr/.style={-{Stealth[length=5pt, width=3.5pt]}, line width=0.9pt, draw=slatedark},
-          edgelabel/.style={font=\sffamily\scriptsize, fill=cardbg, inner sep=1pt, rounded corners=2pt, text=slatedark}
+          eculabel/.style={font=\sffamily\footnotesize\bfseries, align=center, minimum size=0.84cm, inner sep=1pt, circle, line width=1.1pt},
+          edgearr/.style={-{Stealth[length=5.5pt, width=4pt]}, line width=1.1pt},
+          edgelabel/.style={font=\sffamily\scriptsize, fill=cardbg, inner sep=1.2pt, rounded corners=2pt, text=slatedark}
       ]
-        \node[ecunode] (bcm) at (0, 1.90) {BCM};
-        \node[ecunode] (abs) at (-1.90, 0.95) {ABS};
-        \node[ecunode] (ecm) at (1.90, 0.95) {ECM};
-        \node[ecunode] (tcm) at (0, 0) {TCM};
+        \node[eculabel, draw=nodebcm, fill=nodebcm, text=white]       (bcm) at (0, 2.10) {BCM};
+        \node[eculabel, draw=nodeabs, fill=nodeabs, text=white]       (abs) at (-2.25, 1.05) {ABS};
+        \node[eculabel, draw=nodeecmtext, fill=nodeecm, text=nodeecmtext] (ecm) at (2.25, 1.05) {ECM};
+        \node[eculabel, draw=nodetcm, fill=nodetcm, text=white]       (tcm) at (0, 0) {TCM};
 
-        \draw[edgearr] (bcm) -- (abs) node[edgelabel, midway, above left] {Brake Sw};
-        \draw[edgearr] (bcm) -- (ecm) node[edgelabel, midway, above right] {Brake Sw};
-        \draw[edgearr] (abs) -- (ecm) node[edgelabel, midway, above=2pt] {WSS / Speed};
-        \draw[edgearr] (abs) -- (tcm) node[edgelabel, midway, below left] {Veh Speed};
-        \draw[edgearr] (ecm) -- (tcm) node[edgelabel, midway, below right] {RPM / Torque};
+        \draw[line width=1.1pt, draw=nodeabs,     -{Stealth[length=6pt, width=4.4pt, fill=nodeabs]}]     (bcm) -- (abs) node[edgelabel, midway, above left=-1pt] {Brake Sw (0x400)};
+        \draw[line width=1.1pt, draw=nodeecmtext, -{Stealth[length=6pt, width=4.4pt, fill=nodeecm]}]     (bcm) -- (ecm) node[edgelabel, midway, above right=-1pt] {Brake Sw (0x400)};
+        \draw[line width=1.1pt, draw=nodeecmtext, -{Stealth[length=6pt, width=4.4pt, fill=nodeecm]}]     (abs) -- (ecm) node[edgelabel, midway] {Veh Speed (0x205)};
+        \draw[line width=1.1pt, draw=nodetcm,     -{Stealth[length=6pt, width=4.4pt, fill=nodetcm]}]     (abs) -- (tcm) node[edgelabel, midway, below left=-1pt] {WSS/Spd (0x200/5)};
+        \draw[line width=1.1pt, draw=nodetcm,     -{Stealth[length=6pt, width=4.4pt, fill=nodetcm]}]     (ecm) -- (tcm) node[edgelabel, midway, below right=-1pt] {RPM/Thr (0x100)};
       \end{tikzpicture}
 
       \vspace{3pt}
