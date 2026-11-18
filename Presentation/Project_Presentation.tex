@@ -203,79 +203,79 @@
 \end{frame}
 
 % =============================================================================
-% SLIDE 3: System Architecture & Block Diagram (Clean Orthogonal Layout)
+% SLIDE 3: System Architecture & Block Diagram (Full-Page Orthogonal Layout)
 % =============================================================================
 \begin{frame}[t]
 \slidetitle{Detailed System Architecture}{Multi-Layer Automotive E/E Simulation Architecture in Vector CANoe 19}
 
 \centering
-\vspace{-0.12cm}
+\vspace{-0.16cm}
 \resizebox{\textwidth}{!}{%
-\begin{tikzpicture}[x=1cm, y=1cm, >=Latex]
+\begin{tikzpicture}[x=1cm, y=1cm, >={Stealth[length=5pt, width=3.5pt]}]
 
   % LAYER 1 (Top): Balanced Wide Stimulus & HMI Cards
-  \node[draw=accentamber!90, fill=accentamber!8, rounded corners=5pt, line width=1.0pt, minimum width=6.6cm, minimum height=1.72cm] (inj_box) at (3.45, 4.72) {};
-  \node[font=\bfseries\footnotesize, text=accentamber!90!black, anchor=north] at ($(inj_box.north)+(0,-0.07)$) {FAULT INJECTION \& STIMULUS LAYER};
-  \node[font=\scriptsize, text=slatedark, anchor=north west] at ($(inj_box.north west)+(0.18,-0.40)$) {
-    \begin{tabular}{@{}l@{\quad}l@{}}
+  \node[draw=accentamber!90, fill=accentamber!8, rounded corners=5pt, line width=1.1pt, minimum width=7.2cm, minimum height=1.55cm] (inj_box) at (3.70, 4.72) {};
+  \node[font=\bfseries\small, text=accentamber!90!black, anchor=north] at ($(inj_box.north)+(0,-0.06)$) {FAULT INJECTION \& STIMULUS LAYER};
+  \node[font=\scriptsize, text=slatedark, anchor=north west] at ($(inj_box.north west)+(0.20,-0.40)$) {
+    \begin{tabular}{@{}l@{\qquad}l@{}}
       \textbullet~WSS FL Open ($v=0$) & \textbullet~ABS / ECM Bus-Off \\
-      \textbullet~Throttle Low (0\%)    & \textbullet~Brake Sw Stuck \\
-      \textbullet~Coolant Overheat (125$^\circ$C) & \textbullet~Manual / Auto Test
+      \textbullet~Throttle Low (0\%)    & \textbullet~Brake Switch Stuck \\
+      \textbullet~Coolant Overheat (125$^\circ$C) & \textbullet~Auto Test Suite
     \end{tabular}
   };
 
-  \node[draw=accentgreen!80, fill=accentgreen!8, rounded corners=5pt, line width=1.0pt, minimum width=6.6cm, minimum height=1.72cm] (hmi_box) at (10.55, 4.72) {};
-  \node[font=\bfseries\footnotesize, text=accentgreen!80!black, anchor=north] at ($(hmi_box.north)+(0,-0.07)$) {CANoe 19 COCKPIT HMI \& TELEMETRY};
-  \node[font=\scriptsize, text=slatedark, anchor=north west] at ($(hmi_box.north west)+(0.18,-0.40)$) {
-    \begin{tabular}{@{}l@{\quad}l@{}}
+  \node[draw=accentgreen!80, fill=accentgreen!8, rounded corners=5pt, line width=1.1pt, minimum width=7.2cm, minimum height=1.55cm] (hmi_box) at (11.50, 4.72) {};
+  \node[font=\bfseries\small, text=accentgreen!80!black, anchor=north] at ($(hmi_box.north)+(0,-0.06)$) {CANoe 19 COCKPIT HMI \& TELEMETRY};
+  \node[font=\scriptsize, text=slatedark, anchor=north west] at ($(hmi_box.north west)+(0.20,-0.40)$) {
+    \begin{tabular}{@{}l@{\qquad}l@{}}
       \textbullet~Speed, RPM \& Gear    & \textbullet~Hydraulic Bar Gauge \\
       \textbullet~Raw Symptom List      & \textbullet~Root Cause LED \\
-      \multicolumn{2}{@{}l@{}}{\textbullet~ISO 14229 0x19 04 Freeze Frame Log}
+      \multicolumn{2}{@{}l@{}}{\textbullet~ISO 14229 Service 0x19 04 Freeze Frame Log}
     \end{tabular}
   };
 
-  % LAYER 2 (Middle): 4 Evenly Spaced ECUs
-  \node[draw=nodebcm, fill=nodebcm!10, rounded corners=5pt, line width=1.0pt, minimum width=2.95cm, minimum height=1.55cm] (bcm) at (1.75, 2.35) {};
+  % LAYER 2 (Middle): 4 Evenly Spaced ECUs (Generous vertical gap for arrows!)
+  \node[draw=nodebcm, fill=nodebcm!10, rounded corners=5pt, line width=1.1pt, minimum width=3.25cm, minimum height=1.52cm] (bcm) at (1.95, 2.42) {};
   \node[font=\bfseries\footnotesize, text=nodebcm, anchor=north] at ($(bcm.north)+(0,-0.06)$) {BCM (0x400)};
   \node[font=\scriptsize, text=slatedark, align=center, anchor=center] at ($(bcm.center)+(0,-0.16)$) {Brake Switch, Ignition\\Hazard State\\UDS: 0x7E3 / 0x7EB};
 
-  \node[draw=nodeabs, fill=nodeabs!10, rounded corners=5pt, line width=1.0pt, minimum width=2.95cm, minimum height=1.55cm] (abs) at (5.25, 2.35) {};
+  \node[draw=nodeabs, fill=nodeabs!10, rounded corners=5pt, line width=1.1pt, minimum width=3.25cm, minimum height=1.52cm] (abs) at (5.72, 2.42) {};
   \node[font=\bfseries\footnotesize, text=nodeabs, anchor=north] at ($(abs.north)+(0,-0.06)$) {ABS (0x200, 0x205)};
   \node[font=\scriptsize, text=slatedark, align=center, anchor=center] at ($(abs.center)+(0,-0.16)$) {4 Wheel Speeds\\Brake Pressure\\UDS: 0x7E2 / 0x7EA};
 
-  \node[draw=vectorred, fill=vectorred!8, rounded corners=5pt, line width=1.0pt, minimum width=2.95cm, minimum height=1.55cm] (ecm) at (8.75, 2.35) {};
+  \node[draw=vectorred, fill=vectorred!8, rounded corners=5pt, line width=1.1pt, minimum width=3.25cm, minimum height=1.52cm] (ecm) at (9.48, 2.42) {};
   \node[font=\bfseries\footnotesize, text=vectorred, anchor=north] at ($(ecm.north)+(0,-0.06)$) {ECM (0x100, 0x105)};
   \node[font=\scriptsize, text=slatedark, align=center, anchor=center] at ($(ecm.center)+(0,-0.16)$) {RPM, Throttle, Torque\\Coolant Temp\\UDS: 0x7E0 / 0x7E8};
 
-  \node[draw=nodetcm, fill=nodetcm!10, rounded corners=5pt, line width=1.0pt, minimum width=2.95cm, minimum height=1.55cm] (tcm) at (12.25, 2.35) {};
+  \node[draw=nodetcm, fill=nodetcm!10, rounded corners=5pt, line width=1.1pt, minimum width=3.25cm, minimum height=1.52cm] (tcm) at (13.25, 2.42) {};
   \node[font=\bfseries\footnotesize, text=nodetcm, anchor=north] at ($(tcm.north)+(0,-0.06)$) {TCM (0x300)};
   \node[font=\scriptsize, text=slatedark, align=center, anchor=center] at ($(tcm.center)+(0,-0.16)$) {Current Gear, Clutch\\Limp Shift Lock\\UDS: 0x7E1 / 0x7E9};
 
-  % HIGH-SPEED CAN BUS BAR
-  \filldraw[fill=slatedark!85, draw=slatedark, rounded corners=2pt] (0.25, 0.85) rectangle (13.75, 1.21);
-  \node[font=\bfseries\scriptsize, text=white] at (7.0, 1.03) {HIGH-SPEED CAN BUS (ISO 11898-1 \textbar{} 500 kbps \textbar{} 15 Messages \textbar{} 43 Signals)};
+  % HIGH-SPEED CAN BUS BAR (0.76cm gap above and 0.72cm gap below -> clean arrow stems!)
+  \filldraw[fill=slatedark!85, draw=slatedark, rounded corners=2.5pt] (0.15, 0.50) rectangle (15.05, 0.90);
+  \node[font=\bfseries\footnotesize, text=white] at (7.60, 0.70) {HIGH-SPEED CAN BUS (ISO 11898-1 \textbar{} 500 kbps \textbar{} 15 Messages \textbar{} 43 Signals)};
 
-  % ECU <-> Bus orthogonal connectors
-  \draw[line width=1.2pt, <->, color=nodebcm]   (bcm.south) -- (1.75, 1.21);
-  \draw[line width=1.2pt, <->, color=nodeabs]   (abs.south) -- (5.25, 1.21);
-  \draw[line width=1.2pt, <->, color=vectorred] (ecm.south) -- (8.75, 1.21);
-  \draw[line width=1.2pt, <->, color=nodetcm]   (tcm.south) -- (12.25, 1.21);
+  % ECU <-> Bus orthogonal bidirectional arrows (0.76cm stem -> zero collision!)
+  \draw[line width=1.2pt, <->, color=nodebcm]   (bcm.south) -- (1.95, 0.90);
+  \draw[line width=1.2pt, <->, color=nodeabs]   (abs.south) -- (5.72, 0.90);
+  \draw[line width=1.2pt, <->, color=vectorred] (ecm.south) -- (9.48, 0.90);
+  \draw[line width=1.2pt, <->, color=nodetcm]   (tcm.south) -- (13.25, 0.90);
 
-  % LAYER 3 (Bottom): Diagnostic Master & DAG Engine (Clean 2-line layout!)
-  \node[draw=nodetester, fill=nodetester!8, rounded corners=6pt, line width=1.1pt, minimum width=13.5cm, minimum height=1.45cm] (diag_box) at (7.0, -0.35) {};
-  \node[font=\bfseries\footnotesize, text=nodetester, anchor=north] at ($(diag_box.north)+(0,-0.06)$) {DIAGNOSTIC MASTER \& TOPOLOGICAL ROOT CAUSE ISOLATION ENGINE};
+  % LAYER 3 (Bottom): Diagnostic Master & DAG Engine
+  \node[draw=nodetester, fill=nodetester!8, rounded corners=6pt, line width=1.1pt, minimum width=14.9cm, minimum height=1.42cm] (diag_box) at (7.60, -0.92) {};
+  \node[font=\bfseries\small, text=nodetester, anchor=north] at ($(diag_box.north)+(0,-0.06)$) {DIAGNOSTIC MASTER \& TOPOLOGICAL ROOT CAUSE ISOLATION ENGINE};
   \node[font=\scriptsize, text=slatedark, align=center, anchor=center] at ($(diag_box.center)+(0,-0.16)$) {
     \textbf{ISO 14229-1 (UDS 0x19 02, Mask 0x08):} Periodic 10 ms Functional Broadcast Interrogation over 0x7DF\\[2pt]
     \textbf{DAG Engine:} Directed Acyclic Graph $G=(V, E)$ \textbullet{} In-Degree $\deg_S^-(v_i) = 0$ \textbullet{} 42.50 ms Latency ($<8~\mu$s MCU Exec)
   };
 
-  % Clean Bus <-> Master arrow
-  \draw[line width=1.4pt, <->, color=nodetester] (7.0, 0.85) -- (diag_box.north);
+  % Clean Bus <-> Master arrow (0.71cm stem!)
+  \draw[line width=1.4pt, <->, color=nodetester] (7.60, 0.50) -- (diag_box.north);
 
-  % Clean Non-Overlapping Inter-Layer Links
-  \draw[line width=1.0pt, ->, dashed, color=accentamber!90] (1.75, 3.86) -- (bcm.north);
-  \draw[line width=1.0pt, ->, dashed, color=accentamber!90] (5.25, 3.86) -- (abs.north);
-  \draw[line width=1.0pt, ->, dashed, color=accentgreen!80] (diag_box.east) -- (14.15, -0.35) |- (hmi_box.east);
+  % Clean Non-Overlapping Inter-Layer Links (long crisp stems!)
+  \draw[line width=1.1pt, ->, dashed, color=accentamber!90] (1.95, 3.945) -- (bcm.north);
+  \draw[line width=1.1pt, ->, dashed, color=accentamber!90] (5.72, 3.945) -- (abs.north);
+  \draw[line width=1.1pt, ->, dashed, color=accentgreen!80] (diag_box.east) -- (15.45, -0.92) |- (hmi_box.east);
 
 \end{tikzpicture}%
 }
@@ -283,53 +283,47 @@
 \end{frame}
 
 % =============================================================================
-% SLIDE 4: CAN Network Message and Signal Structure (Based on slide_3.png)
+% SLIDE 4: CAN Network Message and Signal Structure (Full-Page slide_3.png Layout)
 % =============================================================================
 \begin{frame}[t]
 \slidetitle{Node, Message and Signal Structure}{Vehicle E/E Architecture \textbullet{} High-Speed CAN 500 kbps (ISO 11898-1) \textbullet{} CAN Arbitration Priority Ordering}
 
 \centering
-\vspace{-0.10cm}
+\vspace{-0.06cm}
 \resizebox{\textwidth}{!}{%
 \begin{tikzpicture}[x=1cm, y=1cm]
 
-  % 5 Nodes Across Top (Exact order & colors matching slide_3.png)
-  \node[draw=none, fill=nodetester, rounded corners=7pt, minimum width=2.55cm, minimum height=1.18cm, text=white, align=center] (n_diag) at (1.45, 3.30) {\textbf{\normalsize DIAG}\\[2pt]\scriptsize Diagnostic Master};
-  \node[draw=none, fill=nodeabs,    rounded corners=7pt, minimum width=2.55cm, minimum height=1.18cm, text=white, align=center] (n_abs)  at (4.42, 3.30) {\textbf{\normalsize ABS / ESP}\\[2pt]\scriptsize Chassis / ESC};
-  \node[draw=none, fill=nodetcm,    rounded corners=7pt, minimum width=2.55cm, minimum height=1.18cm, text=white, align=center] (n_tcm)  at (7.40, 3.30) {\textbf{\normalsize TCM}\\[2pt]\scriptsize Gearbox};
-  \node[draw=none, fill=nodeecm,    rounded corners=7pt, minimum width=2.55cm, minimum height=1.18cm, text=nodeecmtext, align=center] (n_ecm)  at (10.38, 3.30) {\textbf{\normalsize ECM}\\[2pt]\scriptsize Engine};
-  \node[draw=none, fill=nodebcm,    rounded corners=7pt, minimum width=2.55cm, minimum height=1.18cm, text=white, align=center] (n_bcm)  at (13.35, 3.30) {\textbf{\normalsize BCM}\\[2pt]\scriptsize Body Gateway};
+  % 5 Nodes Across Top (Spanning full 14.8cm width & full height edge-to-edge!)
+  \node[draw=none, fill=nodetester, rounded corners=7pt, minimum width=2.72cm, minimum height=1.34cm, text=white, align=center] (n_diag) at (1.36, 4.38) {\textbf{\normalsize DIAG}\\[2pt]\scriptsize Diagnostic Master};
+  \node[draw=none, fill=nodeabs,    rounded corners=7pt, minimum width=2.72cm, minimum height=1.34cm, text=white, align=center] (n_abs)  at (4.38, 4.38) {\textbf{\normalsize ABS / ESP}\\[2pt]\scriptsize Chassis / ESC};
+  \node[draw=none, fill=nodetcm,    rounded corners=7pt, minimum width=2.72cm, minimum height=1.34cm, text=white, align=center] (n_tcm)  at (7.40, 4.38) {\textbf{\normalsize TCM}\\[2pt]\scriptsize Gearbox};
+  \node[draw=none, fill=nodeecm,    rounded corners=7pt, minimum width=2.72cm, minimum height=1.34cm, text=nodeecmtext, align=center] (n_ecm)  at (10.42, 4.38) {\textbf{\normalsize ECM}\\[2pt]\scriptsize Engine};
+  \node[draw=none, fill=nodebcm,    rounded corners=7pt, minimum width=2.72cm, minimum height=1.34cm, text=white, align=center] (n_bcm)  at (13.44, 4.38) {\textbf{\normalsize BCM}\\[2pt]\scriptsize Body Gateway};
 
   % Bus Line & Drop Dots
-  \draw[line width=2.4pt, color=busline] (0.05, 2.38) -- (14.75, 2.38);
-  \foreach \x in {1.45, 4.42, 7.40, 10.38, 13.35} {
-    \draw[line width=1.6pt, color=busline] (\x, 2.71) -- (\x, 2.38);
-    \fill[busline] (\x, 2.38) circle (0.10);
+  \draw[line width=2.6pt, color=busline] (0.00, 3.22) -- (14.80, 3.22);
+  \foreach \x in {1.36, 4.38, 7.40, 10.42, 13.44} {
+    \draw[line width=1.8pt, color=busline] (\x, 3.71) -- (\x, 3.22);
+    \fill[busline] (\x, 3.22) circle (0.11);
   }
 
-  % Message Banners (Clean vertical spacing so 0x7DF never touches footer!)
-  % Row 1: 0x200 (ABS -> right) & 0x100 (left <- ECM)
-  \msgRight{0.60}{1.78}{0x200}{Wheel speed FL, FR, RL, RR (10 ms)}{5.05}{nodeabs}{white}{nodetcm}
-  \msgLeft {7.65}{1.78}{0x100}{Engine speed, throttle, torque (10 ms)}{5.20}{nodeecm}{nodeecmtext}{nodetcm}
+  % Message Banners (Tall clean pitch filling full vertical page height!)
+  \msgRight{0.40}{2.48}{0x200}{Wheel speed FL, FR, RL, RR (10 ms)}{5.25}{nodeabs}{white}{nodetcm}
+  \msgLeft {7.65}{2.48}{0x100}{Engine speed, throttle, torque (10 ms)}{5.35}{nodeecm}{nodeecmtext}{nodetcm}
 
-  % Row 2: 0x205 (ABS -> right) & 0x105 (left <- ECM)
-  \msgRight{0.60}{1.18}{0x205}{Vehicle speed, yaw rate, brake (20 ms)}{5.05}{nodeabs}{white}{nodetcm}
-  \msgLeft {7.65}{1.18}{0x105}{Coolant temp, fuel rate, MIL (50 ms)}{5.20}{nodeecm}{nodeecmtext}{nodetcm}
+  \msgRight{0.40}{1.70}{0x205}{Vehicle speed, yaw rate, brake (20 ms)}{5.25}{nodeabs}{white}{nodetcm}
+  \msgLeft {7.65}{1.70}{0x105}{Coolant temp, fuel rate, MIL (50 ms)}{5.35}{nodeecm}{nodeecmtext}{nodetcm}
 
-  % Row 3: 0x300 (TCM -> right)
-  \msgRight{4.30}{0.58}{0x300}{Current gear, target, clutch status (20 ms)}{5.35}{nodetcm}{white}{nodeecm}
+  \msgRight{4.30}{0.92}{0x300}{Current gear, target, clutch status (20 ms)}{5.55}{nodetcm}{white}{nodeecm}
 
-  % Row 4: 0x400 (left <- BCM)
-  \msgLeft {7.45}{-0.02}{0x400}{Ignition state, brake sw, hazard (50 ms)}{5.35}{nodebcm}{white}{nodetcm}
+  \msgLeft {7.45}{0.14}{0x400}{Ignition state, brake sw, hazard (50 ms)}{5.55}{nodebcm}{white}{nodetcm}
 
-  % Row 5: 0x7DF (DIAG Functional Req across full bus)
-  \msgRight{0.60}{-0.62}{0x7DF}{UDS Functional Request: Session, DTC Inquiry (0x10, 0x19, 0x22) [Event]}{11.80}{nodetester}{white}{nodeabs}
+  \msgRight{0.40}{-0.64}{0x7DF}{UDS Functional Request: Session, DTC Inquiry (0x10, 0x19, 0x22) [Event]}{12.15}{nodetester}{white}{nodeabs}
 
-  % Priority Rule & Physical UDS Mapping Footer (Strictly 2 crisp lines cleanly separated!)
-  \node[draw=cardborder, fill=cardbg, rounded corners=4pt, inner sep=4.5pt, minimum width=14.6cm, align=center] at (7.40, -1.52) {
-    \scriptsize\color{slatedark}
-    \textbf{CAN Arbitration Priority:} Lower ID = Higher Priority \textbf{(0x100 $>$ 0x105 $>$ 0x200 $>$ 0x205 $>$ 0x300 $>$ 0x400 $>$ 0x7DF $>$ 0x7E0--0x7EB)}\\[2pt]
-    \textbf{Total: 15 Messages \textbullet{} 43 Signals} \quad\textbar\quad \textbf{Physical UDS:} ECM (0x7E0/0x7E8) \textbullet{} TCM (0x7E1/0x7E9) \textbullet{} ABS (0x7E2/0x7EA) \textbullet{} BCM (0x7E3/0x7EB)
+  % Priority Rule & Physical UDS Mapping Footer (Anchored near bottom footline!)
+  \node[draw=cardborder, fill=cardbg, rounded corners=4pt, inner sep=5.5pt, minimum width=14.8cm, font=\scriptsize, text=slatedark, align=center] at (7.40, -1.62) {
+    \textbf{CAN Priority:} Lower ID = Higher Bus Priority (\textbf{0x100 $>$ 0x105 $>$ 0x200 $>$ 0x205 $>$ 0x300 $>$ 0x400 $>$ 0x7DF $>$ 0x7E0--0x7EB})\\[3pt]
+    \textbf{15 Messages \textbullet{} 43 Signals} \quad\textbar\quad \textbf{Physical UDS:} ECM (0x7E0/0x7E8) \textbullet{} TCM (0x7E1/0x7E9) \textbullet{} ABS (0x7E2/0x7EA) \textbullet{} BCM (0x7E3/0x7EB)
   };
 
 \end{tikzpicture}%
