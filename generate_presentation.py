@@ -195,118 +195,118 @@ beamer_code = r"""\documentclass[aspectratio=169,10pt]{beamer}
 \begin{tikzpicture}[x=1cm, y=1cm]
 
   % 5 Nodes Across Top (4.00 cm center-to-center pitch -> full widescreen spread)
-  \node[draw=none, fill=nodetester, rounded corners=7pt, minimum width=3.45cm, minimum height=1.04cm, text=white, align=center] (n_diag) at (1.75, 4.42) {\textbf{\normalsize DIAG}\\[2pt]\scriptsize Diagnostic Master};
-  \node[draw=none, fill=nodeabs,    rounded corners=7pt, minimum width=3.45cm, minimum height=1.04cm, text=white, align=center] (n_abs)  at (5.75, 4.42) {\textbf{\normalsize ABS / ESP}\\[2pt]\scriptsize Chassis / ESC};
-  \node[draw=none, fill=nodetcm,    rounded corners=7pt, minimum width=3.45cm, minimum height=1.04cm, text=white, align=center] (n_tcm)  at (9.75, 4.42) {\textbf{\normalsize TCM}\\[2pt]\scriptsize Gearbox};
-  \node[draw=none, fill=nodeecm,    rounded corners=7pt, minimum width=3.45cm, minimum height=1.04cm, text=nodeecmtext, align=center] (n_ecm)  at (13.75, 4.42) {\textbf{\normalsize ECM}\\[2pt]\scriptsize Engine};
-  \node[draw=none, fill=nodebcm,    rounded corners=7pt, minimum width=3.45cm, minimum height=1.04cm, text=white, align=center] (n_bcm)  at (17.75, 4.42) {\textbf{\normalsize BCM}\\[2pt]\scriptsize Body Gateway};
+  \node[draw=none, fill=nodetester, rounded corners=7pt, minimum width=3.45cm, minimum height=1.06cm, text=white, align=center] (n_diag) at (1.75, 4.55) {\textbf{\normalsize DIAG}\\[2pt]\scriptsize Diagnostic Master};
+  \node[draw=none, fill=nodeabs,    rounded corners=7pt, minimum width=3.45cm, minimum height=1.06cm, text=white, align=center] (n_abs)  at (5.75, 4.55) {\textbf{\normalsize ABS / ESP}\\[2pt]\scriptsize Chassis / ESC};
+  \node[draw=none, fill=nodetcm,    rounded corners=7pt, minimum width=3.45cm, minimum height=1.06cm, text=white, align=center] (n_tcm)  at (9.75, 4.55) {\textbf{\normalsize TCM}\\[2pt]\scriptsize Gearbox};
+  \node[draw=none, fill=nodeecm,    rounded corners=7pt, minimum width=3.45cm, minimum height=1.06cm, text=nodeecmtext, align=center] (n_ecm)  at (13.75, 4.55) {\textbf{\normalsize ECM}\\[2pt]\scriptsize Engine};
+  \node[draw=none, fill=nodebcm,    rounded corners=7pt, minimum width=3.45cm, minimum height=1.06cm, text=white, align=center] (n_bcm)  at (17.75, 4.55) {\textbf{\normalsize BCM}\\[2pt]\scriptsize Body Gateway};
 
   % Bus Line, Drop Dots & Subtle Vertical Lifelines
-  \draw[line width=2.6pt, color=busline] (0.00, 3.52) -- (19.50, 3.52);
+  \draw[line width=2.6pt, color=busline] (0.00, 3.60) -- (19.50, 3.60);
   \foreach \x in {1.75, 5.75, 9.75, 13.75, 17.75} {
-    \draw[line width=1.8pt, color=busline] (\x, 3.90) -- (\x, 3.52);
-    \fill[busline] (\x, 3.52) circle (0.11);
-    \draw[line width=0.8pt, dashed, color=busline!40] (\x, 3.52) -- (\x, -2.30);
+    \draw[line width=1.8pt, color=busline] (\x, 4.02) -- (\x, 3.60);
+    \fill[busline] (\x, 3.60) circle (0.11);
+    \draw[line width=0.8pt, dashed, color=busline!40] (\x, 3.60) -- (\x, -3.05);
   }
 
-  % Row 1 (y=3.02): 0x100 ECM -> TCM [arrowhead = TCM Crimson]
-  \begin{scope}[shift={(0, 3.02)}]
-    \draw[line width=1.05pt, fill=nodetcm, draw=black] (9.75, 0) -- (10.13, -0.19) -- (10.13, 0.19) -- cycle;
-    \draw[line width=1.05pt, fill=nodeecm, draw=black] (10.13, -0.19) rectangle (13.75, 0.19);
+  % Row 1 (y=3.00): 0x100 ECM -> TCM [arrowhead = TCM Crimson]
+  \begin{scope}[shift={(0, 3.00)}]
+    \draw[line width=1.05pt, fill=nodetcm, draw=black] (9.75, 0) -- (10.13, -0.20) -- (10.13, 0.20) -- cycle;
+    \draw[line width=1.05pt, fill=nodeecm, draw=black] (10.13, -0.20) rectangle (13.75, 0.20);
     \node[font=\bfseries\tiny, text=nodeecmtext, align=center, inner sep=0pt] at (11.94, 0) {Engine speed, throttle,\\[-1pt]torque, status (10 ms)};
-    \draw[line width=1.05pt, fill=white, draw=black] (13.75, -0.19) rectangle (14.88, 0.19);
+    \draw[line width=1.05pt, fill=white, draw=black] (13.75, -0.20) rectangle (14.88, 0.20);
     \node[font=\bfseries\scriptsize, text=black, inner sep=0pt] at (14.315, 0) {0x100};
   \end{scope}
 
-  % Row 2 (y=2.39): 0x105 ECM -> TCM [Crimson] & BCM [Slate Blue]
-  \begin{scope}[shift={(0, 2.39)}]
-    \draw[line width=1.05pt, fill=nodetcm, draw=black] (9.75, 0) -- (10.13, -0.19) -- (10.13, 0.19) -- cycle;
-    \draw[line width=1.05pt, fill=nodeecm, draw=black] (10.13, -0.19) rectangle (17.37, 0.19);
-    \draw[line width=1.05pt, fill=nodebcm, draw=black] (17.75, 0) -- (17.37, -0.19) -- (17.37, 0.19) -- cycle;
-    \draw[line width=1.05pt, fill=white, draw=black] (13.18, -0.19) rectangle (14.32, 0.19);
+  % Row 2 (y=2.28): 0x105 ECM -> TCM [Crimson] & BCM [Slate Blue]
+  \begin{scope}[shift={(0, 2.28)}]
+    \draw[line width=1.05pt, fill=nodetcm, draw=black] (9.75, 0) -- (10.13, -0.20) -- (10.13, 0.20) -- cycle;
+    \draw[line width=1.05pt, fill=nodeecm, draw=black] (10.13, -0.20) rectangle (17.37, 0.20);
+    \draw[line width=1.05pt, fill=nodebcm, draw=black] (17.75, 0) -- (17.37, -0.20) -- (17.37, 0.20) -- cycle;
+    \draw[line width=1.05pt, fill=white, draw=black] (13.18, -0.20) rectangle (14.32, 0.20);
     \node[font=\bfseries\scriptsize, text=black, inner sep=0pt] at (13.75, 0) {0x105};
     \node[font=\bfseries\scriptsize, text=nodeecmtext, inner sep=0pt] at (11.655, 0) {Coolant temp (50 ms)};
     \node[font=\bfseries\scriptsize, text=nodeecmtext, inner sep=0pt] at (15.845, 0) {Temp, fuel, MIL};
   \end{scope}
 
-  % Row 3 (y=1.76): 0x200 ABS -> TCM [arrowhead = TCM Crimson]
-  \begin{scope}[shift={(0, 1.76)}]
-    \draw[line width=1.05pt, fill=white, draw=black] (4.62, -0.19) rectangle (5.75, 0.19);
+  % Row 3 (y=1.56): 0x200 ABS -> TCM [arrowhead = TCM Crimson]
+  \begin{scope}[shift={(0, 1.56)}]
+    \draw[line width=1.05pt, fill=white, draw=black] (4.62, -0.20) rectangle (5.75, 0.20);
     \node[font=\bfseries\scriptsize, text=black, inner sep=0pt] at (5.185, 0) {0x200};
-    \draw[line width=1.05pt, fill=nodeabs, draw=black] (5.75, -0.19) rectangle (9.37, 0.19);
+    \draw[line width=1.05pt, fill=nodeabs, draw=black] (5.75, -0.20) rectangle (9.37, 0.20);
     \node[font=\bfseries\tiny, text=white, align=center, inner sep=0pt] at (7.56, 0) {Wheel speed FL, FR,\\[-1pt]RL, RR (10 ms)};
-    \draw[line width=1.05pt, fill=nodetcm, draw=black] (9.75, 0) -- (9.37, -0.19) -- (9.37, 0.19) -- cycle;
+    \draw[line width=1.05pt, fill=nodetcm, draw=black] (9.75, 0) -- (9.37, -0.20) -- (9.37, 0.20) -- cycle;
   \end{scope}
 
-  % Row 4 (y=1.13): 0x205 ABS -> TCM (tap) -> ECM [arrowhead = ECM Light Grey]
-  \begin{scope}[shift={(0, 1.13)}]
-    \draw[line width=1.05pt, fill=white, draw=black] (4.62, -0.19) rectangle (5.75, 0.19);
+  % Row 4 (y=0.84): 0x205 ABS -> TCM (tap) -> ECM [arrowhead = ECM Light Grey]
+  \begin{scope}[shift={(0, 0.84)}]
+    \draw[line width=1.05pt, fill=white, draw=black] (4.62, -0.20) rectangle (5.75, 0.20);
     \node[font=\bfseries\scriptsize, text=black, inner sep=0pt] at (5.185, 0) {0x205};
-    \draw[line width=1.05pt, fill=nodeabs, draw=black] (5.75, -0.19) rectangle (13.37, 0.19);
+    \draw[line width=1.05pt, fill=nodeabs, draw=black] (5.75, -0.20) rectangle (13.37, 0.20);
     \node[font=\bfseries\scriptsize, text=white, inner sep=0pt] at (9.56, 0) {Vehicle speed, yaw rate, brake pressure, ESP (20 ms)};
-    \filldraw[fill=nodetcm, draw=black, line width=0.8pt] (9.75, 0.19) circle (0.09);
-    \draw[line width=1.05pt, fill=nodeecm, draw=black] (13.75, 0) -- (13.37, -0.19) -- (13.37, 0.19) -- cycle;
+    \filldraw[fill=nodetcm, draw=black, line width=0.8pt] (9.75, 0.20) circle (0.095);
+    \draw[line width=1.05pt, fill=nodeecm, draw=black] (13.75, 0) -- (13.37, -0.20) -- (13.37, 0.20) -- cycle;
   \end{scope}
 
-  % Row 5 (y=0.50): 0x300 TCM -> ECM (tap) -> BCM [arrowhead = BCM Slate Blue]
-  \begin{scope}[shift={(0, 0.50)}]
-    \draw[line width=1.05pt, fill=white, draw=black] (8.62, -0.19) rectangle (9.75, 0.19);
+  % Row 5 (y=0.12): 0x300 TCM -> ECM (tap) -> BCM [arrowhead = BCM Slate Blue]
+  \begin{scope}[shift={(0, 0.12)}]
+    \draw[line width=1.05pt, fill=white, draw=black] (8.62, -0.20) rectangle (9.75, 0.20);
     \node[font=\bfseries\scriptsize, text=black, inner sep=0pt] at (9.185, 0) {0x300};
-    \draw[line width=1.05pt, fill=nodetcm, draw=black] (9.75, -0.19) rectangle (17.37, 0.19);
+    \draw[line width=1.05pt, fill=nodetcm, draw=black] (9.75, -0.20) rectangle (17.37, 0.20);
     \node[font=\bfseries\scriptsize, text=white, inner sep=0pt] at (13.56, 0) {Current gear, target, clutch, oil temp (20 ms)};
-    \filldraw[fill=nodeecm, draw=black, line width=0.8pt] (13.75, 0.19) circle (0.09);
-    \draw[line width=1.05pt, fill=nodebcm, draw=black] (17.75, 0) -- (17.37, -0.19) -- (17.37, 0.19) -- cycle;
+    \filldraw[fill=nodeecm, draw=black, line width=0.8pt] (13.75, 0.20) circle (0.095);
+    \draw[line width=1.05pt, fill=nodebcm, draw=black] (17.75, 0) -- (17.37, -0.20) -- (17.37, 0.20) -- cycle;
   \end{scope}
 
-  % Row 6 (y=-0.13): 0x400 BCM -> ECM (tap), TCM (tap), ABS [arrowhead = ABS Charcoal]
-  \begin{scope}[shift={(0, -0.13)}]
-    \draw[line width=1.05pt, fill=nodeabs, draw=black] (5.75, 0) -- (6.13, -0.19) -- (6.13, 0.19) -- cycle;
-    \draw[line width=1.05pt, fill=nodebcm, draw=black] (6.13, -0.19) rectangle (17.75, 0.19);
+  % Row 6 (y=-0.60): 0x400 BCM -> ECM (tap), TCM (tap), ABS [arrowhead = ABS Charcoal]
+  \begin{scope}[shift={(0, -0.60)}]
+    \draw[line width=1.05pt, fill=nodeabs, draw=black] (5.75, 0) -- (6.13, -0.20) -- (6.13, 0.20) -- cycle;
+    \draw[line width=1.05pt, fill=nodebcm, draw=black] (6.13, -0.20) rectangle (17.75, 0.20);
     \node[font=\bfseries\scriptsize, text=white, inner sep=0pt] at (11.94, 0) {Ignition state, brake switch, hazard status (50 ms)};
-    \filldraw[fill=nodetcm, draw=black, line width=0.8pt] (9.75, 0.19) circle (0.09);
-    \filldraw[fill=nodeecm, draw=black, line width=0.8pt] (13.75, 0.19) circle (0.09);
-    \draw[line width=1.05pt, fill=white, draw=black] (17.75, -0.19) rectangle (18.88, 0.19);
+    \filldraw[fill=nodetcm, draw=black, line width=0.8pt] (9.75, 0.20) circle (0.095);
+    \filldraw[fill=nodeecm, draw=black, line width=0.8pt] (13.75, 0.20) circle (0.095);
+    \draw[line width=1.05pt, fill=white, draw=black] (17.75, -0.20) rectangle (18.88, 0.20);
     \node[font=\bfseries\scriptsize, text=black, inner sep=0pt] at (18.315, 0) {0x400};
   \end{scope}
 
-  % Row 7 (y=-0.76): 0x7DF DIAG -> ABS, TCM, ECM, BCM [arrowhead = BCM Slate Blue]
-  \begin{scope}[shift={(0, -0.76)}]
-    \draw[line width=1.05pt, fill=white, draw=black] (0.62, -0.19) rectangle (1.75, 0.19);
+  % Row 7 (y=-1.32): 0x7DF DIAG -> ABS, TCM, ECM, BCM [arrowhead = BCM Slate Blue]
+  \begin{scope}[shift={(0, -1.32)}]
+    \draw[line width=1.05pt, fill=white, draw=black] (0.62, -0.20) rectangle (1.75, 0.20);
     \node[font=\bfseries\scriptsize, text=black, inner sep=0pt] at (1.185, 0) {0x7DF};
-    \draw[line width=1.05pt, fill=nodetester, draw=black] (1.75, -0.19) rectangle (17.37, 0.19);
+    \draw[line width=1.05pt, fill=nodetester, draw=black] (1.75, -0.20) rectangle (17.37, 0.20);
     \node[font=\bfseries\scriptsize, text=white, inner sep=0pt] at (9.56, 0) {UDS Functional Broadcast: Extended Session (0x10 03), Clear DTC (0x14) [Event]};
-    \filldraw[fill=nodeabs, draw=black, line width=0.8pt] (5.75, 0.19) circle (0.09);
-    \filldraw[fill=nodetcm, draw=black, line width=0.8pt] (9.75, 0.19) circle (0.09);
-    \filldraw[fill=nodeecm, draw=black, line width=0.8pt] (13.75, 0.19) circle (0.09);
-    \draw[line width=1.05pt, fill=nodebcm, draw=black] (17.75, 0) -- (17.37, -0.19) -- (17.37, 0.19) -- cycle;
+    \filldraw[fill=nodeabs, draw=black, line width=0.8pt] (5.75, 0.20) circle (0.095);
+    \filldraw[fill=nodetcm, draw=black, line width=0.8pt] (9.75, 0.20) circle (0.095);
+    \filldraw[fill=nodeecm, draw=black, line width=0.8pt] (13.75, 0.20) circle (0.095);
+    \draw[line width=1.05pt, fill=nodebcm, draw=black] (17.75, 0) -- (17.37, -0.20) -- (17.37, 0.20) -- cycle;
   \end{scope}
 
-  % Row 8 (y=-1.39): 0x7E0-0x7E3 DIAG -> Physical ECUs [arrowhead = BCM Slate Blue]
-  \begin{scope}[shift={(0, -1.39)}]
-    \draw[line width=1.05pt, fill=white, draw=black] (0.37, -0.19) rectangle (1.75, 0.19);
+  % Row 8 (y=-2.04): 0x7E0-0x7E3 DIAG -> Physical ECUs [arrowhead = BCM Slate Blue]
+  \begin{scope}[shift={(0, -2.04)}]
+    \draw[line width=1.05pt, fill=white, draw=black] (0.37, -0.20) rectangle (1.75, 0.20);
     \node[font=\bfseries\scriptsize, text=black, inner sep=0pt] at (1.06, 0) {0x7E0--3};
-    \draw[line width=1.05pt, fill=nodetester, draw=black] (1.75, -0.19) rectangle (17.37, 0.19);
+    \draw[line width=1.05pt, fill=nodetester, draw=black] (1.75, -0.20) rectangle (17.37, 0.20);
     \node[font=\bfseries\scriptsize, text=white, inner sep=0pt] at (9.56, 0) {UDS Physical Requests: DTC Inquiry 0x19 02 (ABS 0x7E2, TCM 0x7E1, ECM 0x7E0, BCM 0x7E3)};
-    \filldraw[fill=nodeabs, draw=black, line width=0.8pt] (5.75, 0.19) circle (0.09);
-    \filldraw[fill=nodetcm, draw=black, line width=0.8pt] (9.75, 0.19) circle (0.09);
-    \filldraw[fill=nodeecm, draw=black, line width=0.8pt] (13.75, 0.19) circle (0.09);
-    \draw[line width=1.05pt, fill=nodebcm, draw=black] (17.75, 0) -- (17.37, -0.19) -- (17.37, 0.19) -- cycle;
+    \filldraw[fill=nodeabs, draw=black, line width=0.8pt] (5.75, 0.20) circle (0.095);
+    \filldraw[fill=nodetcm, draw=black, line width=0.8pt] (9.75, 0.20) circle (0.095);
+    \filldraw[fill=nodeecm, draw=black, line width=0.8pt] (13.75, 0.20) circle (0.095);
+    \draw[line width=1.05pt, fill=nodebcm, draw=black] (17.75, 0) -- (17.37, -0.20) -- (17.37, 0.20) -- cycle;
   \end{scope}
 
-  % Row 9 (y=-2.02): 0x7E8-0x7EB All ECUs -> DIAG [arrowhead = DIAG Purple]
-  \begin{scope}[shift={(0, -2.02)}]
-    \draw[line width=1.05pt, fill=nodetester, draw=black] (1.75, 0) -- (2.13, -0.19) -- (2.13, 0.19) -- cycle;
-    \draw[line width=1.05pt, fill=slategrey!85, draw=black] (2.13, -0.19) rectangle (17.75, 0.19);
+  % Row 9 (y=-2.76): 0x7E8-0x7EB All ECUs -> DIAG [arrowhead = DIAG Purple]
+  \begin{scope}[shift={(0, -2.76)}]
+    \draw[line width=1.05pt, fill=nodetester, draw=black] (1.75, 0) -- (2.13, -0.20) -- (2.13, 0.20) -- cycle;
+    \draw[line width=1.05pt, fill=slategrey!85, draw=black] (2.13, -0.20) rectangle (17.75, 0.20);
     \node[font=\bfseries\scriptsize, text=white, inner sep=0pt] at (9.94, 0) {UDS Physical Responses: 0x50, 0x59 Confirmed DTCs (ECM 0x7E8, TCM 0x7E9, ABS 0x7EA, BCM 0x7EB)};
-    \filldraw[fill=nodeabs, draw=black, line width=0.8pt] (5.75, 0.19) circle (0.09);
-    \filldraw[fill=nodetcm, draw=black, line width=0.8pt] (9.75, 0.19) circle (0.09);
-    \filldraw[fill=nodeecm, draw=black, line width=0.8pt] (13.75, 0.19) circle (0.09);
-    \draw[line width=1.05pt, fill=white, draw=black] (17.75, -0.19) rectangle (19.13, 0.19);
+    \filldraw[fill=nodeabs, draw=black, line width=0.8pt] (5.75, 0.20) circle (0.095);
+    \filldraw[fill=nodetcm, draw=black, line width=0.8pt] (9.75, 0.20) circle (0.095);
+    \filldraw[fill=nodeecm, draw=black, line width=0.8pt] (13.75, 0.20) circle (0.095);
+    \draw[line width=1.05pt, fill=white, draw=black] (17.75, -0.20) rectangle (19.13, 0.20);
     \node[font=\bfseries\scriptsize, text=black, inner sep=0pt] at (18.44, 0) {0x7E8--B};
   \end{scope}
 
   % Priority Rule & Legend Footer (Verified 100% against CAPL & DBC!)
-  \node[draw=cardborder, fill=cardbg, rounded corners=4pt, inner sep=4pt, minimum width=19.50cm, font=\scriptsize, text=slatedark, align=center] at (9.75, -2.72) {
+  \node[draw=cardborder, fill=cardbg, rounded corners=4pt, inner sep=4pt, minimum width=19.50cm, font=\scriptsize, text=slatedark, align=center] at (9.75, -3.48) {
     \textbf{CAN Priority:} \textbf{0x100 $>$ 0x105 $>$ 0x200 $>$ 0x205 $>$ 0x300 $>$ 0x400 $>$ 0x7DF $>$ 0x7E0--0x7E3 $>$ 0x7E8--0x7EB} \quad\textbar\quad \textbf{15 Messages \textbullet{} 43 Signals}\\[2pt]
     \textbf{Legend:} Banner Fill = Transmitter ECU \quad\textbullet\quad Arrowhead Color = Target Destination ECU \quad\textbullet\quad Top Dot = Subscriber / Multi-ECU Node
   };
