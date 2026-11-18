@@ -160,11 +160,10 @@
   \begin{column}{0.485\textwidth}
     \begin{tcolorbox}[cardstyle, colframe=accentblue!75, colbacktitle=accentblue!8, height=5.32cm,
       title={\normalsize\bfseries\color{accentblue} Project Objectives \& Contributions}]
-      \footnotesize\color{slatedark}\raggedright\vspace{-4pt}
-      \begin{itemize}\setlength{\itemsep}{1.5pt}\setlength{\leftmargini}{10pt}
+      \footnotesize\color{slatedark}\raggedright\vspace{-2pt}
+      \begin{itemize}\setlength{\itemsep}{6pt}\setlength{\leftmargini}{10pt}
         \item \textbf{DAG Signal Modeling:} Formulate in-vehicle signal flows as a Directed Acyclic Graph $G=(V, E)$ capturing causal links.
         \item \textbf{On-Bus Pruning Engine:} Implement in-degree topological filtering in CAPL to isolate root causes in real time.
-        \item \textbf{Deterministic Timing:} Achieve disambiguation in $<50$ ms, within the ISO 26262 ASIL-D 100 ms FTTI bound.
         \item \textbf{Vector CANoe 19 Validation:} Validate across 6 failure modes (sensor shorts, ECU dropouts, stuck switches) at 100\% accuracy.
       \end{itemize}
     \end{tcolorbox}
@@ -478,13 +477,12 @@
     \begin{tcolorbox}[cardstyle, colframe=vectorred!70, colbacktitle=vectorred!8, height=5.95cm,
       title={\normalsize\bfseries\color{vectorred} Virtual Network Environment}]
       \footnotesize\color{slatedark}\raggedright
-      \vspace{-2pt}
-      \begin{itemize}\setlength{\itemsep}{1pt}\setlength{\leftmargini}{10pt}
+      \vspace{2pt}
+      \begin{itemize}\setlength{\itemsep}{6pt}\setlength{\leftmargini}{10pt}
         \item \textbf{Vector CANoe 19 Engine:} Simulates complete 500 kbps CAN bus with event-driven CAPL node logic.
         \item \textbf{Realistic Vehicle Physics:} 4-wheel speeds, engine dynamics, gear shifts, and hydraulic braking.
         \item \textbf{Interactive Fault Injection:} Toggle switches inject open circuits, sensor shorts, and node dropouts.
         \item \textbf{Automated UDS Master:} Periodic CAPL timer polls 0x7DF/0x7E0--0x7E3; parses 0x59 into DAG bitmasks.
-        \item \textbf{Zero-Jitter Execution:} Disambiguation runs in $<8~\mu$s with zero scheduling overhead.
       \end{itemize}
     \end{tcolorbox}
   \end{column}
