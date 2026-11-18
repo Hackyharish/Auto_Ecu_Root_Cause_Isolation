@@ -89,7 +89,7 @@ Before the evaluators arrive, execute this checklist step-by-step:
   >
   > This results in an **alarm flood** of 5 to 8 simultaneous DTCs within a single 100 ms diagnostic window. Standard workshop scan tools simply dump these DTCs without causality information. This leads to three severe consequences:
   > 1. **Warranty Misdiagnosis & High NTF (No Trouble Found) Rates**: Up to 40% of ECUs replaced in service bays are completely healthy; technicians replace secondary victims because their DTCs appeared first or had higher priority.
-  > 2. **ISO 26262 ASIL D Safety Violations**: Faults cascade faster than human reaction times. During critical events like high-speed braking at 160 km/h, the vehicle must isolate the primary actuator defect within the Fault Tolerant Time Interval (FTTI < 100 ms) to execute appropriate limp-home mitigation.
+  > 2. **ISO 26262 ASIL D Safety Violations**: Faults cascade faster than human reaction times. During critical events like high-speed braking at 160 km/h, the vehicle must rapidly isolate the primary actuator defect to execute appropriate limp-home mitigation.
   > 3. **High Diagnostic Latency**: Manual troubleshooting on OEM assembly lines and service bays escalates vehicle downtime and warranty reserves.
   >
   > To resolve this, we formulated four strict research objectives:
@@ -217,7 +217,7 @@ Before the evaluators arrive, execute this checklist step-by-step:
   >
   > Across all test scenarios:
   > - Raw DTC alarms were reduced from **36 total to 13 isolated**, representing a **63.89% average alarm flood reduction**.
-  > - Mean root cause isolation latency was **42.50 ms**, well below the strict ISO 26262 Fault Tolerant Time Interval (FTTI) limit of 100 ms.
+  > - Mean root cause isolation latency was **41.00 ms**, governed by the deterministic 40 ms UDS collection window plus 1 ms evaluation step.
   > - Diagnostic accuracy was **100%**, with zero false isolations.
   >
   > When compared against contemporary research:
@@ -250,7 +250,7 @@ Prepare for the following anticipated questions from industry (Tata Technologies
 * **Bulletproof Answer**:
   > "In automotive safety-critical systems governed by **ISO 26262 ASIL D**, algorithms must provide **deterministic execution and 100% structural explainability**. 
   > Neural networks and Bayesian models suffer from three fatal automotive drawbacks:
-  > 1. **Non-deterministic convergence and latency**: A deep learning model's inference time varies and can violate the 100 ms Fault Tolerant Time Interval (FTTI).
+  > 1. **Non-deterministic convergence and latency**: A deep learning model's inference time varies unpredictably under load, lacking worst-case bounded response guarantees.
   > 2. **High hardware footprint**: Automotive body and chassis microcontrollers (like Renesas RH850 or NXP S32K) have kilobytes of RAM and no GPU or floating-point tensor accelerators.
   > 3. **Black-box certification risk**: ISO 26262 Part 8 requires qualification of software tools and algorithms. A DAG with an adjacency matrix has a mathematically provable worst-case execution time of $O(|V|+|E|)$ and can be fully verified with formal methods."
 
@@ -314,7 +314,7 @@ Prepare for the following anticipated questions from industry (Tata Technologies
 | Target ECUs | ABS/ESP (0x100), ECM (0x200), TCM (0x300), BCM (0x400) |
 | Central Diagnostic Master | CAN ID 0x700 / DIAG_TESTER |
 | Average Alarm Reduction | 63.89% (from 36 raw DTCs to 13 isolated) |
-| Average Isolation Latency | 42.50 ms (ISO 26262 FTTI limit: < 100 ms) |
+| Average Isolation Latency | 41.00 ms (6 / 6 Scenarios) |
 | Algorithm Complexity | Worst-case time: $O(\|V\| + \|E\|)$; RAM: $< 320$ bytes |
 | Key Automotive Standards | ISO 26262 (ASIL D), ISO 14229 (UDS), ISO 11898-2, AUTOSAR Classic |
 | Video Demonstration File | `CB.EN.U4EEE23112_IVN_VIDEO.mp4` (12m 45s, 1080p 60fps) |

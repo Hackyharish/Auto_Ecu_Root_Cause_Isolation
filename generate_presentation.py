@@ -612,7 +612,7 @@ beamer_code = r"""\documentclass[aspectratio=169,10pt]{beamer}
   \end{column}
   \begin{column}{0.315\textwidth}
     \begin{tcolorbox}[cardstyle, colframe=accentblue!70, left=4pt, right=4pt, top=5pt, bottom=5pt, height=1.42cm]
-      \centering{\large\bfseries\color{accentblue} 41.00 ms}\\[2pt]\scriptsize\color{slatedark}\textbf{Avg Isolation Latency}\\(ISO 26262 FTTI $<100$ ms)
+      \centering{\large\bfseries\color{accentblue} 41.00 ms}\\[2pt]\scriptsize\color{slatedark}\textbf{Avg Isolation Latency}\\(All 6 Scenarios)
     \end{tcolorbox}
   \end{column}
 \end{columns}
