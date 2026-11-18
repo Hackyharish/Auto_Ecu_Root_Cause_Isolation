@@ -532,7 +532,7 @@ beamer_code = r"""\documentclass[aspectratio=169,10pt]{beamer}
       \begin{minipage}{0.98\linewidth}
         \scriptsize\color{slatedark}\raggedright
         \textbf{Raw Codes:} BCM (B1318-11), ECM (P0504-00), TCM (U0422-81).\\[2pt]
-        \textbf{Topological Result:} BCM isolated ($\deg_S^- = 0$). Hydraulic check proves pedal free ($P_{\text{hyd}} < 5$ bar); ASIL-D BTO cuts throttle to idle coastdown.
+        \textbf{Topological Result:} BCM isolated ($\deg_S^- = 0$); ECM \& TCM suppressed. Hydraulic check ($P_{\text{hyd}} < 5$ bar) avoids phantom braking; BTO limits throttle without shutting down engine (ASIL-B).
       \end{minipage}
     \end{tcolorbox}
   \end{column}
@@ -572,7 +572,7 @@ beamer_code = r"""\documentclass[aspectratio=169,10pt]{beamer}
 % SLIDE 9: Experimental Results & Performance Summary (Table I Only)
 % =============================================================================
 \begin{frame}[t]
-\slidetitle{Experimental Results \& Performance Summary}{100\% Isolation Accuracy \textbullet{} 63.9\% DTC Flood Suppression \textbullet{} 42.50 ms Interrogation Latency}
+\slidetitle{Experimental Results \& Performance Summary}{100\% Isolation Accuracy \textbullet{} 63.9\% DTC Flood Suppression \textbullet{} 41.00 ms Interrogation Latency}
 
 \begin{tcolorbox}[whitecard, colframe=vectorred!70, colbacktitle=vectorred!8, height=4.15cm,
   title={\small\bfseries\color{vectorred} Table I: Quantitative Root Cause Isolation Performance Across All 6 Failure Modes}]
@@ -585,14 +585,14 @@ beamer_code = r"""\documentclass[aspectratio=169,10pt]{beamer}
     \toprule
     \textbf{Injected Failure Scenario} & \textbf{ASIL} & \textbf{Isolated Root Cause} & \textbf{Raw DTCs} & \textbf{Suppressed} & \textbf{Efficiency} & \textbf{Latency} \\
     \midrule
-    1: WSS FL Sensor Open Circuit & ASIL D & ABS (C0035-13) & 3 & 2 & 66.7\% & 42.10 ms \\
-    2: Throttle Position Sensor Low & ASIL D & ECM (P0122-12) & 2 & 1 & 50.0\% & 41.80 ms \\
-    3: Engine Coolant Overheat (125$^\circ$C) & ASIL B & ECM (P0217-00) & 3 & 2 & 66.7\% & 40.50 ms \\
-    4: ABS Transceiver Node Cutoff & ASIL D & ABS (U0121-00) & 3 & 2 & 66.7\% & 45.20 ms \\
-    5: Brake Switch Stuck Closed & ASIL B & BCM (B1318-11) & 3 & 2 & 66.7\% & 42.40 ms \\
-    6: ECM Transceiver Node Cutoff & ASIL D & ECM (U0100-00) & 3 & 2 & 66.7\% & 43.00 ms \\
+    1: WSS FL Sensor Open Circuit & ASIL D & ABS (C0035-13) & 3 & 2 & 66.7\% & 41.00 ms \\
+    2: Throttle Position Sensor Low & ASIL D & ECM (P0122-12) & 2 & 1 & 50.0\% & 41.00 ms \\
+    3: Engine Coolant Overheat (125$^\circ$C) & ASIL B & ECM (P0217-00) & 3 & 2 & 66.7\% & 41.00 ms \\
+    4: ABS Transceiver Node Cutoff & ASIL D & ABS (U0121-00) & 3 & 2 & 66.7\% & 41.00 ms \\
+    5: Brake Switch Stuck Closed & ASIL B & BCM (B1318-11) & 3 & 2 & 66.7\% & 41.00 ms \\
+    6: ECM Transceiver Node Cutoff & ASIL D & ECM (U0100-00) & 3 & 2 & 66.7\% & 41.00 ms \\
     \midrule
-    \textbf{Average / Total} & \textbf{ASIL B--D} & \textbf{100\% True-Positive} & \textbf{2.8 (17)} & \textbf{1.8 (11)} & \textbf{63.9\%} & \textbf{42.50 ms} \\
+    \textbf{Average / Total} & \textbf{ASIL B--D} & \textbf{100\% True-Positive} & \textbf{2.8 (17)} & \textbf{1.8 (11)} & \textbf{63.9\%} & \textbf{41.00 ms} \\
     \bottomrule
   \end{tabular}%
   }
@@ -612,7 +612,7 @@ beamer_code = r"""\documentclass[aspectratio=169,10pt]{beamer}
   \end{column}
   \begin{column}{0.315\textwidth}
     \begin{tcolorbox}[cardstyle, colframe=accentblue!70, left=4pt, right=4pt, top=5pt, bottom=5pt, height=1.42cm]
-      \centering{\large\bfseries\color{accentblue} 42.50 ms}\\[2pt]\scriptsize\color{slatedark}\textbf{Avg Isolation Latency}\\(ISO 26262 FTTI $<100$ ms)
+      \centering{\large\bfseries\color{accentblue} 41.00 ms}\\[2pt]\scriptsize\color{slatedark}\textbf{Avg Isolation Latency}\\(ISO 26262 FTTI $<100$ ms)
     \end{tcolorbox}
   \end{column}
 \end{columns}
@@ -633,7 +633,7 @@ beamer_code = r"""\documentclass[aspectratio=169,10pt]{beamer}
       \footnotesize\color{slatedark}\raggedright\vspace{-4pt}
       \begin{itemize}\setlength{\itemsep}{2pt}\setlength{\leftmargini}{10pt}
         \item \textbf{Causal Over Rule-Based:} In-degree topological pruning eliminates cascading symptom DTCs without maintaining brittle static rule tables.
-        \item \textbf{Functional Safety Guarantee:} Cross-checking mechanical sensors (0.8 bar hydraulic pressure) against electrical contacts plus BTO prevents phantom braking and overspeed.
+        \item \textbf{Functional Safety Guarantee:} Cross-checking hydraulic pressure ($P_{\text{hyd}} < 5$ bar) against brake switch contacts plus BTO prevents phantom braking without shutting down the engine (ASIL-B).
         \item \textbf{Embedded Determinism:} Linear $O(|V| + |E|)$ graph evaluation executes without dynamic allocation or backtracking under ISO 26262.
       \end{itemize}
     \end{tcolorbox}
