@@ -15,7 +15,7 @@
 \usepackage{hyperref}
 
 % Graphicspath
-\graphicspath{{../Images/}{../Images/CleanPlots/}{../Images/WSS_SENSOR_OPEN/}{../Images/BRAKE_SWITCH_STUCK/}{../Images/CUTOFF_ABS_NODE/}{../}{./}}
+\graphicspath{{../Final_Images/}{../Images/}{../Images/CleanPlots/}{../Images/WSS_SENSOR_OPEN/}{../Images/BRAKE_SWITCH_STUCK/}{../Images/CUTOFF_ABS_NODE/}{../}{./}}
 
 % Remove default navigation symbols & set crisp widescreen margins
 \setbeamertemplate{navigation symbols}{}
@@ -99,40 +99,40 @@
 % SLIDE 1: Project Title and Student Details
 % =============================================================================
 \begin{frame}[t]
-\vspace{0.12cm}
+\vspace{-0.06cm}
 \centering
 
-\begin{tcolorbox}[colback=vectorred!10, colframe=vectorred!25, boxrule=0.5pt, arc=4pt, width=10.6cm, left=8pt, right=8pt, top=2.5pt, bottom=2.5pt]
-  \centering\scriptsize\bfseries\color{vectorred} IN-VEHICLE NETWORKING (IVN) CAPSTONE PROJECT \quad\textbullet\quad B.TECH SEMESTER 7
+\begin{tcolorbox}[colback=vectorred!10, colframe=vectorred!25, boxrule=0.5pt, arc=4pt, width=9.4cm, left=6pt, right=6pt, top=1.5pt, bottom=1.5pt]
+  \centering\tiny\bfseries\color{vectorred} IN-VEHICLE NETWORKING (IVN) CAPSTONE PROJECT \quad\textbullet\quad B.TECH SEMESTER 7
 \end{tcolorbox}
 
-\vspace{0.18cm}
-\resizebox{0.96\textwidth}{!}{\LARGE\bfseries\color{vectorred} Automated Root Cause Isolation in Multi-ECU Networks}\\[6pt]
-{\large\bfseries\color{slatedark} Signal Dependency Mapping \& UDS Diagnostics in Vector CANoe 19}\\[5pt]
-{\small\color{slategrey} Compliant with ISO 14229-1 (UDS) \textbullet{} ISO 15765-2 (DoCAN) \textbullet{} ISO 26262 ASIL-D \textbullet{} ISO 11898-1}
+\vspace{0.14cm}
+{\fontsize{25}{28}\selectfont\bfseries\color{vectorred} Automated Root Cause Isolation\\in Multi-ECU Networks}\\[6pt]
+{\normalsize\bfseries\color{slatedark} Signal Dependency Mapping \& UDS Diagnostics in Vector CANoe 19}\\[3pt]
+{\footnotesize\color{slategrey} Compliant with ISO 14229-1 (UDS) \textbullet{} ISO 15765-2 (DoCAN) \textbullet{} ISO 26262 ASIL-D \textbullet{} ISO 11898-1}
 
-\vspace{0.24cm}
+\vspace{0.14cm}
 
 \begin{tcolorbox}[
-  colback=cardbg, colframe=vectorred!70, boxrule=1.0pt, arc=7pt,
-  width=11.4cm, left=14pt, right=14pt, top=5pt, bottom=5pt,
+  colback=cardbg, colframe=vectorred!70, boxrule=0.8pt, arc=6pt,
+  width=9.0cm, left=10pt, right=10pt, top=3pt, bottom=3pt,
   colbacktitle=vectorred, coltitle=white,
-  toptitle=3pt, bottomtitle=3pt,
-  title={\centering\scriptsize\bfseries STUDENT DETAILS}
+  toptitle=2pt, bottomtitle=2pt,
+  title={\centering\tiny\bfseries STUDENT DETAILS}
 ]
-  \small\color{slatedark}
+  \scriptsize\color{slatedark}
   \begin{tabular}{@{}ll@{}}
-    \textbf{Name:}        & Harish R \\[1.5pt]
-    \textbf{Roll Number:} & CB.EN.U4EEE23112 \\[1.5pt]
-    \textbf{Degree:}      & Bachelor of Technology (B.Tech) \\[1.5pt]
-    \textbf{Department:}  & Department of Electrical \& Electronics Engineering \\[1.5pt]
-    \textbf{Institution:} & Amrita School of Engineering, Coimbatore \\[1.5pt]
+    \textbf{Name:}        & Harish R \\[0.5pt]
+    \textbf{Roll Number:} & CB.EN.U4EEE23112 \\[0.5pt]
+    \textbf{Degree:}      & Bachelor of Technology (B.Tech) \\[0.5pt]
+    \textbf{Department:}  & Department of Electrical \& Electronics Engineering \\[0.5pt]
+    \textbf{Institution:} & Amrita School of Engineering, Coimbatore \\[0.5pt]
     \textbf{University:}  & Amrita Vishwa Vidyapeetham
   \end{tabular}
 \end{tcolorbox}
 
-\vspace{0.16cm}
-{\footnotesize\color{slategrey}\textbf{Industry Collaboration:} Tata Technologies (TechPulse Program) \quad\textbullet\quad \textbf{Platform:} Vector CANoe 19}
+\vspace{0.08cm}
+{\scriptsize\color{slategrey}\textbf{Industry Collaboration:} Tata Technologies (TechPulse Program) \quad\textbullet\quad \textbf{Platform:} Vector CANoe 19}
 
 \end{frame}
 
@@ -180,7 +180,87 @@
 \end{frame}
 
 % =============================================================================
-% SLIDE 3: CAN Network Message and Signal Structure (Interchanged to Page 3)
+% SLIDE 3: System Architecture & Block Diagram (Moved to Page 3)
+% =============================================================================
+\begin{frame}[t]
+\slidetitle{Detailed System Architecture}{Multi-Layer Automotive E/E Simulation Architecture in Vector CANoe 19}
+
+\centering
+\vspace{-0.06cm}
+\resizebox{!}{6.02cm}{%
+\begin{tikzpicture}[x=1cm, y=1cm, >={Stealth[length=5pt, width=3.5pt]}]
+
+  % LAYER 1 (Top): Balanced Wide Stimulus & HMI Cards
+  \node[draw=accentamber!90, fill=accentamber!8, rounded corners=5pt, line width=1.1pt, minimum width=7.2cm, minimum height=1.55cm] (inj_box) at (3.70, 4.72) {};
+  \node[font=\bfseries\small, text=accentamber!90!black, anchor=north] at ($(inj_box.north)+(0,-0.06)$) {FAULT INJECTION \& STIMULUS LAYER};
+  \node[font=\scriptsize, text=slatedark, anchor=north west] at ($(inj_box.north west)+(0.20,-0.40)$) {
+    \begin{tabular}{@{}l@{\qquad}l@{}}
+      \textbullet~WSS FL Open ($v=0$) & \textbullet~ABS / ECM Bus-Off \\
+      \textbullet~Throttle Low (0\%)    & \textbullet~Brake Switch Stuck \\
+      \textbullet~Coolant Overheat (138$^\circ$C) & \textbullet~Auto Test Suite
+    \end{tabular}
+  };
+
+  \node[draw=accentgreen!80, fill=accentgreen!8, rounded corners=5pt, line width=1.1pt, minimum width=7.2cm, minimum height=1.55cm] (hmi_box) at (11.50, 4.72) {};
+  \node[font=\bfseries\small, text=accentgreen!80!black, anchor=north] at ($(hmi_box.north)+(0,-0.06)$) {CANoe 19 COCKPIT HMI \& TELEMETRY};
+  \node[font=\scriptsize, text=slatedark, anchor=north west] at ($(hmi_box.north west)+(0.20,-0.40)$) {
+    \begin{tabular}{@{}l@{\qquad}l@{}}
+      \textbullet~Speed, RPM \& Gear    & \textbullet~Hydraulic Bar Gauge \\
+      \textbullet~Raw Symptom List      & \textbullet~Root Cause LED \\
+      \multicolumn{2}{@{}l@{}}{\textbullet~ISO 14229 Service 0x19 04 Freeze Frame Log}
+    \end{tabular}
+  };
+
+  % LAYER 2 (Middle): 4 Evenly Spaced ECUs
+  \node[draw=nodebcm, fill=nodebcm!10, rounded corners=5pt, line width=1.1pt, minimum width=3.25cm, minimum height=1.52cm] (bcm) at (1.95, 2.42) {};
+  \node[font=\bfseries\footnotesize, text=nodebcm, anchor=north] at ($(bcm.north)+(0,-0.06)$) {BCM (0x400)};
+  \node[font=\scriptsize, text=slatedark, align=center, anchor=center] at ($(bcm.center)+(0,-0.16)$) {Brake Switch, Ignition\\Hazard State\\UDS: 0x7E3 / 0x7EB};
+
+  \node[draw=nodeabs, fill=nodeabs!10, rounded corners=5pt, line width=1.1pt, minimum width=3.25cm, minimum height=1.52cm] (abs) at (5.72, 2.42) {};
+  \node[font=\bfseries\footnotesize, text=nodeabs, anchor=north] at ($(abs.north)+(0,-0.06)$) {ABS (0x200, 0x205)};
+  \node[font=\scriptsize, text=slatedark, align=center, anchor=center] at ($(abs.center)+(0,-0.16)$) {4 Wheel Speeds\\Brake Pressure\\UDS: 0x7E2 / 0x7EA};
+
+  \node[draw=vectorred, fill=vectorred!8, rounded corners=5pt, line width=1.1pt, minimum width=3.25cm, minimum height=1.52cm] (ecm) at (9.48, 2.42) {};
+  \node[font=\bfseries\footnotesize, text=vectorred, anchor=north] at ($(ecm.north)+(0,-0.06)$) {ECM (0x100, 0x105)};
+  \node[font=\scriptsize, text=slatedark, align=center, anchor=center] at ($(ecm.center)+(0,-0.16)$) {RPM, Throttle, Torque\\Coolant Temp\\UDS: 0x7E0 / 0x7E8};
+
+  \node[draw=nodetcm, fill=nodetcm!10, rounded corners=5pt, line width=1.1pt, minimum width=3.25cm, minimum height=1.52cm] (tcm) at (13.25, 2.42) {};
+  \node[font=\bfseries\footnotesize, text=nodetcm, anchor=north] at ($(tcm.north)+(0,-0.06)$) {TCM (0x300)};
+  \node[font=\scriptsize, text=slatedark, align=center, anchor=center] at ($(tcm.center)+(0,-0.16)$) {Current Gear, Clutch\\Limp Shift Lock\\UDS: 0x7E1 / 0x7E9};
+
+  % HIGH-SPEED CAN BUS BAR
+  \filldraw[fill=slatedark!85, draw=slatedark, rounded corners=2.5pt] (0.15, 0.50) rectangle (15.05, 0.90);
+  \node[font=\bfseries\footnotesize, text=white] at (7.60, 0.70) {HIGH-SPEED CAN BUS (ISO 11898-1 \textbar{} 500 kbps \textbar{} 15 Messages \textbar{} 43 Signals)};
+
+  % ECU <-> Bus bidirectional arrows
+  \draw[line width=1.2pt, <->, color=nodebcm]   (bcm.south) -- (1.95, 0.90);
+  \draw[line width=1.2pt, <->, color=nodeabs]   (abs.south) -- (5.72, 0.90);
+  \draw[line width=1.2pt, <->, color=vectorred] (ecm.south) -- (9.48, 0.90);
+  \draw[line width=1.2pt, <->, color=nodetcm]   (tcm.south) -- (13.25, 0.90);
+
+  % LAYER 3 (Bottom): Diagnostic Master & DAG Engine
+  \node[draw=nodetester, fill=nodetester!8, rounded corners=6pt, line width=1.1pt, minimum width=14.9cm, minimum height=1.42cm] (diag_box) at (7.60, -0.92) {};
+  \node[font=\bfseries\small, text=nodetester, anchor=north] at ($(diag_box.north)+(0,-0.06)$) {DIAGNOSTIC MASTER \& TOPOLOGICAL ROOT CAUSE ISOLATION ENGINE};
+  \node[font=\scriptsize, text=slatedark, align=center, anchor=center] at ($(diag_box.center)+(0,-0.16)$) {
+    \textbf{ISO 14229-1 (UDS 0x19 02, Mask 0x09):} Functional Broadcast 0x7DF + Physical ECU Polling (0x7E0--0x7E3)\\[2pt]
+    \textbf{DAG Engine:} Directed Acyclic Graph $G=(V, E)$ \textbullet{} In-Degree $\deg_S^-(v_i) = 0$ \textbullet{} Linear $O(|V|+|E|)$ Pruning
+  };
+
+  % Bus <-> Master arrow
+  \draw[line width=1.4pt, <->, color=nodetester] (7.60, 0.50) -- (diag_box.north);
+
+  % Inter-Layer Links
+  \draw[line width=1.1pt, ->, dashed, color=accentamber!90] (1.95, 3.945) -- (bcm.north);
+  \draw[line width=1.1pt, ->, dashed, color=accentamber!90] (5.72, 3.945) -- (abs.north);
+  \draw[line width=1.1pt, ->, dashed, color=accentgreen!80] (diag_box.east) -- (15.45, -0.92) |- (hmi_box.east);
+
+\end{tikzpicture}%
+}
+
+\end{frame}
+
+% =============================================================================
+% SLIDE 4: CAN Network Message and Signal Structure (Moved to Page 4)
 % =============================================================================
 \begin{frame}[t]
 \slidetitle{Node, Message and Signal Structure}{Vehicle E/E Architecture \textbullet{} High-Speed CAN 500 kbps (ISO 11898-1) \textbullet{} Verified DBC/CAPL Message Flows}
@@ -313,86 +393,6 @@
 \end{frame}
 
 % =============================================================================
-% SLIDE 4: System Architecture & Block Diagram (Interchanged to Page 4)
-% =============================================================================
-\begin{frame}[t]
-\slidetitle{Detailed System Architecture}{Multi-Layer Automotive E/E Simulation Architecture in Vector CANoe 19}
-
-\centering
-\vspace{-0.06cm}
-\resizebox{!}{6.02cm}{%
-\begin{tikzpicture}[x=1cm, y=1cm, >={Stealth[length=5pt, width=3.5pt]}]
-
-  % LAYER 1 (Top): Balanced Wide Stimulus & HMI Cards
-  \node[draw=accentamber!90, fill=accentamber!8, rounded corners=5pt, line width=1.1pt, minimum width=7.2cm, minimum height=1.55cm] (inj_box) at (3.70, 4.72) {};
-  \node[font=\bfseries\small, text=accentamber!90!black, anchor=north] at ($(inj_box.north)+(0,-0.06)$) {FAULT INJECTION \& STIMULUS LAYER};
-  \node[font=\scriptsize, text=slatedark, anchor=north west] at ($(inj_box.north west)+(0.20,-0.40)$) {
-    \begin{tabular}{@{}l@{\qquad}l@{}}
-      \textbullet~WSS FL Open ($v=0$) & \textbullet~ABS / ECM Bus-Off \\
-      \textbullet~Throttle Low (0\%)    & \textbullet~Brake Switch Stuck \\
-      \textbullet~Coolant Overheat (138$^\circ$C) & \textbullet~Auto Test Suite
-    \end{tabular}
-  };
-
-  \node[draw=accentgreen!80, fill=accentgreen!8, rounded corners=5pt, line width=1.1pt, minimum width=7.2cm, minimum height=1.55cm] (hmi_box) at (11.50, 4.72) {};
-  \node[font=\bfseries\small, text=accentgreen!80!black, anchor=north] at ($(hmi_box.north)+(0,-0.06)$) {CANoe 19 COCKPIT HMI \& TELEMETRY};
-  \node[font=\scriptsize, text=slatedark, anchor=north west] at ($(hmi_box.north west)+(0.20,-0.40)$) {
-    \begin{tabular}{@{}l@{\qquad}l@{}}
-      \textbullet~Speed, RPM \& Gear    & \textbullet~Hydraulic Bar Gauge \\
-      \textbullet~Raw Symptom List      & \textbullet~Root Cause LED \\
-      \multicolumn{2}{@{}l@{}}{\textbullet~ISO 14229 Service 0x19 04 Freeze Frame Log}
-    \end{tabular}
-  };
-
-  % LAYER 2 (Middle): 4 Evenly Spaced ECUs
-  \node[draw=nodebcm, fill=nodebcm!10, rounded corners=5pt, line width=1.1pt, minimum width=3.25cm, minimum height=1.52cm] (bcm) at (1.95, 2.42) {};
-  \node[font=\bfseries\footnotesize, text=nodebcm, anchor=north] at ($(bcm.north)+(0,-0.06)$) {BCM (0x400)};
-  \node[font=\scriptsize, text=slatedark, align=center, anchor=center] at ($(bcm.center)+(0,-0.16)$) {Brake Switch, Ignition\\Hazard State\\UDS: 0x7E3 / 0x7EB};
-
-  \node[draw=nodeabs, fill=nodeabs!10, rounded corners=5pt, line width=1.1pt, minimum width=3.25cm, minimum height=1.52cm] (abs) at (5.72, 2.42) {};
-  \node[font=\bfseries\footnotesize, text=nodeabs, anchor=north] at ($(abs.north)+(0,-0.06)$) {ABS (0x200, 0x205)};
-  \node[font=\scriptsize, text=slatedark, align=center, anchor=center] at ($(abs.center)+(0,-0.16)$) {4 Wheel Speeds\\Brake Pressure\\UDS: 0x7E2 / 0x7EA};
-
-  \node[draw=vectorred, fill=vectorred!8, rounded corners=5pt, line width=1.1pt, minimum width=3.25cm, minimum height=1.52cm] (ecm) at (9.48, 2.42) {};
-  \node[font=\bfseries\footnotesize, text=vectorred, anchor=north] at ($(ecm.north)+(0,-0.06)$) {ECM (0x100, 0x105)};
-  \node[font=\scriptsize, text=slatedark, align=center, anchor=center] at ($(ecm.center)+(0,-0.16)$) {RPM, Throttle, Torque\\Coolant Temp\\UDS: 0x7E0 / 0x7E8};
-
-  \node[draw=nodetcm, fill=nodetcm!10, rounded corners=5pt, line width=1.1pt, minimum width=3.25cm, minimum height=1.52cm] (tcm) at (13.25, 2.42) {};
-  \node[font=\bfseries\footnotesize, text=nodetcm, anchor=north] at ($(tcm.north)+(0,-0.06)$) {TCM (0x300)};
-  \node[font=\scriptsize, text=slatedark, align=center, anchor=center] at ($(tcm.center)+(0,-0.16)$) {Current Gear, Clutch\\Limp Shift Lock\\UDS: 0x7E1 / 0x7E9};
-
-  % HIGH-SPEED CAN BUS BAR
-  \filldraw[fill=slatedark!85, draw=slatedark, rounded corners=2.5pt] (0.15, 0.50) rectangle (15.05, 0.90);
-  \node[font=\bfseries\footnotesize, text=white] at (7.60, 0.70) {HIGH-SPEED CAN BUS (ISO 11898-1 \textbar{} 500 kbps \textbar{} 15 Messages \textbar{} 43 Signals)};
-
-  % ECU <-> Bus bidirectional arrows
-  \draw[line width=1.2pt, <->, color=nodebcm]   (bcm.south) -- (1.95, 0.90);
-  \draw[line width=1.2pt, <->, color=nodeabs]   (abs.south) -- (5.72, 0.90);
-  \draw[line width=1.2pt, <->, color=vectorred] (ecm.south) -- (9.48, 0.90);
-  \draw[line width=1.2pt, <->, color=nodetcm]   (tcm.south) -- (13.25, 0.90);
-
-  % LAYER 3 (Bottom): Diagnostic Master & DAG Engine
-  \node[draw=nodetester, fill=nodetester!8, rounded corners=6pt, line width=1.1pt, minimum width=14.9cm, minimum height=1.42cm] (diag_box) at (7.60, -0.92) {};
-  \node[font=\bfseries\small, text=nodetester, anchor=north] at ($(diag_box.north)+(0,-0.06)$) {DIAGNOSTIC MASTER \& TOPOLOGICAL ROOT CAUSE ISOLATION ENGINE};
-  \node[font=\scriptsize, text=slatedark, align=center, anchor=center] at ($(diag_box.center)+(0,-0.16)$) {
-    \textbf{ISO 14229-1 (UDS 0x19 02, Mask 0x09):} Functional Broadcast 0x7DF + Physical ECU Polling (0x7E0--0x7E3)\\[2pt]
-    \textbf{DAG Engine:} Directed Acyclic Graph $G=(V, E)$ \textbullet{} In-Degree $\deg_S^-(v_i) = 0$ \textbullet{} Linear $O(|V|+|E|)$ Pruning
-  };
-
-  % Bus <-> Master arrow
-  \draw[line width=1.4pt, <->, color=nodetester] (7.60, 0.50) -- (diag_box.north);
-
-  % Inter-Layer Links
-  \draw[line width=1.1pt, ->, dashed, color=accentamber!90] (1.95, 3.945) -- (bcm.north);
-  \draw[line width=1.1pt, ->, dashed, color=accentamber!90] (5.72, 3.945) -- (abs.north);
-  \draw[line width=1.1pt, ->, dashed, color=accentgreen!80] (diag_box.east) -- (15.45, -0.92) |- (hmi_box.east);
-
-\end{tikzpicture}%
-}
-
-\end{frame}
-
-% =============================================================================
 % SLIDE 5: Implementation Methodology – Directed Acyclic Graph (DAG) & Pruning
 % =============================================================================
 \begin{frame}[t]
@@ -512,7 +512,7 @@
     \begin{tcolorbox}[cardstyle, colframe=vectorred!70, colbacktitle=vectorred!8, height=5.12cm,
       title={\footnotesize\bfseries\color{vectorred} Scenario 1: Wheel Speed Sensor Open (ASIL-D)}]
       \centering
-      \includegraphics[width=\linewidth, height=2.36cm, keepaspectratio]{WSS_SENSOR_OPEN/PANEL.jpg}\\[3pt]
+      \includegraphics[width=\linewidth, height=2.36cm, keepaspectratio]{ABS_fAULT.png}\\[3pt]
       \begin{minipage}{0.98\linewidth}
         \scriptsize\color{slatedark}\raggedright
         \textbf{Raw Codes:} ABS (C0035-13), ECM (P0500-00), TCM (U0415-81).\\[2pt]
@@ -525,7 +525,7 @@
     \begin{tcolorbox}[cardstyle, colframe=accentblue!70, colbacktitle=accentblue!8, height=5.12cm,
       title={\footnotesize\bfseries\color{accentblue} Scenario 5: Brake Switch Stuck Closed (ASIL-B)}]
       \centering
-      \includegraphics[width=\linewidth, height=2.36cm, keepaspectratio]{BRAKE_SWITCH_STUCK/PANEL.jpg}\\[3pt]
+      \includegraphics[width=\linewidth, height=2.36cm, keepaspectratio]{bRAKE_SWITCH_STUCK.png}\\[3pt]
       \begin{minipage}{0.98\linewidth}
         \scriptsize\color{slatedark}\raggedright
         \textbf{Raw Codes:} BCM (B1318-11), ECM (P0504-00), TCM (U0422-81).\\[2pt]
