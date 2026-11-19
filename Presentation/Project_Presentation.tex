@@ -330,7 +330,7 @@
     \begin{tabular}{@{}l@{\qquad}l@{}}
       \textbullet~WSS FL Open ($v=0$) & \textbullet~ABS / ECM Bus-Off \\
       \textbullet~Throttle Low (0\%)    & \textbullet~Brake Switch Stuck \\
-      \textbullet~Coolant Overheat (125$^\circ$C) & \textbullet~Auto Test Suite
+      \textbullet~Coolant Overheat (138$^\circ$C) & \textbullet~Auto Test Suite
     \end{tabular}
   };
 
@@ -539,7 +539,7 @@
 \vspace{0.08cm}
 \begin{tcolorbox}[colback=slategrey!10, colframe=cardborder, boxrule=0.7pt, arc=4pt, left=6pt, right=6pt, top=3pt, bottom=3pt]
   \centering\scriptsize\color{slatedark}
-  \textbf{Other Tested Scenarios:} Sc. 2 (Throttle Low P0122-12, 1200 rpm limp) \quad\textbar\quad Sc. 3 (Coolant Overheat P0217-00, 125$^\circ$C) \quad\textbar\quad Sc. 4 \& 6 (ABS U0121-00 / ECM U0100-00 Bus-Off)
+  \textbf{Other Tested Scenarios:} Sc. 2 (Throttle Low P0122-12, ASIL-D Safe Stop) \quad\textbar\quad Sc. 4 (Coolant Overheat P0217-00, 138$^\circ$C) \quad\textbar\quad Sc. 3 \& 6 (ECM U0100-00 / ABS U0121-00 Bus-Off)
 \end{tcolorbox}
 
 \end{frame}
@@ -584,10 +584,10 @@
     \midrule
     1: WSS FL Sensor Open Circuit & ASIL D & ABS (C0035-13) & 3 & 2 & 66.7\% & 41.00 ms \\
     2: Throttle Position Sensor Low & ASIL D & ECM (P0122-12) & 2 & 1 & 50.0\% & 41.00 ms \\
-    3: Engine Coolant Overheat (125$^\circ$C) & ASIL B & ECM (P0217-00) & 3 & 2 & 66.7\% & 41.00 ms \\
-    4: ABS Transceiver Node Cutoff & ASIL D & ABS (U0121-00) & 3 & 2 & 66.7\% & 41.00 ms \\
+    3: ECM Transceiver Node Cutoff & ASIL D & ECM (U0100-00) & 3 & 2 & 66.7\% & 41.00 ms \\
+    4: Engine Coolant Overheat (138$^\circ$C) & ASIL B & ECM (P0217-00) & 3 & 2 & 66.7\% & 41.00 ms \\
     5: Brake Switch Stuck Closed & ASIL B & BCM (B1318-11) & 3 & 2 & 66.7\% & 41.00 ms \\
-    6: ECM Transceiver Node Cutoff & ASIL D & ECM (U0100-00) & 3 & 2 & 66.7\% & 41.00 ms \\
+    6: ABS Transceiver Node Cutoff & ASIL D & ABS (U0121-00) & 3 & 2 & 66.7\% & 41.00 ms \\
     \midrule
     \textbf{Average / Total} & \textbf{ASIL B--D} & \textbf{100\% True-Positive} & \textbf{2.8 (17)} & \textbf{1.8 (11)} & \textbf{63.9\%} & \textbf{41.00 ms} \\
     \bottomrule
