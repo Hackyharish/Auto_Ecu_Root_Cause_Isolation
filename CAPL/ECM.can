@@ -343,6 +343,8 @@ on message 0x7E0, 0x7DF
   byte pci;
   byte sid;
   byte subf;
+  byte reqMask;
+  int j;
 
   if (@sysvar::Fault_Node_Cutoff_ECM == 1 || g_Fault_Cutoff_ECM_Active == 1)
   {
@@ -351,23 +353,36 @@ on message 0x7E0, 0x7DF
 
   pci = this.byte(0);
   sid = this.byte(1);
+  for (j = 0; j < 8; j++) msg_ECM_DiagResp.byte(j) = 0xAA;
+  msg_ECM_DiagResp.dlc = 8;
 
   // Service 0x10: DiagnosticSessionControl
   if (sid == UDS_SID_DIAGNOSTIC_SESSION_CONTROL)
   {
     subf = this.byte(2);
-    g_DiagSession = subf;
+    g_DiagSession = subf & 0x7F;
+    if ((subf & 0x80) != 0) return; // suppressPosRspMsgIndicationBit
     msg_ECM_DiagResp.byte(0) = 0x06; // PCI length
     msg_ECM_DiagResp.byte(1) = sid + 0x40; // Positive response 0x50
-    msg_ECM_DiagResp.byte(2) = subf;
+    msg_ECM_DiagResp.byte(2) = g_DiagSession;
     msg_ECM_DiagResp.byte(3) = 0x00; // P2 Server Max High (50ms)
     msg_ECM_DiagResp.byte(4) = 0x32; // P2 Server Max Low
     msg_ECM_DiagResp.byte(5) = 0x01; // P2* Server Max High (5000ms)
     msg_ECM_DiagResp.byte(6) = 0xF4; // P2* Server Max Low
-    msg_ECM_DiagResp.byte(7) = 0xAA;
-    msg_ECM_DiagResp.dlc = 8;
     output(msg_ECM_DiagResp);
-    write("[ECM-UDS] Session Transition -> 0x%02X. Response sent.", subf);
+    write("[ECM-UDS] Session Transition -> 0x%02X. Response sent.", g_DiagSession);
+  }
+  // Service 0x11: ECUReset
+  else if (sid == UDS_SID_ECU_RESET)
+  {
+    subf = this.byte(2);
+    Reset_ECM_Node();
+    if ((subf & 0x80) != 0) return;
+    msg_ECM_DiagResp.byte(0) = 0x02;
+    msg_ECM_DiagResp.byte(1) = 0x51;
+    msg_ECM_DiagResp.byte(2) = subf & 0x7F;
+    output(msg_ECM_DiagResp);
+    write("[ECM-UDS] ECUReset (0x%02X) executed.", subf & 0x7F);
   }
   // Service 0x14: ClearDiagnosticInformation
   else if (sid == UDS_SID_CLEAR_DIAGNOSTIC_INFORMATION)
@@ -375,8 +390,6 @@ on message 0x7E0, 0x7DF
     Reset_ECM_Node();
     msg_ECM_DiagResp.byte(0) = 0x01;
     msg_ECM_DiagResp.byte(1) = sid + 0x40; // 0x54
-    msg_ECM_DiagResp.byte(2) = 0xAA;
-    msg_ECM_DiagResp.dlc = 8;
     output(msg_ECM_DiagResp);
     write("[ECM-UDS] DTCs Cleared by Diagnostic Client.");
   }
@@ -384,33 +397,50 @@ on message 0x7E0, 0x7DF
   else if (sid == UDS_SID_READ_DTC_INFORMATION)
   {
     subf = this.byte(2);
-    if (subf == UDS_SUBF_REPORT_DTC_BY_STATUS_MASK)
+    if (subf == UDS_SUBF_REPORT_NUMBER_OF_DTC_BY_MASK)
     {
-      if (g_NumDTCs == 0)
+      msg_ECM_DiagResp.byte(0) = 0x06;
+      msg_ECM_DiagResp.byte(1) = 0x59;
+      msg_ECM_DiagResp.byte(2) = 0x01;
+      msg_ECM_DiagResp.byte(3) = 0x09; // DTCStatusAvailabilityMask (TestFailed | Confirmed)
+      msg_ECM_DiagResp.byte(4) = 0x01; // ISO 14229-1 DTCFormatIdentifier
+      msg_ECM_DiagResp.byte(5) = 0x00;
+      msg_ECM_DiagResp.byte(6) = (g_NumDTCs > 0) ? 1 : 0;
+      output(msg_ECM_DiagResp);
+    }
+    else if (subf == UDS_SUBF_REPORT_DTC_BY_STATUS_MASK)
+    {
+      reqMask = (pci >= 3) ? this.byte(3) : 0xFF;
+      if (g_NumDTCs == 0 || reqMask == 0x00 || ((g_ECM_DTCs[0].statusMask & reqMask) == 0 && reqMask != 0xFF))
       {
         msg_ECM_DiagResp.byte(0) = 0x03;
         msg_ECM_DiagResp.byte(1) = 0x59;
         msg_ECM_DiagResp.byte(2) = 0x02;
-        msg_ECM_DiagResp.byte(3) = 0x00; // DTC Status Availability Mask
-        msg_ECM_DiagResp.byte(4) = 0x00;
-        msg_ECM_DiagResp.dlc = 8;
+        msg_ECM_DiagResp.byte(3) = 0x09; // DTCStatusAvailabilityMask (ISO 14229-1)
         output(msg_ECM_DiagResp);
       }
       else
       {
-        // Return first primary active DTC (ISO 14229 single frame)
-        msg_ECM_DiagResp.byte(0) = 0x06; // PCI length 6 bytes
+        // ISO 14229-1 single frame: [0x07, 0x59, 0x02, AvailMask, DTC_Hi, DTC_Mid, DTC_Lo, Status]
+        msg_ECM_DiagResp.byte(0) = 0x07;
         msg_ECM_DiagResp.byte(1) = 0x59;
         msg_ECM_DiagResp.byte(2) = 0x02;
-        msg_ECM_DiagResp.byte(3) = (g_ECM_DTCs[0].dtcNumber >> 16) & 0xFF; // High byte
-        msg_ECM_DiagResp.byte(4) = (g_ECM_DTCs[0].dtcNumber >> 8) & 0xFF;  // Mid byte
-        msg_ECM_DiagResp.byte(5) = (g_ECM_DTCs[0].dtcNumber) & 0xFF;       // Low byte
-        msg_ECM_DiagResp.byte(6) = g_ECM_DTCs[0].statusMask;
-        msg_ECM_DiagResp.byte(7) = 0xAA;
-        msg_ECM_DiagResp.dlc = 8;
+        msg_ECM_DiagResp.byte(3) = 0x09; // DTCStatusAvailabilityMask
+        msg_ECM_DiagResp.byte(4) = (g_ECM_DTCs[0].dtcNumber >> 16) & 0xFF; // High byte
+        msg_ECM_DiagResp.byte(5) = (g_ECM_DTCs[0].dtcNumber >> 8) & 0xFF;  // Mid byte
+        msg_ECM_DiagResp.byte(6) = (g_ECM_DTCs[0].dtcNumber) & 0xFF;       // Low byte
+        msg_ECM_DiagResp.byte(7) = g_ECM_DTCs[0].statusMask;
         output(msg_ECM_DiagResp);
         write("[ECM-UDS] ReadDTC response sent: 0x%06X (Status: 0x%02X)", g_ECM_DTCs[0].dtcNumber, g_ECM_DTCs[0].statusMask);
       }
+    }
+    else if (this.id != CAN_ID_DIAG_FUNCTIONAL_REQ)
+    {
+      msg_ECM_DiagResp.byte(0) = 0x03;
+      msg_ECM_DiagResp.byte(1) = UDS_SID_NEGATIVE_RESPONSE;
+      msg_ECM_DiagResp.byte(2) = sid;
+      msg_ECM_DiagResp.byte(3) = UDS_NRC_SUBFUNCTION_NOT_SUPPORTED;
+      output(msg_ECM_DiagResp);
     }
   }
   // Service 0x22: ReadDataByIdentifier
@@ -427,7 +457,6 @@ on message 0x7E0, 0x7DF
       msg_ECM_DiagResp.byte(3) = 0x00;
       msg_ECM_DiagResp.byte(4) = ((word)g_EngineRPM >> 8) & 0xFF;
       msg_ECM_DiagResp.byte(5) = ((word)g_EngineRPM) & 0xFF;
-      msg_ECM_DiagResp.dlc = 8;
       output(msg_ECM_DiagResp);
     }
     else if (did == 0x0101) // Throttle Position DID
@@ -437,9 +466,43 @@ on message 0x7E0, 0x7DF
       msg_ECM_DiagResp.byte(2) = 0x01;
       msg_ECM_DiagResp.byte(3) = 0x01;
       msg_ECM_DiagResp.byte(4) = (byte)g_ThrottlePos;
-      msg_ECM_DiagResp.dlc = 8;
       output(msg_ECM_DiagResp);
     }
+    else if (did == 0x0102) // Coolant Temperature DID (offset +40 degC)
+    {
+      msg_ECM_DiagResp.byte(0) = 0x04;
+      msg_ECM_DiagResp.byte(1) = 0x62;
+      msg_ECM_DiagResp.byte(2) = 0x01;
+      msg_ECM_DiagResp.byte(3) = 0x02;
+      msg_ECM_DiagResp.byte(4) = (byte)((int)g_CoolantTemp + 40);
+      output(msg_ECM_DiagResp);
+    }
+    else if (this.id != CAN_ID_DIAG_FUNCTIONAL_REQ)
+    {
+      msg_ECM_DiagResp.byte(0) = 0x03;
+      msg_ECM_DiagResp.byte(1) = UDS_SID_NEGATIVE_RESPONSE;
+      msg_ECM_DiagResp.byte(2) = sid;
+      msg_ECM_DiagResp.byte(3) = UDS_NRC_REQUEST_OUT_OF_RANGE;
+      output(msg_ECM_DiagResp);
+    }
+  }
+  // Service 0x3E: TesterPresent
+  else if (sid == UDS_SID_TESTER_PRESENT)
+  {
+    subf = this.byte(2);
+    if ((subf & 0x80) != 0) return;
+    msg_ECM_DiagResp.byte(0) = 0x02;
+    msg_ECM_DiagResp.byte(1) = 0x7E;
+    msg_ECM_DiagResp.byte(2) = subf & 0x7F;
+    output(msg_ECM_DiagResp);
+  }
+  else if (this.id != CAN_ID_DIAG_FUNCTIONAL_REQ)
+  {
+    msg_ECM_DiagResp.byte(0) = 0x03;
+    msg_ECM_DiagResp.byte(1) = UDS_SID_NEGATIVE_RESPONSE;
+    msg_ECM_DiagResp.byte(2) = sid;
+    msg_ECM_DiagResp.byte(3) = UDS_NRC_SERVICE_NOT_SUPPORTED;
+    output(msg_ECM_DiagResp);
   }
 }
 

@@ -141,61 +141,135 @@ on message 0x7E3, 0x7DF
 {
   byte sid;
   byte subf;
+  byte reqMask;
+  int j;
+
+  if (@sysvar::Fault_Node_Cutoff_BCM == 1 || g_Fault_Cutoff_BCM_Active == 1)
+  {
+    return; // Node is cut off / bus-off; cannot transmit diagnostic response
+  }
   sid = this.byte(1);
+  for (j = 0; j < 8; j++) msg_BCM_DiagResp.byte(j) = 0xAA;
+  msg_BCM_DiagResp.dlc = 8;
 
   if (sid == UDS_SID_DIAGNOSTIC_SESSION_CONTROL)
   {
     subf = this.byte(2);
-    g_DiagSession = subf;
+    g_DiagSession = subf & 0x7F;
+    if ((subf & 0x80) != 0) return;
     msg_BCM_DiagResp.byte(0) = 0x06;
     msg_BCM_DiagResp.byte(1) = 0x50;
-    msg_BCM_DiagResp.byte(2) = subf;
+    msg_BCM_DiagResp.byte(2) = g_DiagSession;
     msg_BCM_DiagResp.byte(3) = 0x00;
     msg_BCM_DiagResp.byte(4) = 0x32;
     msg_BCM_DiagResp.byte(5) = 0x01;
     msg_BCM_DiagResp.byte(6) = 0xF4;
-    msg_BCM_DiagResp.byte(7) = 0xAA;
-    msg_BCM_DiagResp.dlc = 8;
     output(msg_BCM_DiagResp);
+  }
+  else if (sid == UDS_SID_ECU_RESET)
+  {
+    subf = this.byte(2);
+    Reset_BCM_Node();
+    if ((subf & 0x80) != 0) return;
+    msg_BCM_DiagResp.byte(0) = 0x02;
+    msg_BCM_DiagResp.byte(1) = 0x51;
+    msg_BCM_DiagResp.byte(2) = subf & 0x7F;
+    output(msg_BCM_DiagResp);
+    write("[BCM-UDS] ECUReset (0x%02X) executed.", subf & 0x7F);
   }
   else if (sid == UDS_SID_CLEAR_DIAGNOSTIC_INFORMATION)
   {
     Reset_BCM_Node();
     msg_BCM_DiagResp.byte(0) = 0x01;
     msg_BCM_DiagResp.byte(1) = 0x54;
-    msg_BCM_DiagResp.byte(2) = 0xAA;
-    msg_BCM_DiagResp.dlc = 8;
     output(msg_BCM_DiagResp);
     write("[BCM-UDS] DTCs Cleared.");
   }
   else if (sid == UDS_SID_READ_DTC_INFORMATION)
   {
     subf = this.byte(2);
-    if (subf == UDS_SUBF_REPORT_DTC_BY_STATUS_MASK)
+    if (subf == UDS_SUBF_REPORT_NUMBER_OF_DTC_BY_MASK)
     {
-      if (g_NumDTCs == 0)
+      msg_BCM_DiagResp.byte(0) = 0x06;
+      msg_BCM_DiagResp.byte(1) = 0x59;
+      msg_BCM_DiagResp.byte(2) = 0x01;
+      msg_BCM_DiagResp.byte(3) = 0x09;
+      msg_BCM_DiagResp.byte(4) = 0x01;
+      msg_BCM_DiagResp.byte(5) = 0x00;
+      msg_BCM_DiagResp.byte(6) = (g_NumDTCs > 0) ? 1 : 0;
+      output(msg_BCM_DiagResp);
+    }
+    else if (subf == UDS_SUBF_REPORT_DTC_BY_STATUS_MASK)
+    {
+      reqMask = (this.byte(0) >= 3) ? this.byte(3) : 0xFF;
+      if (g_NumDTCs == 0 || reqMask == 0x00 || ((g_BCM_DTCs[0].statusMask & reqMask) == 0 && reqMask != 0xFF))
       {
         msg_BCM_DiagResp.byte(0) = 0x03;
         msg_BCM_DiagResp.byte(1) = 0x59;
         msg_BCM_DiagResp.byte(2) = 0x02;
-        msg_BCM_DiagResp.byte(3) = 0x00;
-        msg_BCM_DiagResp.dlc = 8;
+        msg_BCM_DiagResp.byte(3) = 0x09;
         output(msg_BCM_DiagResp);
       }
       else
       {
-        msg_BCM_DiagResp.byte(0) = 0x06;
+        msg_BCM_DiagResp.byte(0) = 0x07;
         msg_BCM_DiagResp.byte(1) = 0x59;
         msg_BCM_DiagResp.byte(2) = 0x02;
-        msg_BCM_DiagResp.byte(3) = (g_BCM_DTCs[0].dtcNumber >> 16) & 0xFF;
-        msg_BCM_DiagResp.byte(4) = (g_BCM_DTCs[0].dtcNumber >> 8) & 0xFF;
-        msg_BCM_DiagResp.byte(5) = (g_BCM_DTCs[0].dtcNumber) & 0xFF;
-        msg_BCM_DiagResp.byte(6) = g_BCM_DTCs[0].statusMask;
-        msg_BCM_DiagResp.byte(7) = 0xAA;
-        msg_BCM_DiagResp.dlc = 8;
+        msg_BCM_DiagResp.byte(3) = 0x09;
+        msg_BCM_DiagResp.byte(4) = (g_BCM_DTCs[0].dtcNumber >> 16) & 0xFF;
+        msg_BCM_DiagResp.byte(5) = (g_BCM_DTCs[0].dtcNumber >> 8) & 0xFF;
+        msg_BCM_DiagResp.byte(6) = (g_BCM_DTCs[0].dtcNumber) & 0xFF;
+        msg_BCM_DiagResp.byte(7) = g_BCM_DTCs[0].statusMask;
         output(msg_BCM_DiagResp);
       }
     }
+    else if (this.id != CAN_ID_DIAG_FUNCTIONAL_REQ)
+    {
+      msg_BCM_DiagResp.byte(0) = 0x03;
+      msg_BCM_DiagResp.byte(1) = UDS_SID_NEGATIVE_RESPONSE;
+      msg_BCM_DiagResp.byte(2) = sid;
+      msg_BCM_DiagResp.byte(3) = UDS_NRC_SUBFUNCTION_NOT_SUPPORTED;
+      output(msg_BCM_DiagResp);
+    }
+  }
+  else if (sid == UDS_SID_READ_DATA_BY_IDENTIFIER)
+  {
+    word did;
+    did = (this.byte(2) << 8) | this.byte(3);
+    if (did == 0x0400) // Chassis Switch State DID
+    {
+      msg_BCM_DiagResp.byte(0) = 0x04;
+      msg_BCM_DiagResp.byte(1) = 0x62;
+      msg_BCM_DiagResp.byte(2) = 0x04;
+      msg_BCM_DiagResp.byte(3) = 0x00;
+      msg_BCM_DiagResp.byte(4) = ((g_IgnitionState & 0x0F) << 4) | (g_BrakeSwitch & 0x01);
+      output(msg_BCM_DiagResp);
+    }
+    else if (this.id != CAN_ID_DIAG_FUNCTIONAL_REQ)
+    {
+      msg_BCM_DiagResp.byte(0) = 0x03;
+      msg_BCM_DiagResp.byte(1) = UDS_SID_NEGATIVE_RESPONSE;
+      msg_BCM_DiagResp.byte(2) = sid;
+      msg_BCM_DiagResp.byte(3) = UDS_NRC_REQUEST_OUT_OF_RANGE;
+      output(msg_BCM_DiagResp);
+    }
+  }
+  else if (sid == UDS_SID_TESTER_PRESENT)
+  {
+    subf = this.byte(2);
+    if ((subf & 0x80) != 0) return;
+    msg_BCM_DiagResp.byte(0) = 0x02;
+    msg_BCM_DiagResp.byte(1) = 0x7E;
+    msg_BCM_DiagResp.byte(2) = subf & 0x7F;
+    output(msg_BCM_DiagResp);
+  }
+  else if (this.id != CAN_ID_DIAG_FUNCTIONAL_REQ)
+  {
+    msg_BCM_DiagResp.byte(0) = 0x03;
+    msg_BCM_DiagResp.byte(1) = UDS_SID_NEGATIVE_RESPONSE;
+    msg_BCM_DiagResp.byte(2) = sid;
+    msg_BCM_DiagResp.byte(3) = UDS_NRC_SERVICE_NOT_SUPPORTED;
+    output(msg_BCM_DiagResp);
   }
 }
 

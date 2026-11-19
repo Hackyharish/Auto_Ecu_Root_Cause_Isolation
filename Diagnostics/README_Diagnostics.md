@@ -17,15 +17,16 @@ This directory contains the official diagnostic descriptions for the Multi-ECU R
 
 ## 2. ISO 14229-1:2013 Diagnostic Services Implemented
 
-| SID | Service Name | ISO Clause | Supported Sub-functions | Usage in Project |
+| SID | Service Name | ISO Clause | Supported Sub-functions / DIDs | Usage in Project |
 |---|---|---|---|---|
-| **0x10** | DiagnosticSessionControl | Clause 9.2 | `0x01` (Default), `0x02` (Programming), `0x03` (Extended) | Master enters Extended Session before polling DTCs |
-| **0x11** | ECUReset | Clause 9.3 | `0x01` (Hard Reset), `0x03` (Soft Reset) | Node recovery testing |
-| **0x14** | ClearDiagnosticInformation | Clause 11.2 | Parameter: `0xFFFFFF` (All DTC groups) | Broadcast on `0x7DF` to clear network faults |
-| **0x19** | ReadDTCInformation | Clause 11.3 | `0x01` (Count), `0x02` (By Status Mask `0x09`), `0x04` (Freeze Frame), `0x0A` (Supported) | Core service used by RCA Engine to poll active DTCs |
-| **0x22** | ReadDataByIdentifier | Clause 10.2 | DIDs: `0xF190` (VIN), `0x0100`–`0x0106` (Speed, RPM, Temp, Pressure) | Real-time parameter inspection |
-| **0x27** | SecurityAccess | Clause 9.4 | `0x01` (Request Seed), `0x02` (Send Key) | Security gating for critical routines |
-| **0x3E** | TesterPresent | Clause 9.6 | `0x00` (Zero Subfunction), `0x80` (Suppress Response) | Keep-alive heartbeat during diagnostic sessions |
+| **0x10** | DiagnosticSessionControl | Clause 9.2 | `0x01` (Default), `0x02` (Programming), `0x03` (Extended), `+0x80` suppress | Master / Console enters Extended Session before polling DTCs |
+| **0x11** | ECUReset | Clause 9.3 | `0x01` (Hard Reset), `0x03` (Soft Reset), `+0x80` suppress | Resets node faults & DTC memory |
+| **0x14** | ClearDiagnosticInformation | Clause 11.2 | Parameter: `0xFFFFFF` (All DTC groups) | Broadcast on `0x7DF` or physical ID to clear faults |
+| **0x19** | ReadDTCInformation | Clause 11.3 | `0x01` (Report Number of DTCs), `0x02` (Report DTC by Status Mask, `AvailMask=0x09`) | Core service used by Fault Memory GUI & RCA Engine (`07 59 02 09 <DTC3> <Status>` or `03 59 02 09` when clear) |
+| **0x22** | ReadDataByIdentifier | Clause 10.2 | ECM: `0x0100` RPM, `0x0101` Throttle, `0x0102` Coolant (+40); ABS: `0x0200` WheelSpeeds, `0x0201` VehSpeed; TCM: `0x0300` Gear; BCM: `0x0400` Switches | Live telemetry inspection in Diagnostic Console |
+| **0x3E** | TesterPresent | Clause 9.6 | `0x00` (Zero Subfunction), `0x80` (Suppress Response) | Periodic keep-alive heartbeat required by CANoe Diagnostic Console / Fault Memory |
+
+> Unsupported SIDs, sub-functions, or unknown DIDs return ISO 14229-1 Negative Response (`0x7F <SID> <NRC>`: `0x11`, `0x12`, `0x31`) on **physical** requests (`0x7E0`–`0x7E3`) and are suppressed on **functional** broadcast (`0x7DF`).
 
 ---
 
@@ -64,17 +65,20 @@ This directory contains the official diagnostic descriptions for the Multi-ECU R
 
 ---
 
-## 5. How to Load CDD or PDX in Vector CANoe
- 
-To enable symbolic decoding and the CANoe Fault Memory GUI:
+## 5. How to Load PDX in Vector CANoe 19
 
-1. Open **Vector CANoe** with `Project.cfg`.
-2. On the top ribbon, navigate to: **Diagnostics** &rarr; **Diagnostic / ISO TP Configuration**.
+> **Note:** `Project.cfg` uses Vector CANoe 19 binary-serialized configuration blocks, so the PDX container must be attached once via the CANoe GUI (and saved with `Ctrl+S`).
+
+1. Open **Vector CANoe 19** with `Project.cfg`.
+2. On the top ribbon, open **Diagnostics** &rarr; **Diagnostic / ISO TP Configuration**.
 3. Under the CAN network (`Powertrain_Body_Network`):
-   - Right-click and choose **Add Diagnostic Description...**
-   - Browse and select [`MultiECU_Diagnostics.pdx`](MultiECU_Diagnostics.pdx) (or [`MultiECU_Diagnostics.cdd`](MultiECU_Diagnostics.cdd)).
-4. Assign the diagnostic descriptions / ECU variants to the respective simulated nodes (`ECM`, `TCM`, `ABS`, `BCM`).
-5. In CANoe:
-   - **Trace Window:** Raw UDS frames (`03 19 02 09`) will now symbolically display service names, sub-functions, and decoded DTC names.
-   - **Diagnostic Console (`Diagnostics &rarr; Diagnostic Console`):** Allows sending single requests directly via GUI.
-   - **Fault Memory Window (`Diagnostics &rarr; Fault Memory`):** Displays visual tree of all active DTCs, status masks, and Freeze Frame snapshots.
+   - Right-click &rarr; **Add Diagnostic Description...** &rarr; select [`MultiECU_Diagnostics.pdx`](MultiECU_Diagnostics.pdx).
+   - Select **Add** for all four ECU variants (**`ECM_ECU`**, **`TCM_ECU`**, **`ABS_ESP_ECU`**, **`BCM_ECU`**) using protocol **`UDS_on_CAN`** (physical IDs `0x7E0/0x7E8` .. `0x7E3/0x7EB`, functional `0x7DF`, `500 kbps`).
+4. In the **Diagnostic/ISO TP** settings for each added ECU, keep **Diagnostic Simulation / Simulated ECU** **unchecked** so your CAPL nodes (`ECM.can`, `TCM.can`, `ABS_ESP.can`, `BCM.can`) generate the live fault and telemetry responses.
+5. Click **OK**, press **F9** (Compile All CAPL Nodes), save (`Ctrl+S`), and start measurement (`F9` / Start).
+6. Use **Trace Window**, **Diagnostic Console** (`Diagnostics -> Diagnostic Console`), or **Fault Memory** (`Diagnostics -> Fault Memory`) to query DTCs (`0x19 02 09`), read DIDs (`0x22`), clear faults (`0x14 FF FF FF`), or reset (`0x11 01`).
+
+Regenerate & verify the PDX container offline at any time using:
+```bash
+python Scripts/generate_pdx.py
+```

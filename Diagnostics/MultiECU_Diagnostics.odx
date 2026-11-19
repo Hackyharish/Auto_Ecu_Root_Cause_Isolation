@@ -1,421 +1,299 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!-- =========================================================================
-     ASAM MCD-2D (ODX 2.2.0) Diagnostic Description File
-     Project: Automated Root Cause Isolation in Multi-ECU In-Vehicle Networks
-     Specification: ISO 22901-1 (ODX) / ISO 14229-1:2013 (UDS) / ISO 15765-2 (DoCAN)
-     Author: IVN Capstone Team | Tata Technologies TechPulse
-     ========================================================================= -->
-<ODX MODEL-VERSION="2.2.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="odx.xsd" xml:lang="en-US">
-  <DIAG-LAYER-CONTAINER ID="DLC_MultiECU_Diagnostics" xml:lang="en-US">
+<?xml version="1.0" encoding="UTF-8" standalone="no" ?>
+<ODX MODEL-VERSION="2.2.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="odx.xsd">
+  <DIAG-LAYER-CONTAINER ID="DLC_MultiECU_Diagnostics">
     <SHORT-NAME>MultiECU_Diagnostics_Container</SHORT-NAME>
     <LONG-NAME>In-Vehicle Multi-ECU Diagnostic Description</LONG-NAME>
-    <DESC>
-      <p>ASAM MCD-2D ODX description for ECM, TCM, ABS, and BCM diagnostic services.</p>
-    </DESC>
+    <DESC><p>ASAM MCD-2D ODX 2.2.0 description for ECM, TCM, ABS/ESP, and BCM UDS diagnostics.</p></DESC>
+
+    <PROTOCOLS>
+      <PROTOCOL ID="PROTO_UDS_on_CAN">
+        <SHORT-NAME>UDS_on_CAN</SHORT-NAME>
+        <LONG-NAME>ISO 14229-1 Unified Diagnostic Services on High-Speed CAN (ISO 15765-2)</LONG-NAME>
+        <COMPARAM-REFS>
+          <COMPARAM-REF ID-REF="CS_ISO_11898.CP_Baudrate" DOCREF="ISO_11898_Raw_CAN" DOCTYPE="COMPARAM-SUBSET">
+            <SIMPLE-VALUE>500000</SIMPLE-VALUE>
+          </COMPARAM-REF>
+          <COMPARAM-REF ID-REF="CS_ISO_15765_2.CP_CanFuncReqId" DOCREF="ISO_15765_2" DOCTYPE="COMPARAM-SUBSET">
+            <SIMPLE-VALUE>2015</SIMPLE-VALUE>
+          </COMPARAM-REF>
+          <COMPARAM-REF ID-REF="CS_ISO_15765_3.CP_P2Max" DOCREF="ISO_15765_3_on_CAN" DOCTYPE="COMPARAM-SUBSET">
+            <SIMPLE-VALUE>50000</SIMPLE-VALUE>
+          </COMPARAM-REF>
+          <COMPARAM-REF ID-REF="CS_ISO_15765_3.CP_P2Star" DOCREF="ISO_15765_3_on_CAN" DOCTYPE="COMPARAM-SUBSET">
+            <SIMPLE-VALUE>5000000</SIMPLE-VALUE>
+          </COMPARAM-REF>
+        </COMPARAM-REFS>
+        <COMPARAM-SPEC-REF ID-REF="CPS_MultiECU_UDS_on_CAN" DOCREF="MultiECU_CommParams" DOCTYPE="COMPARAM-SPEC"/>
+        <PROT-STACK-SNREF SHORT-NAME="ISO_15765_3_on_ISO_15765_2"/>
+      </PROTOCOL>
+    </PROTOCOLS>
 
     <BASE-VARIANTS>
       <BASE-VARIANT ID="BV_UDS_Base">
         <SHORT-NAME>UDS_Base_Protocol</SHORT-NAME>
-        <LONG-NAME>ISO 14229-1:2013 Unified Diagnostic Services on CAN</LONG-NAME>
-        <DESC>
-          <p>Common UDS diagnostic protocol base specification according to ISO 14229-1:2013.</p>
-        </DESC>
-
+        <LONG-NAME>ISO 14229-1:2013 Base UDS Services</LONG-NAME>
         <DIAG-DATA-DICTIONARY-SPEC>
           <DATA-OBJECT-PROPS>
-            <DATA-OBJECT-PROP ID="DOP_VehicleSpeed">
-              <SHORT-NAME>DOP_VehicleSpeed</SHORT-NAME>
-              <COMPU-METHOD>
-                <CATEGORY>LINEAR</CATEGORY>
-                <COMPU-INTERNAL-TO-PHYS>
-                  <COMPU-SCALES>
-                    <COMPU-SCALE>
-                      <COMPU-RATIONAL-COEFFS>
-                        <COMPU-NUMERATOR>
-                          <V>0</V>
-                          <V>0.01</V>
-                        </COMPU-NUMERATOR>
-                        <COMPU-DENOMINATOR>
-                          <V>1</V>
-                        </COMPU-DENOMINATOR>
-                      </COMPU-RATIONAL-COEFFS>
-                    </COMPU-SCALE>
-                  </COMPU-SCALES>
-                </COMPU-INTERNAL-TO-PHYS>
-              </COMPU-METHOD>
-              <DIAG-CODED-TYPE BASE-DATA-TYPE="A_UINT32" xsi:type="STANDARD-LENGTH-TYPE">
-                <BIT-LENGTH>16</BIT-LENGTH>
-              </DIAG-CODED-TYPE>
-              <PHYSICAL-TYPE BASE-DATA-TYPE="A_FLOAT64"/>
-              <UNIT-REF ID-REF="UNIT_km_h"/>
+            <DATA-OBJECT-PROP ID="DOP_Uint8">
+              <SHORT-NAME>DOP_Uint8</SHORT-NAME>
+              <COMPU-METHOD><CATEGORY>IDENTICAL</CATEGORY></COMPU-METHOD>
+              <DIAG-CODED-TYPE BASE-DATA-TYPE="A_UINT32" xsi:type="STANDARD-LENGTH-TYPE"><BIT-LENGTH>8</BIT-LENGTH></DIAG-CODED-TYPE>
+              <PHYSICAL-TYPE BASE-DATA-TYPE="A_UINT32"/>
             </DATA-OBJECT-PROP>
-
-            <DATA-OBJECT-PROP ID="DOP_EngineSpeed">
-              <SHORT-NAME>DOP_EngineSpeed</SHORT-NAME>
-              <COMPU-METHOD>
-                <CATEGORY>LINEAR</CATEGORY>
-                <COMPU-INTERNAL-TO-PHYS>
-                  <COMPU-SCALES>
-                    <COMPU-SCALE>
-                      <COMPU-RATIONAL-COEFFS>
-                        <COMPU-NUMERATOR>
-                          <V>0</V>
-                          <V>0.25</V>
-                        </COMPU-NUMERATOR>
-                        <COMPU-DENOMINATOR>
-                          <V>1</V>
-                        </COMPU-DENOMINATOR>
-                      </COMPU-RATIONAL-COEFFS>
-                    </COMPU-SCALE>
-                  </COMPU-SCALES>
-                </COMPU-INTERNAL-TO-PHYS>
-              </COMPU-METHOD>
-              <DIAG-CODED-TYPE BASE-DATA-TYPE="A_UINT32" xsi:type="STANDARD-LENGTH-TYPE">
-                <BIT-LENGTH>16</BIT-LENGTH>
-              </DIAG-CODED-TYPE>
-              <PHYSICAL-TYPE BASE-DATA-TYPE="A_FLOAT64"/>
-              <UNIT-REF ID-REF="UNIT_rpm"/>
+            <DATA-OBJECT-PROP ID="DOP_Uint16">
+              <SHORT-NAME>DOP_Uint16</SHORT-NAME>
+              <COMPU-METHOD><CATEGORY>IDENTICAL</CATEGORY></COMPU-METHOD>
+              <DIAG-CODED-TYPE BASE-DATA-TYPE="A_UINT32" xsi:type="STANDARD-LENGTH-TYPE"><BIT-LENGTH>16</BIT-LENGTH></DIAG-CODED-TYPE>
+              <PHYSICAL-TYPE BASE-DATA-TYPE="A_UINT32"/>
             </DATA-OBJECT-PROP>
-
-            <DATA-OBJECT-PROP ID="DOP_CoolantTemp">
-              <SHORT-NAME>DOP_CoolantTemp</SHORT-NAME>
+            <DATA-OBJECT-PROP ID="DOP_Uint24">
+              <SHORT-NAME>DOP_Uint24</SHORT-NAME>
+              <COMPU-METHOD><CATEGORY>IDENTICAL</CATEGORY></COMPU-METHOD>
+              <DIAG-CODED-TYPE BASE-DATA-TYPE="A_UINT32" xsi:type="STANDARD-LENGTH-TYPE"><BIT-LENGTH>24</BIT-LENGTH></DIAG-CODED-TYPE>
+              <PHYSICAL-TYPE BASE-DATA-TYPE="A_UINT32"/>
+            </DATA-OBJECT-PROP>
+            <DATA-OBJECT-PROP ID="DOP_SessionType">
+              <SHORT-NAME>DOP_SessionType</SHORT-NAME>
               <COMPU-METHOD>
-                <CATEGORY>LINEAR</CATEGORY>
+                <CATEGORY>TEXTTABLE</CATEGORY>
                 <COMPU-INTERNAL-TO-PHYS>
                   <COMPU-SCALES>
-                    <COMPU-SCALE>
-                      <COMPU-RATIONAL-COEFFS>
-                        <COMPU-NUMERATOR>
-                          <V>-40</V>
-                          <V>1.0</V>
-                        </COMPU-NUMERATOR>
-                        <COMPU-DENOMINATOR>
-                          <V>1</V>
-                        </COMPU-DENOMINATOR>
-                      </COMPU-RATIONAL-COEFFS>
-                    </COMPU-SCALE>
+                    <COMPU-SCALE><LOWER-LIMIT>1</LOWER-LIMIT><UPPER-LIMIT>1</UPPER-LIMIT><COMPU-CONST><VT>DefaultSession (0x01)</VT></COMPU-CONST></COMPU-SCALE>
+                    <COMPU-SCALE><LOWER-LIMIT>2</LOWER-LIMIT><UPPER-LIMIT>2</UPPER-LIMIT><COMPU-CONST><VT>ProgrammingSession (0x02)</VT></COMPU-CONST></COMPU-SCALE>
+                    <COMPU-SCALE><LOWER-LIMIT>3</LOWER-LIMIT><UPPER-LIMIT>3</UPPER-LIMIT><COMPU-CONST><VT>ExtendedDiagnosticSession (0x03)</VT></COMPU-CONST></COMPU-SCALE>
                   </COMPU-SCALES>
                 </COMPU-INTERNAL-TO-PHYS>
               </COMPU-METHOD>
-              <DIAG-CODED-TYPE BASE-DATA-TYPE="A_UINT32" xsi:type="STANDARD-LENGTH-TYPE">
-                <BIT-LENGTH>8</BIT-LENGTH>
-              </DIAG-CODED-TYPE>
-              <PHYSICAL-TYPE BASE-DATA-TYPE="A_FLOAT64"/>
-              <UNIT-REF ID-REF="UNIT_degC"/>
+              <DIAG-CODED-TYPE BASE-DATA-TYPE="A_UINT32" xsi:type="STANDARD-LENGTH-TYPE"><BIT-LENGTH>8</BIT-LENGTH></DIAG-CODED-TYPE>
+              <PHYSICAL-TYPE BASE-DATA-TYPE="A_UNICODE2STRING"/>
+            </DATA-OBJECT-PROP>
+            <DATA-OBJECT-PROP ID="DOP_ResetType">
+              <SHORT-NAME>DOP_ResetType</SHORT-NAME>
+              <COMPU-METHOD>
+                <CATEGORY>TEXTTABLE</CATEGORY>
+                <COMPU-INTERNAL-TO-PHYS>
+                  <COMPU-SCALES>
+                    <COMPU-SCALE><LOWER-LIMIT>1</LOWER-LIMIT><UPPER-LIMIT>1</UPPER-LIMIT><COMPU-CONST><VT>HardReset (0x01)</VT></COMPU-CONST></COMPU-SCALE>
+                    <COMPU-SCALE><LOWER-LIMIT>3</LOWER-LIMIT><UPPER-LIMIT>3</UPPER-LIMIT><COMPU-CONST><VT>SoftReset (0x03)</VT></COMPU-CONST></COMPU-SCALE>
+                  </COMPU-SCALES>
+                </COMPU-INTERNAL-TO-PHYS>
+              </COMPU-METHOD>
+              <DIAG-CODED-TYPE BASE-DATA-TYPE="A_UINT32" xsi:type="STANDARD-LENGTH-TYPE"><BIT-LENGTH>8</BIT-LENGTH></DIAG-CODED-TYPE>
+              <PHYSICAL-TYPE BASE-DATA-TYPE="A_UNICODE2STRING"/>
             </DATA-OBJECT-PROP>
           </DATA-OBJECT-PROPS>
-
-          <UNIT-SPEC>
-            <UNITS>
-              <UNIT ID="UNIT_km_h">
-                <SHORT-NAME>km_h</SHORT-NAME>
-                <DISPLAY-NAME>km/h</DISPLAY-NAME>
-                <FACTOR-SI-TO-UNIT>1</FACTOR-SI-TO-UNIT>
-                <OFFSET-SI-TO-UNIT>0</OFFSET-SI-TO-UNIT>
-              </UNIT>
-              <UNIT ID="UNIT_rpm">
-                <SHORT-NAME>rpm</SHORT-NAME>
-                <DISPLAY-NAME>rpm</DISPLAY-NAME>
-                <FACTOR-SI-TO-UNIT>1</FACTOR-SI-TO-UNIT>
-                <OFFSET-SI-TO-UNIT>0</OFFSET-SI-TO-UNIT>
-              </UNIT>
-              <UNIT ID="UNIT_degC">
-                <SHORT-NAME>degC</SHORT-NAME>
-                <DISPLAY-NAME>degC</DISPLAY-NAME>
-                <FACTOR-SI-TO-UNIT>1</FACTOR-SI-TO-UNIT>
-                <OFFSET-SI-TO-UNIT>0</OFFSET-SI-TO-UNIT>
-              </UNIT>
-              <UNIT ID="UNIT_bar">
-                <SHORT-NAME>bar</SHORT-NAME>
-                <DISPLAY-NAME>bar</DISPLAY-NAME>
-                <FACTOR-SI-TO-UNIT>1</FACTOR-SI-TO-UNIT>
-                <OFFSET-SI-TO-UNIT>0</OFFSET-SI-TO-UNIT>
-              </UNIT>
-              <UNIT ID="UNIT_V">
-                <SHORT-NAME>Volt</SHORT-NAME>
-                <DISPLAY-NAME>V</DISPLAY-NAME>
-                <FACTOR-SI-TO-UNIT>1</FACTOR-SI-TO-UNIT>
-                <OFFSET-SI-TO-UNIT>0</OFFSET-SI-TO-UNIT>
-              </UNIT>
-            </UNITS>
-          </UNIT-SPEC>
         </DIAG-DATA-DICTIONARY-SPEC>
 
         <DIAG-COMMS>
-          <!-- 0x10: DiagnosticSessionControl -->
           <DIAG-SERVICE ID="DS_DiagnosticSessionControl" SEMANTIC="SESSION">
             <SHORT-NAME>DiagnosticSessionControl</SHORT-NAME>
-            <LONG-NAME>UDS Service 0x10 - Diagnostic Session Control</LONG-NAME>
+            <LONG-NAME>UDS 0x10 - Diagnostic Session Control</LONG-NAME>
             <REQUEST-REF ID-REF="REQ_DiagnosticSessionControl"/>
-            <POS-RESPONSE-REFS>
-              <POS-RESPONSE-REF ID-REF="POS_DiagnosticSessionControl"/>
-            </POS-RESPONSE-REFS>
+            <POS-RESPONSE-REFS><POS-RESPONSE-REF ID-REF="POS_DiagnosticSessionControl"/></POS-RESPONSE-REFS>
           </DIAG-SERVICE>
-
-          <!-- 0x11: ECUReset -->
           <DIAG-SERVICE ID="DS_ECUReset" SEMANTIC="RESET">
             <SHORT-NAME>ECUReset</SHORT-NAME>
-            <LONG-NAME>UDS Service 0x11 - ECU Reset</LONG-NAME>
+            <LONG-NAME>UDS 0x11 - ECU Reset</LONG-NAME>
             <REQUEST-REF ID-REF="REQ_ECUReset"/>
-            <POS-RESPONSE-REFS>
-              <POS-RESPONSE-REF ID-REF="POS_ECUReset"/>
-            </POS-RESPONSE-REFS>
+            <POS-RESPONSE-REFS><POS-RESPONSE-REF ID-REF="POS_ECUReset"/></POS-RESPONSE-REFS>
           </DIAG-SERVICE>
-
-          <!-- 0x14: ClearDiagnosticInformation -->
           <DIAG-SERVICE ID="DS_ClearDiagnosticInformation" SEMANTIC="FAULTMEMORY">
             <SHORT-NAME>ClearDiagnosticInformation</SHORT-NAME>
-            <LONG-NAME>UDS Service 0x14 - Clear Diagnostic Information</LONG-NAME>
+            <LONG-NAME>UDS 0x14 - Clear Diagnostic Information</LONG-NAME>
             <REQUEST-REF ID-REF="REQ_ClearDiagnosticInformation"/>
-            <POS-RESPONSE-REFS>
-              <POS-RESPONSE-REF ID-REF="POS_ClearDiagnosticInformation"/>
-            </POS-RESPONSE-REFS>
+            <POS-RESPONSE-REFS><POS-RESPONSE-REF ID-REF="POS_ClearDiagnosticInformation"/></POS-RESPONSE-REFS>
           </DIAG-SERVICE>
-
-          <!-- 0x19: ReadDTCInformation -->
-          <DIAG-SERVICE ID="DS_ReadDTCInformation" SEMANTIC="FAULTMEMORY">
-            <SHORT-NAME>ReadDTCInformation</SHORT-NAME>
-            <LONG-NAME>UDS Service 0x19 - Read DTC Information</LONG-NAME>
-            <REQUEST-REF ID-REF="REQ_ReadDTCInformation"/>
-            <POS-RESPONSE-REFS>
-              <POS-RESPONSE-REF ID-REF="POS_ReadDTCInformation"/>
-            </POS-RESPONSE-REFS>
+          <DIAG-SERVICE ID="DS_ReadNumberOfDTCs" SEMANTIC="FAULTMEMORY">
+            <SHORT-NAME>FaultMemory_ReadNumberOfDTCs</SHORT-NAME>
+            <LONG-NAME>UDS 0x19 01 - Report Number Of DTCs By Status Mask</LONG-NAME>
+            <REQUEST-REF ID-REF="REQ_ReadNumberOfDTCs"/>
+            <POS-RESPONSE-REFS><POS-RESPONSE-REF ID-REF="POS_ReadNumberOfDTCs"/></POS-RESPONSE-REFS>
           </DIAG-SERVICE>
-
-          <!-- 0x22: ReadDataByIdentifier -->
-          <DIAG-SERVICE ID="DS_ReadDataByIdentifier" SEMANTIC="DATA">
-            <SHORT-NAME>ReadDataByIdentifier</SHORT-NAME>
-            <LONG-NAME>UDS Service 0x22 - Read Data By Identifier</LONG-NAME>
-            <REQUEST-REF ID-REF="REQ_ReadDataByIdentifier"/>
-            <POS-RESPONSE-REFS>
-              <POS-RESPONSE-REF ID-REF="POS_ReadDataByIdentifier"/>
-            </POS-RESPONSE-REFS>
-          </DIAG-SERVICE>
-
-          <!-- 0x3E: TesterPresent -->
           <DIAG-SERVICE ID="DS_TesterPresent" SEMANTIC="TESTERPRESENT">
             <SHORT-NAME>TesterPresent</SHORT-NAME>
-            <LONG-NAME>UDS Service 0x3E - Tester Present</LONG-NAME>
+            <LONG-NAME>UDS 0x3E - Tester Present</LONG-NAME>
             <REQUEST-REF ID-REF="REQ_TesterPresent"/>
-            <POS-RESPONSE-REFS>
-              <POS-RESPONSE-REF ID-REF="POS_TesterPresent"/>
-            </POS-RESPONSE-REFS>
+            <POS-RESPONSE-REFS><POS-RESPONSE-REF ID-REF="POS_TesterPresent"/></POS-RESPONSE-REFS>
           </DIAG-SERVICE>
         </DIAG-COMMS>
 
         <REQUESTS>
-          <!-- Request 0x10 -->
           <REQUEST ID="REQ_DiagnosticSessionControl">
             <SHORT-NAME>REQ_DiagnosticSessionControl</SHORT-NAME>
             <PARAMS>
               <PARAM SEMANTIC="SERVICE-ID" xsi:type="CODED-CONST">
-                <SHORT-NAME>SID</SHORT-NAME>
-                <BYTE-POSITION>0</BYTE-POSITION>
-                <CODED-VALUE>16</CODED-VALUE>
-                <DIAG-CODED-TYPE BASE-DATA-TYPE="A_UINT32" xsi:type="STANDARD-LENGTH-TYPE">
-                  <BIT-LENGTH>8</BIT-LENGTH>
-                </DIAG-CODED-TYPE>
+                <SHORT-NAME>SID</SHORT-NAME><BYTE-POSITION>0</BYTE-POSITION><CODED-VALUE>16</CODED-VALUE>
+                <DIAG-CODED-TYPE BASE-DATA-TYPE="A_UINT32" xsi:type="STANDARD-LENGTH-TYPE"><BIT-LENGTH>8</BIT-LENGTH></DIAG-CODED-TYPE>
+              </PARAM>
+              <PARAM SEMANTIC="SUBFUNCTION" xsi:type="VALUE">
+                <SHORT-NAME>DiagnosticSessionType</SHORT-NAME><BYTE-POSITION>1</BYTE-POSITION>
+                <DOP-REF ID-REF="DOP_SessionType"/>
               </PARAM>
             </PARAMS>
           </REQUEST>
-
-          <!-- Request 0x11 -->
           <REQUEST ID="REQ_ECUReset">
             <SHORT-NAME>REQ_ECUReset</SHORT-NAME>
             <PARAMS>
               <PARAM SEMANTIC="SERVICE-ID" xsi:type="CODED-CONST">
-                <SHORT-NAME>SID</SHORT-NAME>
-                <BYTE-POSITION>0</BYTE-POSITION>
-                <CODED-VALUE>17</CODED-VALUE>
-                <DIAG-CODED-TYPE BASE-DATA-TYPE="A_UINT32" xsi:type="STANDARD-LENGTH-TYPE">
-                  <BIT-LENGTH>8</BIT-LENGTH>
-                </DIAG-CODED-TYPE>
+                <SHORT-NAME>SID</SHORT-NAME><BYTE-POSITION>0</BYTE-POSITION><CODED-VALUE>17</CODED-VALUE>
+                <DIAG-CODED-TYPE BASE-DATA-TYPE="A_UINT32" xsi:type="STANDARD-LENGTH-TYPE"><BIT-LENGTH>8</BIT-LENGTH></DIAG-CODED-TYPE>
+              </PARAM>
+              <PARAM SEMANTIC="SUBFUNCTION" xsi:type="VALUE">
+                <SHORT-NAME>ResetType</SHORT-NAME><BYTE-POSITION>1</BYTE-POSITION>
+                <DOP-REF ID-REF="DOP_ResetType"/>
               </PARAM>
             </PARAMS>
           </REQUEST>
-
-          <!-- Request 0x14 -->
           <REQUEST ID="REQ_ClearDiagnosticInformation">
             <SHORT-NAME>REQ_ClearDiagnosticInformation</SHORT-NAME>
             <PARAMS>
               <PARAM SEMANTIC="SERVICE-ID" xsi:type="CODED-CONST">
-                <SHORT-NAME>SID</SHORT-NAME>
-                <BYTE-POSITION>0</BYTE-POSITION>
-                <CODED-VALUE>20</CODED-VALUE>
-                <DIAG-CODED-TYPE BASE-DATA-TYPE="A_UINT32" xsi:type="STANDARD-LENGTH-TYPE">
-                  <BIT-LENGTH>8</BIT-LENGTH>
-                </DIAG-CODED-TYPE>
+                <SHORT-NAME>SID</SHORT-NAME><BYTE-POSITION>0</BYTE-POSITION><CODED-VALUE>20</CODED-VALUE>
+                <DIAG-CODED-TYPE BASE-DATA-TYPE="A_UINT32" xsi:type="STANDARD-LENGTH-TYPE"><BIT-LENGTH>8</BIT-LENGTH></DIAG-CODED-TYPE>
+              </PARAM>
+              <PARAM SEMANTIC="DATA" xsi:type="VALUE">
+                <SHORT-NAME>GroupOfDTC</SHORT-NAME><BYTE-POSITION>1</BYTE-POSITION>
+                <PHYSICAL-DEFAULT-VALUE>16777215</PHYSICAL-DEFAULT-VALUE>
+                <DOP-REF ID-REF="DOP_Uint24"/>
               </PARAM>
             </PARAMS>
           </REQUEST>
-
-          <!-- Request 0x19 -->
-          <REQUEST ID="REQ_ReadDTCInformation">
-            <SHORT-NAME>REQ_ReadDTCInformation</SHORT-NAME>
+          <REQUEST ID="REQ_ReadNumberOfDTCs">
+            <SHORT-NAME>REQ_ReadNumberOfDTCs</SHORT-NAME>
             <PARAMS>
               <PARAM SEMANTIC="SERVICE-ID" xsi:type="CODED-CONST">
-                <SHORT-NAME>SID</SHORT-NAME>
-                <BYTE-POSITION>0</BYTE-POSITION>
-                <CODED-VALUE>25</CODED-VALUE>
-                <DIAG-CODED-TYPE BASE-DATA-TYPE="A_UINT32" xsi:type="STANDARD-LENGTH-TYPE">
-                  <BIT-LENGTH>8</BIT-LENGTH>
-                </DIAG-CODED-TYPE>
+                <SHORT-NAME>SID</SHORT-NAME><BYTE-POSITION>0</BYTE-POSITION><CODED-VALUE>25</CODED-VALUE>
+                <DIAG-CODED-TYPE BASE-DATA-TYPE="A_UINT32" xsi:type="STANDARD-LENGTH-TYPE"><BIT-LENGTH>8</BIT-LENGTH></DIAG-CODED-TYPE>
+              </PARAM>
+              <PARAM SEMANTIC="SUBFUNCTION" xsi:type="CODED-CONST">
+                <SHORT-NAME>SubFunction</SHORT-NAME><BYTE-POSITION>1</BYTE-POSITION><CODED-VALUE>1</CODED-VALUE>
+                <DIAG-CODED-TYPE BASE-DATA-TYPE="A_UINT32" xsi:type="STANDARD-LENGTH-TYPE"><BIT-LENGTH>8</BIT-LENGTH></DIAG-CODED-TYPE>
+              </PARAM>
+              <PARAM SEMANTIC="DATA" xsi:type="VALUE">
+                <SHORT-NAME>DTCStatusMask</SHORT-NAME><BYTE-POSITION>2</BYTE-POSITION>
+                <PHYSICAL-DEFAULT-VALUE>9</PHYSICAL-DEFAULT-VALUE>
+                <DOP-REF ID-REF="DOP_Uint8"/>
               </PARAM>
             </PARAMS>
           </REQUEST>
-
-          <!-- Request 0x22 -->
-          <REQUEST ID="REQ_ReadDataByIdentifier">
-            <SHORT-NAME>REQ_ReadDataByIdentifier</SHORT-NAME>
-            <PARAMS>
-              <PARAM SEMANTIC="SERVICE-ID" xsi:type="CODED-CONST">
-                <SHORT-NAME>SID</SHORT-NAME>
-                <BYTE-POSITION>0</BYTE-POSITION>
-                <CODED-VALUE>34</CODED-VALUE>
-                <DIAG-CODED-TYPE BASE-DATA-TYPE="A_UINT32" xsi:type="STANDARD-LENGTH-TYPE">
-                  <BIT-LENGTH>8</BIT-LENGTH>
-                </DIAG-CODED-TYPE>
-              </PARAM>
-            </PARAMS>
-          </REQUEST>
-
-          <!-- Request 0x3E -->
           <REQUEST ID="REQ_TesterPresent">
             <SHORT-NAME>REQ_TesterPresent</SHORT-NAME>
             <PARAMS>
               <PARAM SEMANTIC="SERVICE-ID" xsi:type="CODED-CONST">
-                <SHORT-NAME>SID</SHORT-NAME>
-                <BYTE-POSITION>0</BYTE-POSITION>
-                <CODED-VALUE>62</CODED-VALUE>
-                <DIAG-CODED-TYPE BASE-DATA-TYPE="A_UINT32" xsi:type="STANDARD-LENGTH-TYPE">
-                  <BIT-LENGTH>8</BIT-LENGTH>
-                </DIAG-CODED-TYPE>
+                <SHORT-NAME>SID</SHORT-NAME><BYTE-POSITION>0</BYTE-POSITION><CODED-VALUE>62</CODED-VALUE>
+                <DIAG-CODED-TYPE BASE-DATA-TYPE="A_UINT32" xsi:type="STANDARD-LENGTH-TYPE"><BIT-LENGTH>8</BIT-LENGTH></DIAG-CODED-TYPE>
+              </PARAM>
+              <PARAM SEMANTIC="SUBFUNCTION" xsi:type="CODED-CONST">
+                <SHORT-NAME>ZeroSubFunction</SHORT-NAME><BYTE-POSITION>1</BYTE-POSITION><CODED-VALUE>0</CODED-VALUE>
+                <DIAG-CODED-TYPE BASE-DATA-TYPE="A_UINT32" xsi:type="STANDARD-LENGTH-TYPE"><BIT-LENGTH>8</BIT-LENGTH></DIAG-CODED-TYPE>
               </PARAM>
             </PARAMS>
           </REQUEST>
         </REQUESTS>
 
         <POS-RESPONSES>
-          <!-- Response 0x50 -->
           <POS-RESPONSE ID="POS_DiagnosticSessionControl">
             <SHORT-NAME>POS_DiagnosticSessionControl</SHORT-NAME>
             <PARAMS>
               <PARAM SEMANTIC="SERVICE-ID" xsi:type="CODED-CONST">
-                <SHORT-NAME>RSID</SHORT-NAME>
-                <BYTE-POSITION>0</BYTE-POSITION>
-                <CODED-VALUE>80</CODED-VALUE>
-                <DIAG-CODED-TYPE BASE-DATA-TYPE="A_UINT32" xsi:type="STANDARD-LENGTH-TYPE">
-                  <BIT-LENGTH>8</BIT-LENGTH>
-                </DIAG-CODED-TYPE>
+                <SHORT-NAME>RSID</SHORT-NAME><BYTE-POSITION>0</BYTE-POSITION><CODED-VALUE>80</CODED-VALUE>
+                <DIAG-CODED-TYPE BASE-DATA-TYPE="A_UINT32" xsi:type="STANDARD-LENGTH-TYPE"><BIT-LENGTH>8</BIT-LENGTH></DIAG-CODED-TYPE>
+              </PARAM>
+              <PARAM SEMANTIC="SUBFUNCTION" xsi:type="MATCHING-REQUEST-PARAM">
+                <SHORT-NAME>DiagnosticSessionType</SHORT-NAME><BYTE-POSITION>1</BYTE-POSITION><REQUEST-BYTE-POS>1</REQUEST-BYTE-POS><BYTE-LENGTH>1</BYTE-LENGTH>
+              </PARAM>
+              <PARAM SEMANTIC="DATA" xsi:type="VALUE">
+                <SHORT-NAME>P2ServerMax_ms</SHORT-NAME><BYTE-POSITION>2</BYTE-POSITION><DOP-REF ID-REF="DOP_Uint16"/>
+              </PARAM>
+              <PARAM SEMANTIC="DATA" xsi:type="VALUE">
+                <SHORT-NAME>P2StarServerMax_10ms</SHORT-NAME><BYTE-POSITION>4</BYTE-POSITION><DOP-REF ID-REF="DOP_Uint16"/>
               </PARAM>
             </PARAMS>
           </POS-RESPONSE>
-
-          <!-- Response 0x51 -->
           <POS-RESPONSE ID="POS_ECUReset">
             <SHORT-NAME>POS_ECUReset</SHORT-NAME>
             <PARAMS>
               <PARAM SEMANTIC="SERVICE-ID" xsi:type="CODED-CONST">
-                <SHORT-NAME>RSID</SHORT-NAME>
-                <BYTE-POSITION>0</BYTE-POSITION>
-                <CODED-VALUE>81</CODED-VALUE>
-                <DIAG-CODED-TYPE BASE-DATA-TYPE="A_UINT32" xsi:type="STANDARD-LENGTH-TYPE">
-                  <BIT-LENGTH>8</BIT-LENGTH>
-                </DIAG-CODED-TYPE>
+                <SHORT-NAME>RSID</SHORT-NAME><BYTE-POSITION>0</BYTE-POSITION><CODED-VALUE>81</CODED-VALUE>
+                <DIAG-CODED-TYPE BASE-DATA-TYPE="A_UINT32" xsi:type="STANDARD-LENGTH-TYPE"><BIT-LENGTH>8</BIT-LENGTH></DIAG-CODED-TYPE>
+              </PARAM>
+              <PARAM SEMANTIC="SUBFUNCTION" xsi:type="MATCHING-REQUEST-PARAM">
+                <SHORT-NAME>ResetType</SHORT-NAME><BYTE-POSITION>1</BYTE-POSITION><REQUEST-BYTE-POS>1</REQUEST-BYTE-POS><BYTE-LENGTH>1</BYTE-LENGTH>
               </PARAM>
             </PARAMS>
           </POS-RESPONSE>
-
-          <!-- Response 0x54 -->
           <POS-RESPONSE ID="POS_ClearDiagnosticInformation">
             <SHORT-NAME>POS_ClearDiagnosticInformation</SHORT-NAME>
             <PARAMS>
               <PARAM SEMANTIC="SERVICE-ID" xsi:type="CODED-CONST">
-                <SHORT-NAME>RSID</SHORT-NAME>
-                <BYTE-POSITION>0</BYTE-POSITION>
-                <CODED-VALUE>84</CODED-VALUE>
-                <DIAG-CODED-TYPE BASE-DATA-TYPE="A_UINT32" xsi:type="STANDARD-LENGTH-TYPE">
-                  <BIT-LENGTH>8</BIT-LENGTH>
-                </DIAG-CODED-TYPE>
+                <SHORT-NAME>RSID</SHORT-NAME><BYTE-POSITION>0</BYTE-POSITION><CODED-VALUE>84</CODED-VALUE>
+                <DIAG-CODED-TYPE BASE-DATA-TYPE="A_UINT32" xsi:type="STANDARD-LENGTH-TYPE"><BIT-LENGTH>8</BIT-LENGTH></DIAG-CODED-TYPE>
               </PARAM>
             </PARAMS>
           </POS-RESPONSE>
-
-          <!-- Response 0x59 -->
-          <POS-RESPONSE ID="POS_ReadDTCInformation">
-            <SHORT-NAME>POS_ReadDTCInformation</SHORT-NAME>
+          <POS-RESPONSE ID="POS_ReadNumberOfDTCs">
+            <SHORT-NAME>POS_ReadNumberOfDTCs</SHORT-NAME>
             <PARAMS>
               <PARAM SEMANTIC="SERVICE-ID" xsi:type="CODED-CONST">
-                <SHORT-NAME>RSID</SHORT-NAME>
-                <BYTE-POSITION>0</BYTE-POSITION>
-                <CODED-VALUE>89</CODED-VALUE>
-                <DIAG-CODED-TYPE BASE-DATA-TYPE="A_UINT32" xsi:type="STANDARD-LENGTH-TYPE">
-                  <BIT-LENGTH>8</BIT-LENGTH>
-                </DIAG-CODED-TYPE>
+                <SHORT-NAME>RSID</SHORT-NAME><BYTE-POSITION>0</BYTE-POSITION><CODED-VALUE>89</CODED-VALUE>
+                <DIAG-CODED-TYPE BASE-DATA-TYPE="A_UINT32" xsi:type="STANDARD-LENGTH-TYPE"><BIT-LENGTH>8</BIT-LENGTH></DIAG-CODED-TYPE>
+              </PARAM>
+              <PARAM SEMANTIC="SUBFUNCTION" xsi:type="CODED-CONST">
+                <SHORT-NAME>SubFunction</SHORT-NAME><BYTE-POSITION>1</BYTE-POSITION><CODED-VALUE>1</CODED-VALUE>
+                <DIAG-CODED-TYPE BASE-DATA-TYPE="A_UINT32" xsi:type="STANDARD-LENGTH-TYPE"><BIT-LENGTH>8</BIT-LENGTH></DIAG-CODED-TYPE>
+              </PARAM>
+              <PARAM SEMANTIC="DATA" xsi:type="VALUE">
+                <SHORT-NAME>DTCStatusAvailabilityMask</SHORT-NAME><BYTE-POSITION>2</BYTE-POSITION><DOP-REF ID-REF="DOP_Uint8"/>
+              </PARAM>
+              <PARAM SEMANTIC="DATA" xsi:type="VALUE">
+                <SHORT-NAME>DTCFormatIdentifier</SHORT-NAME><BYTE-POSITION>3</BYTE-POSITION><DOP-REF ID-REF="DOP_Uint8"/>
+              </PARAM>
+              <PARAM SEMANTIC="DATA" xsi:type="VALUE">
+                <SHORT-NAME>DTCCount</SHORT-NAME><BYTE-POSITION>4</BYTE-POSITION><DOP-REF ID-REF="DOP_Uint16"/>
               </PARAM>
             </PARAMS>
           </POS-RESPONSE>
-
-          <!-- Response 0x62 -->
-          <POS-RESPONSE ID="POS_ReadDataByIdentifier">
-            <SHORT-NAME>POS_ReadDataByIdentifier</SHORT-NAME>
-            <PARAMS>
-              <PARAM SEMANTIC="SERVICE-ID" xsi:type="CODED-CONST">
-                <SHORT-NAME>RSID</SHORT-NAME>
-                <BYTE-POSITION>0</BYTE-POSITION>
-                <CODED-VALUE>98</CODED-VALUE>
-                <DIAG-CODED-TYPE BASE-DATA-TYPE="A_UINT32" xsi:type="STANDARD-LENGTH-TYPE">
-                  <BIT-LENGTH>8</BIT-LENGTH>
-                </DIAG-CODED-TYPE>
-              </PARAM>
-            </PARAMS>
-          </POS-RESPONSE>
-
-          <!-- Response 0x7E -->
           <POS-RESPONSE ID="POS_TesterPresent">
             <SHORT-NAME>POS_TesterPresent</SHORT-NAME>
             <PARAMS>
               <PARAM SEMANTIC="SERVICE-ID" xsi:type="CODED-CONST">
-                <SHORT-NAME>RSID</SHORT-NAME>
-                <BYTE-POSITION>0</BYTE-POSITION>
-                <CODED-VALUE>126</CODED-VALUE>
-                <DIAG-CODED-TYPE BASE-DATA-TYPE="A_UINT32" xsi:type="STANDARD-LENGTH-TYPE">
-                  <BIT-LENGTH>8</BIT-LENGTH>
-                </DIAG-CODED-TYPE>
+                <SHORT-NAME>RSID</SHORT-NAME><BYTE-POSITION>0</BYTE-POSITION><CODED-VALUE>126</CODED-VALUE>
+                <DIAG-CODED-TYPE BASE-DATA-TYPE="A_UINT32" xsi:type="STANDARD-LENGTH-TYPE"><BIT-LENGTH>8</BIT-LENGTH></DIAG-CODED-TYPE>
+              </PARAM>
+              <PARAM SEMANTIC="SUBFUNCTION" xsi:type="CODED-CONST">
+                <SHORT-NAME>ZeroSubFunction</SHORT-NAME><BYTE-POSITION>1</BYTE-POSITION><CODED-VALUE>0</CODED-VALUE>
+                <DIAG-CODED-TYPE BASE-DATA-TYPE="A_UINT32" xsi:type="STANDARD-LENGTH-TYPE"><BIT-LENGTH>8</BIT-LENGTH></DIAG-CODED-TYPE>
               </PARAM>
             </PARAMS>
           </POS-RESPONSE>
         </POS-RESPONSES>
+
+        <PARENT-REFS>
+          <PARENT-REF xsi:type="PROTOCOL-REF" ID-REF="PROTO_UDS_on_CAN"/>
+        </PARENT-REFS>
       </BASE-VARIANT>
     </BASE-VARIANTS>
 
     <ECU-VARIANTS>
-      <!-- 1. ABS / ESP ECU Variant -->
       <ECU-VARIANT ID="ECU_ABS">
         <SHORT-NAME>ABS_ESP_ECU</SHORT-NAME>
         <LONG-NAME>Anti-Lock Braking System / Electronic Stability Program</LONG-NAME>
-        <DESC>
-          <p>Chassis control module responsible for wheel speed sensing and ABS/ESP intervention.</p>
-        </DESC>
+        <DESC><p>Chassis control module responsible for wheel speed sensing and ABS/ESP intervention.</p></DESC>
         <DIAG-DATA-DICTIONARY-SPEC>
           <DTC-DOPS>
-            <DTC-DOP ID="DTC_DOP_ABS">
-              <SHORT-NAME>DTC_DOP_ABS</SHORT-NAME>
-              <DIAG-CODED-TYPE BASE-DATA-TYPE="A_UINT32" xsi:type="STANDARD-LENGTH-TYPE">
-                <BIT-LENGTH>24</BIT-LENGTH>
-              </DIAG-CODED-TYPE>
+            <DTC-DOP ID="DTC_DOP_ECU_ABS">
+              <SHORT-NAME>DTC_DOP_ECU_ABS</SHORT-NAME>
+              <DIAG-CODED-TYPE BASE-DATA-TYPE="A_UINT32" xsi:type="STANDARD-LENGTH-TYPE"><BIT-LENGTH>24</BIT-LENGTH></DIAG-CODED-TYPE>
               <PHYSICAL-TYPE BASE-DATA-TYPE="A_UINT32"/>
-              <COMPU-METHOD>
-                <CATEGORY>IDENTICAL</CATEGORY>
-              </COMPU-METHOD>
+              <COMPU-METHOD><CATEGORY>IDENTICAL</CATEGORY></COMPU-METHOD>
               <DTCS>
-                <DTC ID="DTC_C003513">
+                <DTC ID="DTC_ABS_C003513">
                   <SHORT-NAME>C0035_13</SHORT-NAME>
                   <TROUBLE-CODE>12583761</TROUBLE-CODE>
                   <DISPLAY-TROUBLE-CODE>C0035-13</DISPLAY-TROUBLE-CODE>
                   <TEXT>Left Front Wheel Speed Sensor Circuit Open</TEXT>
                 </DTC>
-                <DTC ID="DTC_U012100">
+                <DTC ID="DTC_ABS_U012100">
                   <SHORT-NAME>U0121_00</SHORT-NAME>
                   <TROUBLE-CODE>13705472</TROUBLE-CODE>
                   <DISPLAY-TROUBLE-CODE>U0121-00</DISPLAY-TROUBLE-CODE>
@@ -424,148 +302,775 @@
               </DTCS>
             </DTC-DOP>
           </DTC-DOPS>
+          <STRUCTURES>
+            <STRUCTURE ID="STRUCT_DTC_Rec_ECU_ABS" BYTE-SIZE="4">
+              <SHORT-NAME>DTCAndStatusRecord_ABS_ESP_ECU</SHORT-NAME>
+              <PARAMS>
+                <PARAM SEMANTIC="DTC" xsi:type="VALUE">
+                  <SHORT-NAME>DTCRecord</SHORT-NAME>
+                  <BYTE-POSITION>0</BYTE-POSITION>
+                  <DOP-REF ID-REF="DTC_DOP_ECU_ABS"/>
+                </PARAM>
+                <PARAM SEMANTIC="DTCSTATUS" xsi:type="VALUE">
+                  <SHORT-NAME>StatusOfDTC</SHORT-NAME>
+                  <BYTE-POSITION>3</BYTE-POSITION>
+                  <DOP-REF ID-REF="DOP_Uint8"/>
+                </PARAM>
+              </PARAMS>
+            </STRUCTURE>
+          </STRUCTURES>
+          <END-OF-PDU-FIELDS>
+            <END-OF-PDU-FIELD ID="EOP_DTC_ECU_ABS">
+              <SHORT-NAME>DTCAndStatusList_ABS_ESP_ECU</SHORT-NAME>
+              <MIN-NUMBER-OF-ITEMS>0</MIN-NUMBER-OF-ITEMS>
+              <BASIC-STRUCTURE-REF ID-REF="STRUCT_DTC_Rec_ECU_ABS"/>
+            </END-OF-PDU-FIELD>
+          </END-OF-PDU-FIELDS>
+          <DATA-OBJECT-PROPS>
+            <DATA-OBJECT-PROP ID="DOP_ABS_ESP_ECU_DID_0200">
+              <SHORT-NAME>DOP_WheelSpeeds_Snapshot</SHORT-NAME>
+              <COMPU-METHOD><CATEGORY>IDENTICAL</CATEGORY></COMPU-METHOD>
+              <DIAG-CODED-TYPE BASE-DATA-TYPE="A_UINT32" xsi:type="STANDARD-LENGTH-TYPE"><BIT-LENGTH>32</BIT-LENGTH></DIAG-CODED-TYPE>
+              <PHYSICAL-TYPE BASE-DATA-TYPE="A_UINT32"/>
+            </DATA-OBJECT-PROP>
+            <DATA-OBJECT-PROP ID="DOP_ABS_ESP_ECU_DID_0201">
+              <SHORT-NAME>DOP_VehicleSpeed</SHORT-NAME>
+              <COMPU-METHOD><CATEGORY>IDENTICAL</CATEGORY></COMPU-METHOD>
+              <DIAG-CODED-TYPE BASE-DATA-TYPE="A_UINT32" xsi:type="STANDARD-LENGTH-TYPE"><BIT-LENGTH>16</BIT-LENGTH></DIAG-CODED-TYPE>
+              <PHYSICAL-TYPE BASE-DATA-TYPE="A_UINT32"/>
+            </DATA-OBJECT-PROP>
+          </DATA-OBJECT-PROPS>
         </DIAG-DATA-DICTIONARY-SPEC>
+        <DIAG-COMMS>
+          <DIAG-SERVICE ID="DS_ECU_ABS_ReadDTC_ByStatusMask" SEMANTIC="FAULTMEMORY">
+            <SHORT-NAME>FaultMemory_ReadDTCByStatusMask</SHORT-NAME>
+            <LONG-NAME>UDS 0x19 02 - Read DTC By Status Mask (ABS_ESP_ECU)</LONG-NAME>
+            <REQUEST-REF ID-REF="REQ_ECU_ABS_ReadDTC_ByStatusMask"/>
+            <POS-RESPONSE-REFS>
+              <POS-RESPONSE-REF ID-REF="POS_ECU_ABS_ReadDTC_ByStatusMask"/>
+            </POS-RESPONSE-REFS>
+          </DIAG-SERVICE>
+          <DIAG-SERVICE ID="DS_ABS_ESP_ECU_DID_0200" SEMANTIC="CURRENTDATA">
+            <SHORT-NAME>RDBI_WheelSpeeds_Snapshot</SHORT-NAME>
+            <LONG-NAME>ReadDataByIdentifier 0x0200 - WheelSpeeds_Snapshot</LONG-NAME>
+            <REQUEST-REF ID-REF="REQ_ABS_ESP_ECU_DID_0200"/>
+            <POS-RESPONSE-REFS>
+              <POS-RESPONSE-REF ID-REF="POS_ABS_ESP_ECU_DID_0200"/>
+            </POS-RESPONSE-REFS>
+          </DIAG-SERVICE>
+          <DIAG-SERVICE ID="DS_ABS_ESP_ECU_DID_0201" SEMANTIC="CURRENTDATA">
+            <SHORT-NAME>RDBI_VehicleSpeed</SHORT-NAME>
+            <LONG-NAME>ReadDataByIdentifier 0x0201 - VehicleSpeed</LONG-NAME>
+            <REQUEST-REF ID-REF="REQ_ABS_ESP_ECU_DID_0201"/>
+            <POS-RESPONSE-REFS>
+              <POS-RESPONSE-REF ID-REF="POS_ABS_ESP_ECU_DID_0201"/>
+            </POS-RESPONSE-REFS>
+          </DIAG-SERVICE>
+        </DIAG-COMMS>
+        <REQUESTS>
+          <REQUEST ID="REQ_ECU_ABS_ReadDTC_ByStatusMask">
+            <SHORT-NAME>REQ_ReadDTCByStatusMask_ABS_ESP_ECU</SHORT-NAME>
+            <PARAMS>
+              <PARAM SEMANTIC="SERVICE-ID" xsi:type="CODED-CONST">
+                <SHORT-NAME>SID</SHORT-NAME>
+                <BYTE-POSITION>0</BYTE-POSITION>
+                <CODED-VALUE>25</CODED-VALUE>
+                <DIAG-CODED-TYPE BASE-DATA-TYPE="A_UINT32" xsi:type="STANDARD-LENGTH-TYPE"><BIT-LENGTH>8</BIT-LENGTH></DIAG-CODED-TYPE>
+              </PARAM>
+              <PARAM SEMANTIC="SUBFUNCTION" xsi:type="CODED-CONST">
+                <SHORT-NAME>SubFunction</SHORT-NAME>
+                <BYTE-POSITION>1</BYTE-POSITION>
+                <CODED-VALUE>2</CODED-VALUE>
+                <DIAG-CODED-TYPE BASE-DATA-TYPE="A_UINT32" xsi:type="STANDARD-LENGTH-TYPE"><BIT-LENGTH>8</BIT-LENGTH></DIAG-CODED-TYPE>
+              </PARAM>
+              <PARAM SEMANTIC="DATA" xsi:type="VALUE">
+                <SHORT-NAME>DTCStatusMask</SHORT-NAME>
+                <BYTE-POSITION>2</BYTE-POSITION>
+                <PHYSICAL-DEFAULT-VALUE>9</PHYSICAL-DEFAULT-VALUE>
+                <DOP-REF ID-REF="DOP_Uint8"/>
+              </PARAM>
+            </PARAMS>
+          </REQUEST>
+          <REQUEST ID="REQ_ABS_ESP_ECU_DID_0200">
+            <SHORT-NAME>REQ_WheelSpeeds_Snapshot</SHORT-NAME>
+            <PARAMS>
+              <PARAM SEMANTIC="SERVICE-ID" xsi:type="CODED-CONST">
+                <SHORT-NAME>SID</SHORT-NAME>
+                <BYTE-POSITION>0</BYTE-POSITION>
+                <CODED-VALUE>34</CODED-VALUE>
+                <DIAG-CODED-TYPE BASE-DATA-TYPE="A_UINT32" xsi:type="STANDARD-LENGTH-TYPE"><BIT-LENGTH>8</BIT-LENGTH></DIAG-CODED-TYPE>
+              </PARAM>
+              <PARAM SEMANTIC="ID" xsi:type="CODED-CONST">
+                <SHORT-NAME>DataIdentifier</SHORT-NAME>
+                <BYTE-POSITION>1</BYTE-POSITION>
+                <CODED-VALUE>512</CODED-VALUE>
+                <DIAG-CODED-TYPE BASE-DATA-TYPE="A_UINT32" xsi:type="STANDARD-LENGTH-TYPE"><BIT-LENGTH>16</BIT-LENGTH></DIAG-CODED-TYPE>
+              </PARAM>
+            </PARAMS>
+          </REQUEST>
+          <REQUEST ID="REQ_ABS_ESP_ECU_DID_0201">
+            <SHORT-NAME>REQ_VehicleSpeed</SHORT-NAME>
+            <PARAMS>
+              <PARAM SEMANTIC="SERVICE-ID" xsi:type="CODED-CONST">
+                <SHORT-NAME>SID</SHORT-NAME>
+                <BYTE-POSITION>0</BYTE-POSITION>
+                <CODED-VALUE>34</CODED-VALUE>
+                <DIAG-CODED-TYPE BASE-DATA-TYPE="A_UINT32" xsi:type="STANDARD-LENGTH-TYPE"><BIT-LENGTH>8</BIT-LENGTH></DIAG-CODED-TYPE>
+              </PARAM>
+              <PARAM SEMANTIC="ID" xsi:type="CODED-CONST">
+                <SHORT-NAME>DataIdentifier</SHORT-NAME>
+                <BYTE-POSITION>1</BYTE-POSITION>
+                <CODED-VALUE>513</CODED-VALUE>
+                <DIAG-CODED-TYPE BASE-DATA-TYPE="A_UINT32" xsi:type="STANDARD-LENGTH-TYPE"><BIT-LENGTH>16</BIT-LENGTH></DIAG-CODED-TYPE>
+              </PARAM>
+            </PARAMS>
+          </REQUEST>
+        </REQUESTS>
+        <POS-RESPONSES>
+          <POS-RESPONSE ID="POS_ECU_ABS_ReadDTC_ByStatusMask">
+            <SHORT-NAME>POS_ReadDTCByStatusMask_ABS_ESP_ECU</SHORT-NAME>
+            <PARAMS>
+              <PARAM SEMANTIC="SERVICE-ID" xsi:type="CODED-CONST">
+                <SHORT-NAME>RSID</SHORT-NAME>
+                <BYTE-POSITION>0</BYTE-POSITION>
+                <CODED-VALUE>89</CODED-VALUE>
+                <DIAG-CODED-TYPE BASE-DATA-TYPE="A_UINT32" xsi:type="STANDARD-LENGTH-TYPE"><BIT-LENGTH>8</BIT-LENGTH></DIAG-CODED-TYPE>
+              </PARAM>
+              <PARAM SEMANTIC="SUBFUNCTION" xsi:type="CODED-CONST">
+                <SHORT-NAME>SubFunction</SHORT-NAME>
+                <BYTE-POSITION>1</BYTE-POSITION>
+                <CODED-VALUE>2</CODED-VALUE>
+                <DIAG-CODED-TYPE BASE-DATA-TYPE="A_UINT32" xsi:type="STANDARD-LENGTH-TYPE"><BIT-LENGTH>8</BIT-LENGTH></DIAG-CODED-TYPE>
+              </PARAM>
+              <PARAM SEMANTIC="DATA" xsi:type="VALUE">
+                <SHORT-NAME>DTCStatusAvailabilityMask</SHORT-NAME>
+                <BYTE-POSITION>2</BYTE-POSITION>
+                <DOP-REF ID-REF="DOP_Uint8"/>
+              </PARAM>
+              <PARAM SEMANTIC="DATA" xsi:type="VALUE">
+                <SHORT-NAME>DTCAndStatusRecord</SHORT-NAME>
+                <BYTE-POSITION>3</BYTE-POSITION>
+                <DOP-REF ID-REF="EOP_DTC_ECU_ABS"/>
+              </PARAM>
+            </PARAMS>
+          </POS-RESPONSE>
+          <POS-RESPONSE ID="POS_ABS_ESP_ECU_DID_0200">
+            <SHORT-NAME>POS_WheelSpeeds_Snapshot</SHORT-NAME>
+            <PARAMS>
+              <PARAM SEMANTIC="SERVICE-ID" xsi:type="CODED-CONST">
+                <SHORT-NAME>RSID</SHORT-NAME>
+                <BYTE-POSITION>0</BYTE-POSITION>
+                <CODED-VALUE>98</CODED-VALUE>
+                <DIAG-CODED-TYPE BASE-DATA-TYPE="A_UINT32" xsi:type="STANDARD-LENGTH-TYPE"><BIT-LENGTH>8</BIT-LENGTH></DIAG-CODED-TYPE>
+              </PARAM>
+              <PARAM SEMANTIC="ID" xsi:type="MATCHING-REQUEST-PARAM">
+                <SHORT-NAME>DataIdentifier</SHORT-NAME>
+                <BYTE-POSITION>1</BYTE-POSITION>
+                <REQUEST-BYTE-POS>1</REQUEST-BYTE-POS>
+                <BYTE-LENGTH>2</BYTE-LENGTH>
+              </PARAM>
+              <PARAM SEMANTIC="DATA" xsi:type="VALUE">
+                <SHORT-NAME>WheelSpeed_FL_FR_RL_RR</SHORT-NAME>
+                <BYTE-POSITION>3</BYTE-POSITION>
+                <DOP-REF ID-REF="DOP_ABS_ESP_ECU_DID_0200"/>
+              </PARAM>
+            </PARAMS>
+          </POS-RESPONSE>
+          <POS-RESPONSE ID="POS_ABS_ESP_ECU_DID_0201">
+            <SHORT-NAME>POS_VehicleSpeed</SHORT-NAME>
+            <PARAMS>
+              <PARAM SEMANTIC="SERVICE-ID" xsi:type="CODED-CONST">
+                <SHORT-NAME>RSID</SHORT-NAME>
+                <BYTE-POSITION>0</BYTE-POSITION>
+                <CODED-VALUE>98</CODED-VALUE>
+                <DIAG-CODED-TYPE BASE-DATA-TYPE="A_UINT32" xsi:type="STANDARD-LENGTH-TYPE"><BIT-LENGTH>8</BIT-LENGTH></DIAG-CODED-TYPE>
+              </PARAM>
+              <PARAM SEMANTIC="ID" xsi:type="MATCHING-REQUEST-PARAM">
+                <SHORT-NAME>DataIdentifier</SHORT-NAME>
+                <BYTE-POSITION>1</BYTE-POSITION>
+                <REQUEST-BYTE-POS>1</REQUEST-BYTE-POS>
+                <BYTE-LENGTH>2</BYTE-LENGTH>
+              </PARAM>
+              <PARAM SEMANTIC="DATA" xsi:type="VALUE">
+                <SHORT-NAME>VehicleSpeed_Raw</SHORT-NAME>
+                <BYTE-POSITION>3</BYTE-POSITION>
+                <DOP-REF ID-REF="DOP_ABS_ESP_ECU_DID_0201"/>
+              </PARAM>
+            </PARAMS>
+          </POS-RESPONSE>
+        </POS-RESPONSES>
+        <COMPARAM-REFS>
+          <COMPARAM-REF ID-REF="CS_ISO_15765_2.CP_UniqueRespIdTable" DOCREF="ISO_15765_2" DOCTYPE="COMPARAM-SUBSET">
+            <COMPLEX-VALUE>
+              <SIMPLE-VALUE>5</SIMPLE-VALUE>
+              <SIMPLE-VALUE>2018</SIMPLE-VALUE>
+              <SIMPLE-VALUE>0</SIMPLE-VALUE>
+              <SIMPLE-VALUE>5</SIMPLE-VALUE>
+              <SIMPLE-VALUE>2026</SIMPLE-VALUE>
+              <SIMPLE-VALUE>0</SIMPLE-VALUE>
+            </COMPLEX-VALUE>
+          </COMPARAM-REF>
+          <COMPARAM-REF ID-REF="CS_ISO_15765_2.CP_CanFuncReqId" DOCREF="ISO_15765_2" DOCTYPE="COMPARAM-SUBSET">
+            <SIMPLE-VALUE>2015</SIMPLE-VALUE>
+          </COMPARAM-REF>
+        </COMPARAM-REFS>
         <PARENT-REFS>
           <PARENT-REF xsi:type="BASE-VARIANT-REF" ID-REF="BV_UDS_Base"/>
         </PARENT-REFS>
       </ECU-VARIANT>
-
-      <!-- 2. ECM ECU Variant -->
       <ECU-VARIANT ID="ECU_ECM">
         <SHORT-NAME>ECM_ECU</SHORT-NAME>
         <LONG-NAME>Engine Control Module / Powertrain Controller</LONG-NAME>
-        <DESC>
-          <p>Powertrain controller managing engine throttle, ignition, and fuel injection.</p>
-        </DESC>
+        <DESC><p>Powertrain controller managing engine throttle, coolant telemetry, and torque.</p></DESC>
         <DIAG-DATA-DICTIONARY-SPEC>
           <DTC-DOPS>
-            <DTC-DOP ID="DTC_DOP_ECM">
-              <SHORT-NAME>DTC_DOP_ECM</SHORT-NAME>
-              <DIAG-CODED-TYPE BASE-DATA-TYPE="A_UINT32" xsi:type="STANDARD-LENGTH-TYPE">
-                <BIT-LENGTH>24</BIT-LENGTH>
-              </DIAG-CODED-TYPE>
+            <DTC-DOP ID="DTC_DOP_ECU_ECM">
+              <SHORT-NAME>DTC_DOP_ECU_ECM</SHORT-NAME>
+              <DIAG-CODED-TYPE BASE-DATA-TYPE="A_UINT32" xsi:type="STANDARD-LENGTH-TYPE"><BIT-LENGTH>24</BIT-LENGTH></DIAG-CODED-TYPE>
               <PHYSICAL-TYPE BASE-DATA-TYPE="A_UINT32"/>
-              <COMPU-METHOD>
-                <CATEGORY>IDENTICAL</CATEGORY>
-              </COMPU-METHOD>
+              <COMPU-METHOD><CATEGORY>IDENTICAL</CATEGORY></COMPU-METHOD>
               <DTCS>
-                <DTC ID="DTC_P012212">
+                <DTC ID="DTC_ECM_P012212">
                   <SHORT-NAME>P0122_12</SHORT-NAME>
                   <TROUBLE-CODE>74258</TROUBLE-CODE>
                   <DISPLAY-TROUBLE-CODE>P0122-12</DISPLAY-TROUBLE-CODE>
                   <TEXT>Throttle Position Sensor 'A' Circuit Low Input</TEXT>
                 </DTC>
-                <DTC ID="DTC_P021700">
+                <DTC ID="DTC_ECM_P021700">
                   <SHORT-NAME>P0217_00</SHORT-NAME>
                   <TROUBLE-CODE>136960</TROUBLE-CODE>
                   <DISPLAY-TROUBLE-CODE>P0217-00</DISPLAY-TROUBLE-CODE>
                   <TEXT>Engine Coolant Over-Temperature Condition</TEXT>
                 </DTC>
-                <DTC ID="DTC_P050000">
+                <DTC ID="DTC_ECM_P050000">
                   <SHORT-NAME>P0500_00</SHORT-NAME>
                   <TROUBLE-CODE>327680</TROUBLE-CODE>
                   <DISPLAY-TROUBLE-CODE>P0500-00</DISPLAY-TROUBLE-CODE>
                   <TEXT>Vehicle Speed Sensor 'A' Missing Signal</TEXT>
                 </DTC>
-                <DTC ID="DTC_P050400">
+                <DTC ID="DTC_ECM_P050400">
                   <SHORT-NAME>P0504_00</SHORT-NAME>
                   <TROUBLE-CODE>328704</TROUBLE-CODE>
                   <DISPLAY-TROUBLE-CODE>P0504-00</DISPLAY-TROUBLE-CODE>
                   <TEXT>Brake Switch A/B Correlation Plausibility Fault</TEXT>
                 </DTC>
-                <DTC ID="DTC_U010000">
+                <DTC ID="DTC_ECM_U010000">
                   <SHORT-NAME>U0100_00</SHORT-NAME>
                   <TROUBLE-CODE>13697024</TROUBLE-CODE>
                   <DISPLAY-TROUBLE-CODE>U0100-00</DISPLAY-TROUBLE-CODE>
                   <TEXT>Lost Communication with ECM/PCM</TEXT>
                 </DTC>
+                <DTC ID="DTC_ECM_U012100">
+                  <SHORT-NAME>U0121_00</SHORT-NAME>
+                  <TROUBLE-CODE>13705472</TROUBLE-CODE>
+                  <DISPLAY-TROUBLE-CODE>U0121-00</DISPLAY-TROUBLE-CODE>
+                  <TEXT>Lost Communication with ABS Control Module</TEXT>
+                </DTC>
               </DTCS>
             </DTC-DOP>
           </DTC-DOPS>
+          <STRUCTURES>
+            <STRUCTURE ID="STRUCT_DTC_Rec_ECU_ECM" BYTE-SIZE="4">
+              <SHORT-NAME>DTCAndStatusRecord_ECM_ECU</SHORT-NAME>
+              <PARAMS>
+                <PARAM SEMANTIC="DTC" xsi:type="VALUE">
+                  <SHORT-NAME>DTCRecord</SHORT-NAME>
+                  <BYTE-POSITION>0</BYTE-POSITION>
+                  <DOP-REF ID-REF="DTC_DOP_ECU_ECM"/>
+                </PARAM>
+                <PARAM SEMANTIC="DTCSTATUS" xsi:type="VALUE">
+                  <SHORT-NAME>StatusOfDTC</SHORT-NAME>
+                  <BYTE-POSITION>3</BYTE-POSITION>
+                  <DOP-REF ID-REF="DOP_Uint8"/>
+                </PARAM>
+              </PARAMS>
+            </STRUCTURE>
+          </STRUCTURES>
+          <END-OF-PDU-FIELDS>
+            <END-OF-PDU-FIELD ID="EOP_DTC_ECU_ECM">
+              <SHORT-NAME>DTCAndStatusList_ECM_ECU</SHORT-NAME>
+              <MIN-NUMBER-OF-ITEMS>0</MIN-NUMBER-OF-ITEMS>
+              <BASIC-STRUCTURE-REF ID-REF="STRUCT_DTC_Rec_ECU_ECM"/>
+            </END-OF-PDU-FIELD>
+          </END-OF-PDU-FIELDS>
+          <DATA-OBJECT-PROPS>
+            <DATA-OBJECT-PROP ID="DOP_ECM_ECU_DID_0100">
+              <SHORT-NAME>DOP_EngineSpeed</SHORT-NAME>
+              <COMPU-METHOD><CATEGORY>IDENTICAL</CATEGORY></COMPU-METHOD>
+              <DIAG-CODED-TYPE BASE-DATA-TYPE="A_UINT32" xsi:type="STANDARD-LENGTH-TYPE"><BIT-LENGTH>16</BIT-LENGTH></DIAG-CODED-TYPE>
+              <PHYSICAL-TYPE BASE-DATA-TYPE="A_UINT32"/>
+            </DATA-OBJECT-PROP>
+            <DATA-OBJECT-PROP ID="DOP_ECM_ECU_DID_0101">
+              <SHORT-NAME>DOP_ThrottlePosition</SHORT-NAME>
+              <COMPU-METHOD><CATEGORY>IDENTICAL</CATEGORY></COMPU-METHOD>
+              <DIAG-CODED-TYPE BASE-DATA-TYPE="A_UINT32" xsi:type="STANDARD-LENGTH-TYPE"><BIT-LENGTH>8</BIT-LENGTH></DIAG-CODED-TYPE>
+              <PHYSICAL-TYPE BASE-DATA-TYPE="A_UINT32"/>
+            </DATA-OBJECT-PROP>
+            <DATA-OBJECT-PROP ID="DOP_ECM_ECU_DID_0102">
+              <SHORT-NAME>DOP_CoolantTemperature</SHORT-NAME>
+              <COMPU-METHOD><CATEGORY>IDENTICAL</CATEGORY></COMPU-METHOD>
+              <DIAG-CODED-TYPE BASE-DATA-TYPE="A_UINT32" xsi:type="STANDARD-LENGTH-TYPE"><BIT-LENGTH>8</BIT-LENGTH></DIAG-CODED-TYPE>
+              <PHYSICAL-TYPE BASE-DATA-TYPE="A_UINT32"/>
+            </DATA-OBJECT-PROP>
+          </DATA-OBJECT-PROPS>
         </DIAG-DATA-DICTIONARY-SPEC>
+        <DIAG-COMMS>
+          <DIAG-SERVICE ID="DS_ECU_ECM_ReadDTC_ByStatusMask" SEMANTIC="FAULTMEMORY">
+            <SHORT-NAME>FaultMemory_ReadDTCByStatusMask</SHORT-NAME>
+            <LONG-NAME>UDS 0x19 02 - Read DTC By Status Mask (ECM_ECU)</LONG-NAME>
+            <REQUEST-REF ID-REF="REQ_ECU_ECM_ReadDTC_ByStatusMask"/>
+            <POS-RESPONSE-REFS>
+              <POS-RESPONSE-REF ID-REF="POS_ECU_ECM_ReadDTC_ByStatusMask"/>
+            </POS-RESPONSE-REFS>
+          </DIAG-SERVICE>
+          <DIAG-SERVICE ID="DS_ECM_ECU_DID_0100" SEMANTIC="CURRENTDATA">
+            <SHORT-NAME>RDBI_EngineSpeed</SHORT-NAME>
+            <LONG-NAME>ReadDataByIdentifier 0x0100 - EngineSpeed</LONG-NAME>
+            <REQUEST-REF ID-REF="REQ_ECM_ECU_DID_0100"/>
+            <POS-RESPONSE-REFS>
+              <POS-RESPONSE-REF ID-REF="POS_ECM_ECU_DID_0100"/>
+            </POS-RESPONSE-REFS>
+          </DIAG-SERVICE>
+          <DIAG-SERVICE ID="DS_ECM_ECU_DID_0101" SEMANTIC="CURRENTDATA">
+            <SHORT-NAME>RDBI_ThrottlePosition</SHORT-NAME>
+            <LONG-NAME>ReadDataByIdentifier 0x0101 - ThrottlePosition</LONG-NAME>
+            <REQUEST-REF ID-REF="REQ_ECM_ECU_DID_0101"/>
+            <POS-RESPONSE-REFS>
+              <POS-RESPONSE-REF ID-REF="POS_ECM_ECU_DID_0101"/>
+            </POS-RESPONSE-REFS>
+          </DIAG-SERVICE>
+          <DIAG-SERVICE ID="DS_ECM_ECU_DID_0102" SEMANTIC="CURRENTDATA">
+            <SHORT-NAME>RDBI_CoolantTemperature</SHORT-NAME>
+            <LONG-NAME>ReadDataByIdentifier 0x0102 - CoolantTemperature</LONG-NAME>
+            <REQUEST-REF ID-REF="REQ_ECM_ECU_DID_0102"/>
+            <POS-RESPONSE-REFS>
+              <POS-RESPONSE-REF ID-REF="POS_ECM_ECU_DID_0102"/>
+            </POS-RESPONSE-REFS>
+          </DIAG-SERVICE>
+        </DIAG-COMMS>
+        <REQUESTS>
+          <REQUEST ID="REQ_ECU_ECM_ReadDTC_ByStatusMask">
+            <SHORT-NAME>REQ_ReadDTCByStatusMask_ECM_ECU</SHORT-NAME>
+            <PARAMS>
+              <PARAM SEMANTIC="SERVICE-ID" xsi:type="CODED-CONST">
+                <SHORT-NAME>SID</SHORT-NAME>
+                <BYTE-POSITION>0</BYTE-POSITION>
+                <CODED-VALUE>25</CODED-VALUE>
+                <DIAG-CODED-TYPE BASE-DATA-TYPE="A_UINT32" xsi:type="STANDARD-LENGTH-TYPE"><BIT-LENGTH>8</BIT-LENGTH></DIAG-CODED-TYPE>
+              </PARAM>
+              <PARAM SEMANTIC="SUBFUNCTION" xsi:type="CODED-CONST">
+                <SHORT-NAME>SubFunction</SHORT-NAME>
+                <BYTE-POSITION>1</BYTE-POSITION>
+                <CODED-VALUE>2</CODED-VALUE>
+                <DIAG-CODED-TYPE BASE-DATA-TYPE="A_UINT32" xsi:type="STANDARD-LENGTH-TYPE"><BIT-LENGTH>8</BIT-LENGTH></DIAG-CODED-TYPE>
+              </PARAM>
+              <PARAM SEMANTIC="DATA" xsi:type="VALUE">
+                <SHORT-NAME>DTCStatusMask</SHORT-NAME>
+                <BYTE-POSITION>2</BYTE-POSITION>
+                <PHYSICAL-DEFAULT-VALUE>9</PHYSICAL-DEFAULT-VALUE>
+                <DOP-REF ID-REF="DOP_Uint8"/>
+              </PARAM>
+            </PARAMS>
+          </REQUEST>
+          <REQUEST ID="REQ_ECM_ECU_DID_0100">
+            <SHORT-NAME>REQ_EngineSpeed</SHORT-NAME>
+            <PARAMS>
+              <PARAM SEMANTIC="SERVICE-ID" xsi:type="CODED-CONST">
+                <SHORT-NAME>SID</SHORT-NAME>
+                <BYTE-POSITION>0</BYTE-POSITION>
+                <CODED-VALUE>34</CODED-VALUE>
+                <DIAG-CODED-TYPE BASE-DATA-TYPE="A_UINT32" xsi:type="STANDARD-LENGTH-TYPE"><BIT-LENGTH>8</BIT-LENGTH></DIAG-CODED-TYPE>
+              </PARAM>
+              <PARAM SEMANTIC="ID" xsi:type="CODED-CONST">
+                <SHORT-NAME>DataIdentifier</SHORT-NAME>
+                <BYTE-POSITION>1</BYTE-POSITION>
+                <CODED-VALUE>256</CODED-VALUE>
+                <DIAG-CODED-TYPE BASE-DATA-TYPE="A_UINT32" xsi:type="STANDARD-LENGTH-TYPE"><BIT-LENGTH>16</BIT-LENGTH></DIAG-CODED-TYPE>
+              </PARAM>
+            </PARAMS>
+          </REQUEST>
+          <REQUEST ID="REQ_ECM_ECU_DID_0101">
+            <SHORT-NAME>REQ_ThrottlePosition</SHORT-NAME>
+            <PARAMS>
+              <PARAM SEMANTIC="SERVICE-ID" xsi:type="CODED-CONST">
+                <SHORT-NAME>SID</SHORT-NAME>
+                <BYTE-POSITION>0</BYTE-POSITION>
+                <CODED-VALUE>34</CODED-VALUE>
+                <DIAG-CODED-TYPE BASE-DATA-TYPE="A_UINT32" xsi:type="STANDARD-LENGTH-TYPE"><BIT-LENGTH>8</BIT-LENGTH></DIAG-CODED-TYPE>
+              </PARAM>
+              <PARAM SEMANTIC="ID" xsi:type="CODED-CONST">
+                <SHORT-NAME>DataIdentifier</SHORT-NAME>
+                <BYTE-POSITION>1</BYTE-POSITION>
+                <CODED-VALUE>257</CODED-VALUE>
+                <DIAG-CODED-TYPE BASE-DATA-TYPE="A_UINT32" xsi:type="STANDARD-LENGTH-TYPE"><BIT-LENGTH>16</BIT-LENGTH></DIAG-CODED-TYPE>
+              </PARAM>
+            </PARAMS>
+          </REQUEST>
+          <REQUEST ID="REQ_ECM_ECU_DID_0102">
+            <SHORT-NAME>REQ_CoolantTemperature</SHORT-NAME>
+            <PARAMS>
+              <PARAM SEMANTIC="SERVICE-ID" xsi:type="CODED-CONST">
+                <SHORT-NAME>SID</SHORT-NAME>
+                <BYTE-POSITION>0</BYTE-POSITION>
+                <CODED-VALUE>34</CODED-VALUE>
+                <DIAG-CODED-TYPE BASE-DATA-TYPE="A_UINT32" xsi:type="STANDARD-LENGTH-TYPE"><BIT-LENGTH>8</BIT-LENGTH></DIAG-CODED-TYPE>
+              </PARAM>
+              <PARAM SEMANTIC="ID" xsi:type="CODED-CONST">
+                <SHORT-NAME>DataIdentifier</SHORT-NAME>
+                <BYTE-POSITION>1</BYTE-POSITION>
+                <CODED-VALUE>258</CODED-VALUE>
+                <DIAG-CODED-TYPE BASE-DATA-TYPE="A_UINT32" xsi:type="STANDARD-LENGTH-TYPE"><BIT-LENGTH>16</BIT-LENGTH></DIAG-CODED-TYPE>
+              </PARAM>
+            </PARAMS>
+          </REQUEST>
+        </REQUESTS>
+        <POS-RESPONSES>
+          <POS-RESPONSE ID="POS_ECU_ECM_ReadDTC_ByStatusMask">
+            <SHORT-NAME>POS_ReadDTCByStatusMask_ECM_ECU</SHORT-NAME>
+            <PARAMS>
+              <PARAM SEMANTIC="SERVICE-ID" xsi:type="CODED-CONST">
+                <SHORT-NAME>RSID</SHORT-NAME>
+                <BYTE-POSITION>0</BYTE-POSITION>
+                <CODED-VALUE>89</CODED-VALUE>
+                <DIAG-CODED-TYPE BASE-DATA-TYPE="A_UINT32" xsi:type="STANDARD-LENGTH-TYPE"><BIT-LENGTH>8</BIT-LENGTH></DIAG-CODED-TYPE>
+              </PARAM>
+              <PARAM SEMANTIC="SUBFUNCTION" xsi:type="CODED-CONST">
+                <SHORT-NAME>SubFunction</SHORT-NAME>
+                <BYTE-POSITION>1</BYTE-POSITION>
+                <CODED-VALUE>2</CODED-VALUE>
+                <DIAG-CODED-TYPE BASE-DATA-TYPE="A_UINT32" xsi:type="STANDARD-LENGTH-TYPE"><BIT-LENGTH>8</BIT-LENGTH></DIAG-CODED-TYPE>
+              </PARAM>
+              <PARAM SEMANTIC="DATA" xsi:type="VALUE">
+                <SHORT-NAME>DTCStatusAvailabilityMask</SHORT-NAME>
+                <BYTE-POSITION>2</BYTE-POSITION>
+                <DOP-REF ID-REF="DOP_Uint8"/>
+              </PARAM>
+              <PARAM SEMANTIC="DATA" xsi:type="VALUE">
+                <SHORT-NAME>DTCAndStatusRecord</SHORT-NAME>
+                <BYTE-POSITION>3</BYTE-POSITION>
+                <DOP-REF ID-REF="EOP_DTC_ECU_ECM"/>
+              </PARAM>
+            </PARAMS>
+          </POS-RESPONSE>
+          <POS-RESPONSE ID="POS_ECM_ECU_DID_0100">
+            <SHORT-NAME>POS_EngineSpeed</SHORT-NAME>
+            <PARAMS>
+              <PARAM SEMANTIC="SERVICE-ID" xsi:type="CODED-CONST">
+                <SHORT-NAME>RSID</SHORT-NAME>
+                <BYTE-POSITION>0</BYTE-POSITION>
+                <CODED-VALUE>98</CODED-VALUE>
+                <DIAG-CODED-TYPE BASE-DATA-TYPE="A_UINT32" xsi:type="STANDARD-LENGTH-TYPE"><BIT-LENGTH>8</BIT-LENGTH></DIAG-CODED-TYPE>
+              </PARAM>
+              <PARAM SEMANTIC="ID" xsi:type="MATCHING-REQUEST-PARAM">
+                <SHORT-NAME>DataIdentifier</SHORT-NAME>
+                <BYTE-POSITION>1</BYTE-POSITION>
+                <REQUEST-BYTE-POS>1</REQUEST-BYTE-POS>
+                <BYTE-LENGTH>2</BYTE-LENGTH>
+              </PARAM>
+              <PARAM SEMANTIC="DATA" xsi:type="VALUE">
+                <SHORT-NAME>EngineRPM_Value</SHORT-NAME>
+                <BYTE-POSITION>3</BYTE-POSITION>
+                <DOP-REF ID-REF="DOP_ECM_ECU_DID_0100"/>
+              </PARAM>
+            </PARAMS>
+          </POS-RESPONSE>
+          <POS-RESPONSE ID="POS_ECM_ECU_DID_0101">
+            <SHORT-NAME>POS_ThrottlePosition</SHORT-NAME>
+            <PARAMS>
+              <PARAM SEMANTIC="SERVICE-ID" xsi:type="CODED-CONST">
+                <SHORT-NAME>RSID</SHORT-NAME>
+                <BYTE-POSITION>0</BYTE-POSITION>
+                <CODED-VALUE>98</CODED-VALUE>
+                <DIAG-CODED-TYPE BASE-DATA-TYPE="A_UINT32" xsi:type="STANDARD-LENGTH-TYPE"><BIT-LENGTH>8</BIT-LENGTH></DIAG-CODED-TYPE>
+              </PARAM>
+              <PARAM SEMANTIC="ID" xsi:type="MATCHING-REQUEST-PARAM">
+                <SHORT-NAME>DataIdentifier</SHORT-NAME>
+                <BYTE-POSITION>1</BYTE-POSITION>
+                <REQUEST-BYTE-POS>1</REQUEST-BYTE-POS>
+                <BYTE-LENGTH>2</BYTE-LENGTH>
+              </PARAM>
+              <PARAM SEMANTIC="DATA" xsi:type="VALUE">
+                <SHORT-NAME>ThrottlePos_Pct</SHORT-NAME>
+                <BYTE-POSITION>3</BYTE-POSITION>
+                <DOP-REF ID-REF="DOP_ECM_ECU_DID_0101"/>
+              </PARAM>
+            </PARAMS>
+          </POS-RESPONSE>
+          <POS-RESPONSE ID="POS_ECM_ECU_DID_0102">
+            <SHORT-NAME>POS_CoolantTemperature</SHORT-NAME>
+            <PARAMS>
+              <PARAM SEMANTIC="SERVICE-ID" xsi:type="CODED-CONST">
+                <SHORT-NAME>RSID</SHORT-NAME>
+                <BYTE-POSITION>0</BYTE-POSITION>
+                <CODED-VALUE>98</CODED-VALUE>
+                <DIAG-CODED-TYPE BASE-DATA-TYPE="A_UINT32" xsi:type="STANDARD-LENGTH-TYPE"><BIT-LENGTH>8</BIT-LENGTH></DIAG-CODED-TYPE>
+              </PARAM>
+              <PARAM SEMANTIC="ID" xsi:type="MATCHING-REQUEST-PARAM">
+                <SHORT-NAME>DataIdentifier</SHORT-NAME>
+                <BYTE-POSITION>1</BYTE-POSITION>
+                <REQUEST-BYTE-POS>1</REQUEST-BYTE-POS>
+                <BYTE-LENGTH>2</BYTE-LENGTH>
+              </PARAM>
+              <PARAM SEMANTIC="DATA" xsi:type="VALUE">
+                <SHORT-NAME>CoolantTemp_Offset40</SHORT-NAME>
+                <BYTE-POSITION>3</BYTE-POSITION>
+                <DOP-REF ID-REF="DOP_ECM_ECU_DID_0102"/>
+              </PARAM>
+            </PARAMS>
+          </POS-RESPONSE>
+        </POS-RESPONSES>
+        <COMPARAM-REFS>
+          <COMPARAM-REF ID-REF="CS_ISO_15765_2.CP_UniqueRespIdTable" DOCREF="ISO_15765_2" DOCTYPE="COMPARAM-SUBSET">
+            <COMPLEX-VALUE>
+              <SIMPLE-VALUE>5</SIMPLE-VALUE>
+              <SIMPLE-VALUE>2016</SIMPLE-VALUE>
+              <SIMPLE-VALUE>0</SIMPLE-VALUE>
+              <SIMPLE-VALUE>5</SIMPLE-VALUE>
+              <SIMPLE-VALUE>2024</SIMPLE-VALUE>
+              <SIMPLE-VALUE>0</SIMPLE-VALUE>
+            </COMPLEX-VALUE>
+          </COMPARAM-REF>
+          <COMPARAM-REF ID-REF="CS_ISO_15765_2.CP_CanFuncReqId" DOCREF="ISO_15765_2" DOCTYPE="COMPARAM-SUBSET">
+            <SIMPLE-VALUE>2015</SIMPLE-VALUE>
+          </COMPARAM-REF>
+        </COMPARAM-REFS>
         <PARENT-REFS>
           <PARENT-REF xsi:type="BASE-VARIANT-REF" ID-REF="BV_UDS_Base"/>
         </PARENT-REFS>
       </ECU-VARIANT>
-
-      <!-- 3. TCM ECU Variant -->
       <ECU-VARIANT ID="ECU_TCM">
         <SHORT-NAME>TCM_ECU</SHORT-NAME>
         <LONG-NAME>Transmission Control Module</LONG-NAME>
-        <DESC>
-          <p>Automatic transmission controller computing shift schedules and gear selections.</p>
-        </DESC>
+        <DESC><p>Automatic transmission controller computing shift schedules and speed-gated limp mode.</p></DESC>
         <DIAG-DATA-DICTIONARY-SPEC>
           <DTC-DOPS>
-            <DTC-DOP ID="DTC_DOP_TCM">
-              <SHORT-NAME>DTC_DOP_TCM</SHORT-NAME>
-              <DIAG-CODED-TYPE BASE-DATA-TYPE="A_UINT32" xsi:type="STANDARD-LENGTH-TYPE">
-                <BIT-LENGTH>24</BIT-LENGTH>
-              </DIAG-CODED-TYPE>
+            <DTC-DOP ID="DTC_DOP_ECU_TCM">
+              <SHORT-NAME>DTC_DOP_ECU_TCM</SHORT-NAME>
+              <DIAG-CODED-TYPE BASE-DATA-TYPE="A_UINT32" xsi:type="STANDARD-LENGTH-TYPE"><BIT-LENGTH>24</BIT-LENGTH></DIAG-CODED-TYPE>
               <PHYSICAL-TYPE BASE-DATA-TYPE="A_UINT32"/>
-              <COMPU-METHOD>
-                <CATEGORY>IDENTICAL</CATEGORY>
-              </COMPU-METHOD>
+              <COMPU-METHOD><CATEGORY>IDENTICAL</CATEGORY></COMPU-METHOD>
               <DTCS>
-                <DTC ID="DTC_U041581">
+                <DTC ID="DTC_TCM_U041581">
                   <SHORT-NAME>U0415_81</SHORT-NAME>
                   <TROUBLE-CODE>13899137</TROUBLE-CODE>
                   <DISPLAY-TROUBLE-CODE>U0415-81</DISPLAY-TROUBLE-CODE>
-                  <TEXT>Invalid Data Received from ABS Module (Secondary Cascade)</TEXT>
+                  <TEXT>Invalid Data Received from ABS Module</TEXT>
                 </DTC>
-                <DTC ID="DTC_U040186">
+                <DTC ID="DTC_TCM_U040186">
                   <SHORT-NAME>U0401_86</SHORT-NAME>
                   <TROUBLE-CODE>13894022</TROUBLE-CODE>
                   <DISPLAY-TROUBLE-CODE>U0401-86</DISPLAY-TROUBLE-CODE>
                   <TEXT>Invalid Data Received from ECM (Throttle Signal)</TEXT>
                 </DTC>
-                <DTC ID="DTC_U040182">
+                <DTC ID="DTC_TCM_U040182">
                   <SHORT-NAME>U0401_82</SHORT-NAME>
                   <TROUBLE-CODE>13894018</TROUBLE-CODE>
                   <DISPLAY-TROUBLE-CODE>U0401-82</DISPLAY-TROUBLE-CODE>
                   <TEXT>Invalid Data Received from ECM (Coolant Range)</TEXT>
                 </DTC>
-                <DTC ID="DTC_U042281">
+                <DTC ID="DTC_TCM_U042281">
                   <SHORT-NAME>U0422_81</SHORT-NAME>
                   <TROUBLE-CODE>13902465</TROUBLE-CODE>
                   <DISPLAY-TROUBLE-CODE>U0422-81</DISPLAY-TROUBLE-CODE>
                   <TEXT>Invalid Data Received from BCM (Brake Switch Conflict)</TEXT>
                 </DTC>
+                <DTC ID="DTC_TCM_U010000">
+                  <SHORT-NAME>U0100_00</SHORT-NAME>
+                  <TROUBLE-CODE>13697024</TROUBLE-CODE>
+                  <DISPLAY-TROUBLE-CODE>U0100-00</DISPLAY-TROUBLE-CODE>
+                  <TEXT>Lost Communication with ECM/PCM</TEXT>
+                </DTC>
+                <DTC ID="DTC_TCM_U012100">
+                  <SHORT-NAME>U0121_00</SHORT-NAME>
+                  <TROUBLE-CODE>13705472</TROUBLE-CODE>
+                  <DISPLAY-TROUBLE-CODE>U0121-00</DISPLAY-TROUBLE-CODE>
+                  <TEXT>Lost Communication with ABS Control Module</TEXT>
+                </DTC>
               </DTCS>
             </DTC-DOP>
           </DTC-DOPS>
+          <STRUCTURES>
+            <STRUCTURE ID="STRUCT_DTC_Rec_ECU_TCM" BYTE-SIZE="4">
+              <SHORT-NAME>DTCAndStatusRecord_TCM_ECU</SHORT-NAME>
+              <PARAMS>
+                <PARAM SEMANTIC="DTC" xsi:type="VALUE">
+                  <SHORT-NAME>DTCRecord</SHORT-NAME>
+                  <BYTE-POSITION>0</BYTE-POSITION>
+                  <DOP-REF ID-REF="DTC_DOP_ECU_TCM"/>
+                </PARAM>
+                <PARAM SEMANTIC="DTCSTATUS" xsi:type="VALUE">
+                  <SHORT-NAME>StatusOfDTC</SHORT-NAME>
+                  <BYTE-POSITION>3</BYTE-POSITION>
+                  <DOP-REF ID-REF="DOP_Uint8"/>
+                </PARAM>
+              </PARAMS>
+            </STRUCTURE>
+          </STRUCTURES>
+          <END-OF-PDU-FIELDS>
+            <END-OF-PDU-FIELD ID="EOP_DTC_ECU_TCM">
+              <SHORT-NAME>DTCAndStatusList_TCM_ECU</SHORT-NAME>
+              <MIN-NUMBER-OF-ITEMS>0</MIN-NUMBER-OF-ITEMS>
+              <BASIC-STRUCTURE-REF ID-REF="STRUCT_DTC_Rec_ECU_TCM"/>
+            </END-OF-PDU-FIELD>
+          </END-OF-PDU-FIELDS>
+          <DATA-OBJECT-PROPS>
+            <DATA-OBJECT-PROP ID="DOP_TCM_ECU_DID_0300">
+              <SHORT-NAME>DOP_CurrentGear</SHORT-NAME>
+              <COMPU-METHOD><CATEGORY>IDENTICAL</CATEGORY></COMPU-METHOD>
+              <DIAG-CODED-TYPE BASE-DATA-TYPE="A_UINT32" xsi:type="STANDARD-LENGTH-TYPE"><BIT-LENGTH>8</BIT-LENGTH></DIAG-CODED-TYPE>
+              <PHYSICAL-TYPE BASE-DATA-TYPE="A_UINT32"/>
+            </DATA-OBJECT-PROP>
+          </DATA-OBJECT-PROPS>
         </DIAG-DATA-DICTIONARY-SPEC>
+        <DIAG-COMMS>
+          <DIAG-SERVICE ID="DS_ECU_TCM_ReadDTC_ByStatusMask" SEMANTIC="FAULTMEMORY">
+            <SHORT-NAME>FaultMemory_ReadDTCByStatusMask</SHORT-NAME>
+            <LONG-NAME>UDS 0x19 02 - Read DTC By Status Mask (TCM_ECU)</LONG-NAME>
+            <REQUEST-REF ID-REF="REQ_ECU_TCM_ReadDTC_ByStatusMask"/>
+            <POS-RESPONSE-REFS>
+              <POS-RESPONSE-REF ID-REF="POS_ECU_TCM_ReadDTC_ByStatusMask"/>
+            </POS-RESPONSE-REFS>
+          </DIAG-SERVICE>
+          <DIAG-SERVICE ID="DS_TCM_ECU_DID_0300" SEMANTIC="CURRENTDATA">
+            <SHORT-NAME>RDBI_CurrentGear</SHORT-NAME>
+            <LONG-NAME>ReadDataByIdentifier 0x0300 - CurrentGear</LONG-NAME>
+            <REQUEST-REF ID-REF="REQ_TCM_ECU_DID_0300"/>
+            <POS-RESPONSE-REFS>
+              <POS-RESPONSE-REF ID-REF="POS_TCM_ECU_DID_0300"/>
+            </POS-RESPONSE-REFS>
+          </DIAG-SERVICE>
+        </DIAG-COMMS>
+        <REQUESTS>
+          <REQUEST ID="REQ_ECU_TCM_ReadDTC_ByStatusMask">
+            <SHORT-NAME>REQ_ReadDTCByStatusMask_TCM_ECU</SHORT-NAME>
+            <PARAMS>
+              <PARAM SEMANTIC="SERVICE-ID" xsi:type="CODED-CONST">
+                <SHORT-NAME>SID</SHORT-NAME>
+                <BYTE-POSITION>0</BYTE-POSITION>
+                <CODED-VALUE>25</CODED-VALUE>
+                <DIAG-CODED-TYPE BASE-DATA-TYPE="A_UINT32" xsi:type="STANDARD-LENGTH-TYPE"><BIT-LENGTH>8</BIT-LENGTH></DIAG-CODED-TYPE>
+              </PARAM>
+              <PARAM SEMANTIC="SUBFUNCTION" xsi:type="CODED-CONST">
+                <SHORT-NAME>SubFunction</SHORT-NAME>
+                <BYTE-POSITION>1</BYTE-POSITION>
+                <CODED-VALUE>2</CODED-VALUE>
+                <DIAG-CODED-TYPE BASE-DATA-TYPE="A_UINT32" xsi:type="STANDARD-LENGTH-TYPE"><BIT-LENGTH>8</BIT-LENGTH></DIAG-CODED-TYPE>
+              </PARAM>
+              <PARAM SEMANTIC="DATA" xsi:type="VALUE">
+                <SHORT-NAME>DTCStatusMask</SHORT-NAME>
+                <BYTE-POSITION>2</BYTE-POSITION>
+                <PHYSICAL-DEFAULT-VALUE>9</PHYSICAL-DEFAULT-VALUE>
+                <DOP-REF ID-REF="DOP_Uint8"/>
+              </PARAM>
+            </PARAMS>
+          </REQUEST>
+          <REQUEST ID="REQ_TCM_ECU_DID_0300">
+            <SHORT-NAME>REQ_CurrentGear</SHORT-NAME>
+            <PARAMS>
+              <PARAM SEMANTIC="SERVICE-ID" xsi:type="CODED-CONST">
+                <SHORT-NAME>SID</SHORT-NAME>
+                <BYTE-POSITION>0</BYTE-POSITION>
+                <CODED-VALUE>34</CODED-VALUE>
+                <DIAG-CODED-TYPE BASE-DATA-TYPE="A_UINT32" xsi:type="STANDARD-LENGTH-TYPE"><BIT-LENGTH>8</BIT-LENGTH></DIAG-CODED-TYPE>
+              </PARAM>
+              <PARAM SEMANTIC="ID" xsi:type="CODED-CONST">
+                <SHORT-NAME>DataIdentifier</SHORT-NAME>
+                <BYTE-POSITION>1</BYTE-POSITION>
+                <CODED-VALUE>768</CODED-VALUE>
+                <DIAG-CODED-TYPE BASE-DATA-TYPE="A_UINT32" xsi:type="STANDARD-LENGTH-TYPE"><BIT-LENGTH>16</BIT-LENGTH></DIAG-CODED-TYPE>
+              </PARAM>
+            </PARAMS>
+          </REQUEST>
+        </REQUESTS>
+        <POS-RESPONSES>
+          <POS-RESPONSE ID="POS_ECU_TCM_ReadDTC_ByStatusMask">
+            <SHORT-NAME>POS_ReadDTCByStatusMask_TCM_ECU</SHORT-NAME>
+            <PARAMS>
+              <PARAM SEMANTIC="SERVICE-ID" xsi:type="CODED-CONST">
+                <SHORT-NAME>RSID</SHORT-NAME>
+                <BYTE-POSITION>0</BYTE-POSITION>
+                <CODED-VALUE>89</CODED-VALUE>
+                <DIAG-CODED-TYPE BASE-DATA-TYPE="A_UINT32" xsi:type="STANDARD-LENGTH-TYPE"><BIT-LENGTH>8</BIT-LENGTH></DIAG-CODED-TYPE>
+              </PARAM>
+              <PARAM SEMANTIC="SUBFUNCTION" xsi:type="CODED-CONST">
+                <SHORT-NAME>SubFunction</SHORT-NAME>
+                <BYTE-POSITION>1</BYTE-POSITION>
+                <CODED-VALUE>2</CODED-VALUE>
+                <DIAG-CODED-TYPE BASE-DATA-TYPE="A_UINT32" xsi:type="STANDARD-LENGTH-TYPE"><BIT-LENGTH>8</BIT-LENGTH></DIAG-CODED-TYPE>
+              </PARAM>
+              <PARAM SEMANTIC="DATA" xsi:type="VALUE">
+                <SHORT-NAME>DTCStatusAvailabilityMask</SHORT-NAME>
+                <BYTE-POSITION>2</BYTE-POSITION>
+                <DOP-REF ID-REF="DOP_Uint8"/>
+              </PARAM>
+              <PARAM SEMANTIC="DATA" xsi:type="VALUE">
+                <SHORT-NAME>DTCAndStatusRecord</SHORT-NAME>
+                <BYTE-POSITION>3</BYTE-POSITION>
+                <DOP-REF ID-REF="EOP_DTC_ECU_TCM"/>
+              </PARAM>
+            </PARAMS>
+          </POS-RESPONSE>
+          <POS-RESPONSE ID="POS_TCM_ECU_DID_0300">
+            <SHORT-NAME>POS_CurrentGear</SHORT-NAME>
+            <PARAMS>
+              <PARAM SEMANTIC="SERVICE-ID" xsi:type="CODED-CONST">
+                <SHORT-NAME>RSID</SHORT-NAME>
+                <BYTE-POSITION>0</BYTE-POSITION>
+                <CODED-VALUE>98</CODED-VALUE>
+                <DIAG-CODED-TYPE BASE-DATA-TYPE="A_UINT32" xsi:type="STANDARD-LENGTH-TYPE"><BIT-LENGTH>8</BIT-LENGTH></DIAG-CODED-TYPE>
+              </PARAM>
+              <PARAM SEMANTIC="ID" xsi:type="MATCHING-REQUEST-PARAM">
+                <SHORT-NAME>DataIdentifier</SHORT-NAME>
+                <BYTE-POSITION>1</BYTE-POSITION>
+                <REQUEST-BYTE-POS>1</REQUEST-BYTE-POS>
+                <BYTE-LENGTH>2</BYTE-LENGTH>
+              </PARAM>
+              <PARAM SEMANTIC="DATA" xsi:type="VALUE">
+                <SHORT-NAME>CurrentGear_Enum</SHORT-NAME>
+                <BYTE-POSITION>3</BYTE-POSITION>
+                <DOP-REF ID-REF="DOP_TCM_ECU_DID_0300"/>
+              </PARAM>
+            </PARAMS>
+          </POS-RESPONSE>
+        </POS-RESPONSES>
+        <COMPARAM-REFS>
+          <COMPARAM-REF ID-REF="CS_ISO_15765_2.CP_UniqueRespIdTable" DOCREF="ISO_15765_2" DOCTYPE="COMPARAM-SUBSET">
+            <COMPLEX-VALUE>
+              <SIMPLE-VALUE>5</SIMPLE-VALUE>
+              <SIMPLE-VALUE>2017</SIMPLE-VALUE>
+              <SIMPLE-VALUE>0</SIMPLE-VALUE>
+              <SIMPLE-VALUE>5</SIMPLE-VALUE>
+              <SIMPLE-VALUE>2025</SIMPLE-VALUE>
+              <SIMPLE-VALUE>0</SIMPLE-VALUE>
+            </COMPLEX-VALUE>
+          </COMPARAM-REF>
+          <COMPARAM-REF ID-REF="CS_ISO_15765_2.CP_CanFuncReqId" DOCREF="ISO_15765_2" DOCTYPE="COMPARAM-SUBSET">
+            <SIMPLE-VALUE>2015</SIMPLE-VALUE>
+          </COMPARAM-REF>
+        </COMPARAM-REFS>
         <PARENT-REFS>
           <PARENT-REF xsi:type="BASE-VARIANT-REF" ID-REF="BV_UDS_Base"/>
         </PARENT-REFS>
       </ECU-VARIANT>
-
-      <!-- 4. BCM ECU Variant -->
       <ECU-VARIANT ID="ECU_BCM">
         <SHORT-NAME>BCM_ECU</SHORT-NAME>
         <LONG-NAME>Body Control Module</LONG-NAME>
-        <DESC>
-          <p>Body electronics controller handling lighting, brake pedals, and gateway signals.</p>
-        </DESC>
+        <DESC><p>Body electronics controller handling ignition state, brake switch, and warnings.</p></DESC>
         <DIAG-DATA-DICTIONARY-SPEC>
           <DTC-DOPS>
-            <DTC-DOP ID="DTC_DOP_BCM">
-              <SHORT-NAME>DTC_DOP_BCM</SHORT-NAME>
-              <DIAG-CODED-TYPE BASE-DATA-TYPE="A_UINT32" xsi:type="STANDARD-LENGTH-TYPE">
-                <BIT-LENGTH>24</BIT-LENGTH>
-              </DIAG-CODED-TYPE>
+            <DTC-DOP ID="DTC_DOP_ECU_BCM">
+              <SHORT-NAME>DTC_DOP_ECU_BCM</SHORT-NAME>
+              <DIAG-CODED-TYPE BASE-DATA-TYPE="A_UINT32" xsi:type="STANDARD-LENGTH-TYPE"><BIT-LENGTH>24</BIT-LENGTH></DIAG-CODED-TYPE>
               <PHYSICAL-TYPE BASE-DATA-TYPE="A_UINT32"/>
-              <COMPU-METHOD>
-                <CATEGORY>IDENTICAL</CATEGORY>
-              </COMPU-METHOD>
+              <COMPU-METHOD><CATEGORY>IDENTICAL</CATEGORY></COMPU-METHOD>
               <DTCS>
-                <DTC ID="DTC_B131811">
+                <DTC ID="DTC_BCM_B131811">
                   <SHORT-NAME>B1318_11</SHORT-NAME>
-                  <TROUBLE-CODE>9640017</TROUBLE-CODE>
+                  <TROUBLE-CODE>9639953</TROUBLE-CODE>
                   <DISPLAY-TROUBLE-CODE>B1318-11</DISPLAY-TROUBLE-CODE>
                   <TEXT>Brake Pedal Switch Stuck Active / Circuit Short to Power</TEXT>
                 </DTC>
-                <DTC ID="DTC_B10A200">
+                <DTC ID="DTC_BCM_B10A200">
                   <SHORT-NAME>B10A2_00</SHORT-NAME>
                   <TROUBLE-CODE>9478656</TROUBLE-CODE>
                   <DISPLAY-TROUBLE-CODE>B10A2-00</DISPLAY-TROUBLE-CODE>
@@ -574,7 +1079,165 @@
               </DTCS>
             </DTC-DOP>
           </DTC-DOPS>
+          <STRUCTURES>
+            <STRUCTURE ID="STRUCT_DTC_Rec_ECU_BCM" BYTE-SIZE="4">
+              <SHORT-NAME>DTCAndStatusRecord_BCM_ECU</SHORT-NAME>
+              <PARAMS>
+                <PARAM SEMANTIC="DTC" xsi:type="VALUE">
+                  <SHORT-NAME>DTCRecord</SHORT-NAME>
+                  <BYTE-POSITION>0</BYTE-POSITION>
+                  <DOP-REF ID-REF="DTC_DOP_ECU_BCM"/>
+                </PARAM>
+                <PARAM SEMANTIC="DTCSTATUS" xsi:type="VALUE">
+                  <SHORT-NAME>StatusOfDTC</SHORT-NAME>
+                  <BYTE-POSITION>3</BYTE-POSITION>
+                  <DOP-REF ID-REF="DOP_Uint8"/>
+                </PARAM>
+              </PARAMS>
+            </STRUCTURE>
+          </STRUCTURES>
+          <END-OF-PDU-FIELDS>
+            <END-OF-PDU-FIELD ID="EOP_DTC_ECU_BCM">
+              <SHORT-NAME>DTCAndStatusList_BCM_ECU</SHORT-NAME>
+              <MIN-NUMBER-OF-ITEMS>0</MIN-NUMBER-OF-ITEMS>
+              <BASIC-STRUCTURE-REF ID-REF="STRUCT_DTC_Rec_ECU_BCM"/>
+            </END-OF-PDU-FIELD>
+          </END-OF-PDU-FIELDS>
+          <DATA-OBJECT-PROPS>
+            <DATA-OBJECT-PROP ID="DOP_BCM_ECU_DID_0400">
+              <SHORT-NAME>DOP_ChassisSwitchState</SHORT-NAME>
+              <COMPU-METHOD><CATEGORY>IDENTICAL</CATEGORY></COMPU-METHOD>
+              <DIAG-CODED-TYPE BASE-DATA-TYPE="A_UINT32" xsi:type="STANDARD-LENGTH-TYPE"><BIT-LENGTH>8</BIT-LENGTH></DIAG-CODED-TYPE>
+              <PHYSICAL-TYPE BASE-DATA-TYPE="A_UINT32"/>
+            </DATA-OBJECT-PROP>
+          </DATA-OBJECT-PROPS>
         </DIAG-DATA-DICTIONARY-SPEC>
+        <DIAG-COMMS>
+          <DIAG-SERVICE ID="DS_ECU_BCM_ReadDTC_ByStatusMask" SEMANTIC="FAULTMEMORY">
+            <SHORT-NAME>FaultMemory_ReadDTCByStatusMask</SHORT-NAME>
+            <LONG-NAME>UDS 0x19 02 - Read DTC By Status Mask (BCM_ECU)</LONG-NAME>
+            <REQUEST-REF ID-REF="REQ_ECU_BCM_ReadDTC_ByStatusMask"/>
+            <POS-RESPONSE-REFS>
+              <POS-RESPONSE-REF ID-REF="POS_ECU_BCM_ReadDTC_ByStatusMask"/>
+            </POS-RESPONSE-REFS>
+          </DIAG-SERVICE>
+          <DIAG-SERVICE ID="DS_BCM_ECU_DID_0400" SEMANTIC="CURRENTDATA">
+            <SHORT-NAME>RDBI_ChassisSwitchState</SHORT-NAME>
+            <LONG-NAME>ReadDataByIdentifier 0x0400 - ChassisSwitchState</LONG-NAME>
+            <REQUEST-REF ID-REF="REQ_BCM_ECU_DID_0400"/>
+            <POS-RESPONSE-REFS>
+              <POS-RESPONSE-REF ID-REF="POS_BCM_ECU_DID_0400"/>
+            </POS-RESPONSE-REFS>
+          </DIAG-SERVICE>
+        </DIAG-COMMS>
+        <REQUESTS>
+          <REQUEST ID="REQ_ECU_BCM_ReadDTC_ByStatusMask">
+            <SHORT-NAME>REQ_ReadDTCByStatusMask_BCM_ECU</SHORT-NAME>
+            <PARAMS>
+              <PARAM SEMANTIC="SERVICE-ID" xsi:type="CODED-CONST">
+                <SHORT-NAME>SID</SHORT-NAME>
+                <BYTE-POSITION>0</BYTE-POSITION>
+                <CODED-VALUE>25</CODED-VALUE>
+                <DIAG-CODED-TYPE BASE-DATA-TYPE="A_UINT32" xsi:type="STANDARD-LENGTH-TYPE"><BIT-LENGTH>8</BIT-LENGTH></DIAG-CODED-TYPE>
+              </PARAM>
+              <PARAM SEMANTIC="SUBFUNCTION" xsi:type="CODED-CONST">
+                <SHORT-NAME>SubFunction</SHORT-NAME>
+                <BYTE-POSITION>1</BYTE-POSITION>
+                <CODED-VALUE>2</CODED-VALUE>
+                <DIAG-CODED-TYPE BASE-DATA-TYPE="A_UINT32" xsi:type="STANDARD-LENGTH-TYPE"><BIT-LENGTH>8</BIT-LENGTH></DIAG-CODED-TYPE>
+              </PARAM>
+              <PARAM SEMANTIC="DATA" xsi:type="VALUE">
+                <SHORT-NAME>DTCStatusMask</SHORT-NAME>
+                <BYTE-POSITION>2</BYTE-POSITION>
+                <PHYSICAL-DEFAULT-VALUE>9</PHYSICAL-DEFAULT-VALUE>
+                <DOP-REF ID-REF="DOP_Uint8"/>
+              </PARAM>
+            </PARAMS>
+          </REQUEST>
+          <REQUEST ID="REQ_BCM_ECU_DID_0400">
+            <SHORT-NAME>REQ_ChassisSwitchState</SHORT-NAME>
+            <PARAMS>
+              <PARAM SEMANTIC="SERVICE-ID" xsi:type="CODED-CONST">
+                <SHORT-NAME>SID</SHORT-NAME>
+                <BYTE-POSITION>0</BYTE-POSITION>
+                <CODED-VALUE>34</CODED-VALUE>
+                <DIAG-CODED-TYPE BASE-DATA-TYPE="A_UINT32" xsi:type="STANDARD-LENGTH-TYPE"><BIT-LENGTH>8</BIT-LENGTH></DIAG-CODED-TYPE>
+              </PARAM>
+              <PARAM SEMANTIC="ID" xsi:type="CODED-CONST">
+                <SHORT-NAME>DataIdentifier</SHORT-NAME>
+                <BYTE-POSITION>1</BYTE-POSITION>
+                <CODED-VALUE>1024</CODED-VALUE>
+                <DIAG-CODED-TYPE BASE-DATA-TYPE="A_UINT32" xsi:type="STANDARD-LENGTH-TYPE"><BIT-LENGTH>16</BIT-LENGTH></DIAG-CODED-TYPE>
+              </PARAM>
+            </PARAMS>
+          </REQUEST>
+        </REQUESTS>
+        <POS-RESPONSES>
+          <POS-RESPONSE ID="POS_ECU_BCM_ReadDTC_ByStatusMask">
+            <SHORT-NAME>POS_ReadDTCByStatusMask_BCM_ECU</SHORT-NAME>
+            <PARAMS>
+              <PARAM SEMANTIC="SERVICE-ID" xsi:type="CODED-CONST">
+                <SHORT-NAME>RSID</SHORT-NAME>
+                <BYTE-POSITION>0</BYTE-POSITION>
+                <CODED-VALUE>89</CODED-VALUE>
+                <DIAG-CODED-TYPE BASE-DATA-TYPE="A_UINT32" xsi:type="STANDARD-LENGTH-TYPE"><BIT-LENGTH>8</BIT-LENGTH></DIAG-CODED-TYPE>
+              </PARAM>
+              <PARAM SEMANTIC="SUBFUNCTION" xsi:type="CODED-CONST">
+                <SHORT-NAME>SubFunction</SHORT-NAME>
+                <BYTE-POSITION>1</BYTE-POSITION>
+                <CODED-VALUE>2</CODED-VALUE>
+                <DIAG-CODED-TYPE BASE-DATA-TYPE="A_UINT32" xsi:type="STANDARD-LENGTH-TYPE"><BIT-LENGTH>8</BIT-LENGTH></DIAG-CODED-TYPE>
+              </PARAM>
+              <PARAM SEMANTIC="DATA" xsi:type="VALUE">
+                <SHORT-NAME>DTCStatusAvailabilityMask</SHORT-NAME>
+                <BYTE-POSITION>2</BYTE-POSITION>
+                <DOP-REF ID-REF="DOP_Uint8"/>
+              </PARAM>
+              <PARAM SEMANTIC="DATA" xsi:type="VALUE">
+                <SHORT-NAME>DTCAndStatusRecord</SHORT-NAME>
+                <BYTE-POSITION>3</BYTE-POSITION>
+                <DOP-REF ID-REF="EOP_DTC_ECU_BCM"/>
+              </PARAM>
+            </PARAMS>
+          </POS-RESPONSE>
+          <POS-RESPONSE ID="POS_BCM_ECU_DID_0400">
+            <SHORT-NAME>POS_ChassisSwitchState</SHORT-NAME>
+            <PARAMS>
+              <PARAM SEMANTIC="SERVICE-ID" xsi:type="CODED-CONST">
+                <SHORT-NAME>RSID</SHORT-NAME>
+                <BYTE-POSITION>0</BYTE-POSITION>
+                <CODED-VALUE>98</CODED-VALUE>
+                <DIAG-CODED-TYPE BASE-DATA-TYPE="A_UINT32" xsi:type="STANDARD-LENGTH-TYPE"><BIT-LENGTH>8</BIT-LENGTH></DIAG-CODED-TYPE>
+              </PARAM>
+              <PARAM SEMANTIC="ID" xsi:type="MATCHING-REQUEST-PARAM">
+                <SHORT-NAME>DataIdentifier</SHORT-NAME>
+                <BYTE-POSITION>1</BYTE-POSITION>
+                <REQUEST-BYTE-POS>1</REQUEST-BYTE-POS>
+                <BYTE-LENGTH>2</BYTE-LENGTH>
+              </PARAM>
+              <PARAM SEMANTIC="DATA" xsi:type="VALUE">
+                <SHORT-NAME>BrakeSwitch_Ignition_Bits</SHORT-NAME>
+                <BYTE-POSITION>3</BYTE-POSITION>
+                <DOP-REF ID-REF="DOP_BCM_ECU_DID_0400"/>
+              </PARAM>
+            </PARAMS>
+          </POS-RESPONSE>
+        </POS-RESPONSES>
+        <COMPARAM-REFS>
+          <COMPARAM-REF ID-REF="CS_ISO_15765_2.CP_UniqueRespIdTable" DOCREF="ISO_15765_2" DOCTYPE="COMPARAM-SUBSET">
+            <COMPLEX-VALUE>
+              <SIMPLE-VALUE>5</SIMPLE-VALUE>
+              <SIMPLE-VALUE>2019</SIMPLE-VALUE>
+              <SIMPLE-VALUE>0</SIMPLE-VALUE>
+              <SIMPLE-VALUE>5</SIMPLE-VALUE>
+              <SIMPLE-VALUE>2027</SIMPLE-VALUE>
+              <SIMPLE-VALUE>0</SIMPLE-VALUE>
+            </COMPLEX-VALUE>
+          </COMPARAM-REF>
+          <COMPARAM-REF ID-REF="CS_ISO_15765_2.CP_CanFuncReqId" DOCREF="ISO_15765_2" DOCTYPE="COMPARAM-SUBSET">
+            <SIMPLE-VALUE>2015</SIMPLE-VALUE>
+          </COMPARAM-REF>
+        </COMPARAM-REFS>
         <PARENT-REFS>
           <PARENT-REF xsi:type="BASE-VARIANT-REF" ID-REF="BV_UDS_Base"/>
         </PARENT-REFS>

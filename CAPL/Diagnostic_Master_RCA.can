@@ -522,6 +522,10 @@ on timer t_ScanStep
       msg_Req_Func.byte(1) = UDS_SID_DIAGNOSTIC_SESSION_CONTROL;
       msg_Req_Func.byte(2) = UDS_SUBF_EXTENDED_SESSION;
       msg_Req_Func.byte(3) = 0x55;
+      msg_Req_Func.byte(4) = 0x55;
+      msg_Req_Func.byte(5) = 0x55;
+      msg_Req_Func.byte(6) = 0x55;
+      msg_Req_Func.byte(7) = 0x55;
       msg_Req_Func.dlc = 8;
       output(msg_Req_Func);
       write("[DIAG MASTER] Step 1: Broadcast Service 0x10 03 (Extended Session) on 0x7DF.");
@@ -539,6 +543,7 @@ on timer t_ScanStep
       msg_Req_ECM.byte(1) = UDS_SID_READ_DTC_INFORMATION;
       msg_Req_ECM.byte(2) = UDS_SUBF_REPORT_DTC_BY_STATUS_MASK;
       msg_Req_ECM.byte(3) = (DTC_STATUS_TEST_FAILED | DTC_STATUS_CONFIRMED_DTC);
+      msg_Req_ECM.byte(4) = 0x55; msg_Req_ECM.byte(5) = 0x55; msg_Req_ECM.byte(6) = 0x55; msg_Req_ECM.byte(7) = 0x55;
       msg_Req_ECM.dlc = 8;
       output(msg_Req_ECM);
 
@@ -547,6 +552,7 @@ on timer t_ScanStep
       msg_Req_TCM.byte(1) = UDS_SID_READ_DTC_INFORMATION;
       msg_Req_TCM.byte(2) = UDS_SUBF_REPORT_DTC_BY_STATUS_MASK;
       msg_Req_TCM.byte(3) = (DTC_STATUS_TEST_FAILED | DTC_STATUS_CONFIRMED_DTC);
+      msg_Req_TCM.byte(4) = 0x55; msg_Req_TCM.byte(5) = 0x55; msg_Req_TCM.byte(6) = 0x55; msg_Req_TCM.byte(7) = 0x55;
       msg_Req_TCM.dlc = 8;
       output(msg_Req_TCM);
 
@@ -555,6 +561,7 @@ on timer t_ScanStep
       msg_Req_ABS.byte(1) = UDS_SID_READ_DTC_INFORMATION;
       msg_Req_ABS.byte(2) = UDS_SUBF_REPORT_DTC_BY_STATUS_MASK;
       msg_Req_ABS.byte(3) = (DTC_STATUS_TEST_FAILED | DTC_STATUS_CONFIRMED_DTC);
+      msg_Req_ABS.byte(4) = 0x55; msg_Req_ABS.byte(5) = 0x55; msg_Req_ABS.byte(6) = 0x55; msg_Req_ABS.byte(7) = 0x55;
       msg_Req_ABS.dlc = 8;
       output(msg_Req_ABS);
 
@@ -563,6 +570,7 @@ on timer t_ScanStep
       msg_Req_BCM.byte(1) = UDS_SID_READ_DTC_INFORMATION;
       msg_Req_BCM.byte(2) = UDS_SUBF_REPORT_DTC_BY_STATUS_MASK;
       msg_Req_BCM.byte(3) = (DTC_STATUS_TEST_FAILED | DTC_STATUS_CONFIRMED_DTC);
+      msg_Req_BCM.byte(4) = 0x55; msg_Req_BCM.byte(5) = 0x55; msg_Req_BCM.byte(6) = 0x55; msg_Req_BCM.byte(7) = 0x55;
       msg_Req_BCM.dlc = 8;
       output(msg_Req_BCM);
 
@@ -608,7 +616,11 @@ on message 0x7E8 // ECM Response
 {
   if (this.byte(1) == 0x59 && this.byte(2) == 0x02)
   {
-    if (this.byte(0) >= 6) // Contains DTC
+    if (this.byte(0) >= 7) // ISO 14229-1 [07 59 02 AvailMask DTC_Hi DTC_Mid DTC_Lo Status]
+    {
+      g_DTC_ECM = (this.byte(4) << 16) | (this.byte(5) << 8) | this.byte(6);
+    }
+    else if (this.byte(0) == 6) // Legacy fallback
     {
       g_DTC_ECM = (this.byte(3) << 16) | (this.byte(4) << 8) | this.byte(5);
     }
@@ -620,7 +632,11 @@ on message 0x7E9 // TCM Response
 {
   if (this.byte(1) == 0x59 && this.byte(2) == 0x02)
   {
-    if (this.byte(0) >= 6)
+    if (this.byte(0) >= 7)
+    {
+      g_DTC_TCM = (this.byte(4) << 16) | (this.byte(5) << 8) | this.byte(6);
+    }
+    else if (this.byte(0) == 6)
     {
       g_DTC_TCM = (this.byte(3) << 16) | (this.byte(4) << 8) | this.byte(5);
     }
@@ -632,7 +648,11 @@ on message 0x7EA // ABS Response
 {
   if (this.byte(1) == 0x59 && this.byte(2) == 0x02)
   {
-    if (this.byte(0) >= 6)
+    if (this.byte(0) >= 7)
+    {
+      g_DTC_ABS = (this.byte(4) << 16) | (this.byte(5) << 8) | this.byte(6);
+    }
+    else if (this.byte(0) == 6)
     {
       g_DTC_ABS = (this.byte(3) << 16) | (this.byte(4) << 8) | this.byte(5);
     }
@@ -644,7 +664,11 @@ on message 0x7EB // BCM Response
 {
   if (this.byte(1) == 0x59 && this.byte(2) == 0x02)
   {
-    if (this.byte(0) >= 6)
+    if (this.byte(0) >= 7)
+    {
+      g_DTC_BCM = (this.byte(4) << 16) | (this.byte(5) << 8) | this.byte(6);
+    }
+    else if (this.byte(0) == 6)
     {
       g_DTC_BCM = (this.byte(3) << 16) | (this.byte(4) << 8) | this.byte(5);
     }

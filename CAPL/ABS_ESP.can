@@ -273,66 +273,96 @@ on message 0x7E2, 0x7DF
 {
   byte sid;
   byte subf;
+  byte reqMask;
+  int j;
 
   if (@sysvar::Fault_Node_Cutoff_ABS == 1 || g_Fault_Cutoff_ABS_Active == 1)
   {
     return; // Node is cut off / bus-off; cannot transmit diagnostic response
   }
   sid = this.byte(1);
+  for (j = 0; j < 8; j++) msg_ABS_DiagResp.byte(j) = 0xAA;
+  msg_ABS_DiagResp.dlc = 8;
 
   if (sid == UDS_SID_DIAGNOSTIC_SESSION_CONTROL)
   {
     subf = this.byte(2);
-    g_DiagSession = subf;
+    g_DiagSession = subf & 0x7F;
+    if ((subf & 0x80) != 0) return;
     msg_ABS_DiagResp.byte(0) = 0x06;
     msg_ABS_DiagResp.byte(1) = 0x50;
-    msg_ABS_DiagResp.byte(2) = subf;
+    msg_ABS_DiagResp.byte(2) = g_DiagSession;
     msg_ABS_DiagResp.byte(3) = 0x00;
     msg_ABS_DiagResp.byte(4) = 0x32;
     msg_ABS_DiagResp.byte(5) = 0x01;
     msg_ABS_DiagResp.byte(6) = 0xF4;
-    msg_ABS_DiagResp.byte(7) = 0xAA;
-    msg_ABS_DiagResp.dlc = 8;
     output(msg_ABS_DiagResp);
+  }
+  else if (sid == UDS_SID_ECU_RESET)
+  {
+    subf = this.byte(2);
+    Reset_ABS_Node();
+    if ((subf & 0x80) != 0) return;
+    msg_ABS_DiagResp.byte(0) = 0x02;
+    msg_ABS_DiagResp.byte(1) = 0x51;
+    msg_ABS_DiagResp.byte(2) = subf & 0x7F;
+    output(msg_ABS_DiagResp);
+    write("[ABS_ESP-UDS] ECUReset (0x%02X) executed.", subf & 0x7F);
   }
   else if (sid == UDS_SID_CLEAR_DIAGNOSTIC_INFORMATION)
   {
     Reset_ABS_Node();
     msg_ABS_DiagResp.byte(0) = 0x01;
     msg_ABS_DiagResp.byte(1) = 0x54;
-    msg_ABS_DiagResp.byte(2) = 0xAA;
-    msg_ABS_DiagResp.dlc = 8;
     output(msg_ABS_DiagResp);
     write("[ABS_ESP-UDS] DTCs Cleared.");
   }
   else if (sid == UDS_SID_READ_DTC_INFORMATION)
   {
     subf = this.byte(2);
-    if (subf == UDS_SUBF_REPORT_DTC_BY_STATUS_MASK)
+    if (subf == UDS_SUBF_REPORT_NUMBER_OF_DTC_BY_MASK)
     {
-      if (g_NumDTCs == 0)
+      msg_ABS_DiagResp.byte(0) = 0x06;
+      msg_ABS_DiagResp.byte(1) = 0x59;
+      msg_ABS_DiagResp.byte(2) = 0x01;
+      msg_ABS_DiagResp.byte(3) = 0x09;
+      msg_ABS_DiagResp.byte(4) = 0x01;
+      msg_ABS_DiagResp.byte(5) = 0x00;
+      msg_ABS_DiagResp.byte(6) = (g_NumDTCs > 0) ? 1 : 0;
+      output(msg_ABS_DiagResp);
+    }
+    else if (subf == UDS_SUBF_REPORT_DTC_BY_STATUS_MASK)
+    {
+      reqMask = (this.byte(0) >= 3) ? this.byte(3) : 0xFF;
+      if (g_NumDTCs == 0 || reqMask == 0x00 || ((g_ABS_DTCs[0].statusMask & reqMask) == 0 && reqMask != 0xFF))
       {
         msg_ABS_DiagResp.byte(0) = 0x03;
         msg_ABS_DiagResp.byte(1) = 0x59;
         msg_ABS_DiagResp.byte(2) = 0x02;
-        msg_ABS_DiagResp.byte(3) = 0x00;
-        msg_ABS_DiagResp.dlc = 8;
+        msg_ABS_DiagResp.byte(3) = 0x09;
         output(msg_ABS_DiagResp);
       }
       else
       {
-        msg_ABS_DiagResp.byte(0) = 0x06;
+        msg_ABS_DiagResp.byte(0) = 0x07;
         msg_ABS_DiagResp.byte(1) = 0x59;
         msg_ABS_DiagResp.byte(2) = 0x02;
-        msg_ABS_DiagResp.byte(3) = (g_ABS_DTCs[0].dtcNumber >> 16) & 0xFF;
-        msg_ABS_DiagResp.byte(4) = (g_ABS_DTCs[0].dtcNumber >> 8) & 0xFF;
-        msg_ABS_DiagResp.byte(5) = (g_ABS_DTCs[0].dtcNumber) & 0xFF;
-        msg_ABS_DiagResp.byte(6) = g_ABS_DTCs[0].statusMask;
-        msg_ABS_DiagResp.byte(7) = 0xAA;
-        msg_ABS_DiagResp.dlc = 8;
+        msg_ABS_DiagResp.byte(3) = 0x09;
+        msg_ABS_DiagResp.byte(4) = (g_ABS_DTCs[0].dtcNumber >> 16) & 0xFF;
+        msg_ABS_DiagResp.byte(5) = (g_ABS_DTCs[0].dtcNumber >> 8) & 0xFF;
+        msg_ABS_DiagResp.byte(6) = (g_ABS_DTCs[0].dtcNumber) & 0xFF;
+        msg_ABS_DiagResp.byte(7) = g_ABS_DTCs[0].statusMask;
         output(msg_ABS_DiagResp);
         write("[ABS_ESP-UDS] ReadDTC response sent: 0x%06X (Status: 0x%02X)", g_ABS_DTCs[0].dtcNumber, g_ABS_DTCs[0].statusMask);
       }
+    }
+    else if (this.id != CAN_ID_DIAG_FUNCTIONAL_REQ)
+    {
+      msg_ABS_DiagResp.byte(0) = 0x03;
+      msg_ABS_DiagResp.byte(1) = UDS_SID_NEGATIVE_RESPONSE;
+      msg_ABS_DiagResp.byte(2) = sid;
+      msg_ABS_DiagResp.byte(3) = UDS_NRC_SUBFUNCTION_NOT_SUPPORTED;
+      output(msg_ABS_DiagResp);
     }
   }
   else if (sid == UDS_SID_READ_DATA_BY_IDENTIFIER)
@@ -349,9 +379,43 @@ on message 0x7E2, 0x7DF
       msg_ABS_DiagResp.byte(5) = (byte)g_SpeedFR;
       msg_ABS_DiagResp.byte(6) = (byte)g_SpeedRL;
       msg_ABS_DiagResp.byte(7) = (byte)g_SpeedRR;
-      msg_ABS_DiagResp.dlc = 8;
       output(msg_ABS_DiagResp);
     }
+    else if (did == 0x0201) // Vehicle Speed DID
+    {
+      msg_ABS_DiagResp.byte(0) = 0x05;
+      msg_ABS_DiagResp.byte(1) = 0x62;
+      msg_ABS_DiagResp.byte(2) = 0x02;
+      msg_ABS_DiagResp.byte(3) = 0x01;
+      msg_ABS_DiagResp.byte(4) = ((word)g_VehicleSpeed >> 8) & 0xFF;
+      msg_ABS_DiagResp.byte(5) = ((word)g_VehicleSpeed) & 0xFF;
+      output(msg_ABS_DiagResp);
+    }
+    else if (this.id != CAN_ID_DIAG_FUNCTIONAL_REQ)
+    {
+      msg_ABS_DiagResp.byte(0) = 0x03;
+      msg_ABS_DiagResp.byte(1) = UDS_SID_NEGATIVE_RESPONSE;
+      msg_ABS_DiagResp.byte(2) = sid;
+      msg_ABS_DiagResp.byte(3) = UDS_NRC_REQUEST_OUT_OF_RANGE;
+      output(msg_ABS_DiagResp);
+    }
+  }
+  else if (sid == UDS_SID_TESTER_PRESENT)
+  {
+    subf = this.byte(2);
+    if ((subf & 0x80) != 0) return;
+    msg_ABS_DiagResp.byte(0) = 0x02;
+    msg_ABS_DiagResp.byte(1) = 0x7E;
+    msg_ABS_DiagResp.byte(2) = subf & 0x7F;
+    output(msg_ABS_DiagResp);
+  }
+  else if (this.id != CAN_ID_DIAG_FUNCTIONAL_REQ)
+  {
+    msg_ABS_DiagResp.byte(0) = 0x03;
+    msg_ABS_DiagResp.byte(1) = UDS_SID_NEGATIVE_RESPONSE;
+    msg_ABS_DiagResp.byte(2) = sid;
+    msg_ABS_DiagResp.byte(3) = UDS_NRC_SERVICE_NOT_SUPPORTED;
+    output(msg_ABS_DiagResp);
   }
 }
 
