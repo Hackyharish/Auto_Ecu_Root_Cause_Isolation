@@ -18,7 +18,7 @@ beamer_code = r"""\documentclass[aspectratio=169,10pt]{beamer}
 \usepackage{hyperref}
 
 % Graphicspath
-\graphicspath{{../Final_Images/}{../Images/}{../Images/CleanPlots/}{../Images/WSS_SENSOR_OPEN/}{../Images/BRAKE_SWITCH_STUCK/}{../Images/CUTOFF_ABS_NODE/}{../}{./}}
+\graphicspath{{../Presentation/}{../Final_Images/}{../Images/}{../Images/CleanPlots/}{../Images/WSS_SENSOR_OPEN/}{../Images/BRAKE_SWITCH_STUCK/}{../Images/CUTOFF_ABS_NODE/}{../}{./}}
 
 % Remove default navigation symbols & set crisp widescreen margins
 \setbeamertemplate{navigation symbols}{}
@@ -140,45 +140,77 @@ beamer_code = r"""\documentclass[aspectratio=169,10pt]{beamer}
 \end{frame}
 
 % =============================================================================
-% SLIDE 2: Problem Statement and Objectives
+% SLIDE 2: Problem Statement (Dedicated Slide + Real Automotive Image)
 % =============================================================================
 \begin{frame}[t]
-\slidetitle{Problem Statement \& Research Objectives}{Multi-ECU Signal Cascades \textbullet{} False DTC Floods \textbullet{} ISO 26262 ASIL-D Determinism}
+\slidetitle{Problem Statement: Cascading Fault Alarms}{Multi-ECU Signal Dependencies \textbullet{} Secondary DTC Floods \textbullet{} Warranty \& Safety Impact}
 
 \begin{columns}[T,totalwidth=\textwidth]
 
-  \begin{column}{0.485\textwidth}
-    \begin{tcolorbox}[cardstyle, colframe=vectorred!75, colbacktitle=vectorred!8, height=5.32cm,
-      title={\normalsize\bfseries\color{vectorred} The Problem: Cascading Alarm Floods}]
-      \footnotesize\color{slatedark}\raggedright\vspace{-4pt}
-      \begin{itemize}\setlength{\itemsep}{1.5pt}\setlength{\leftmargini}{10pt}
-        \item \textbf{Dense Coupling:} Modern vehicles host 70--100 ECUs exchanging thousands of cross-dependent CAN signals.
-        \item \textbf{Symptom Alarm Floods:} Single sensor or ECU faults starve healthy downstream nodes, triggering dozens of secondary DTCs.
-        \item \textbf{Misdiagnosis \& Cost:} Technicians replace healthy ECUs, inflating warranty costs and extending vehicle downtime.
-        \item \textbf{Safety Risk:} Conflicting DTCs confuse fail-safe controllers, risking unwanted torque cuts or phantom braking.
+  \begin{column}{0.48\textwidth}
+    \begin{tcolorbox}[cardstyle, colframe=vectorred!75, colbacktitle=vectorred!8, height=5.95cm,
+      title={\normalsize\bfseries\color{vectorred} Cascading Alarm Flood Challenge}]
+      \footnotesize\color{slatedark}\raggedright
+      \vspace{-2pt}
+      \begin{itemize}\setlength{\itemsep}{2.5pt}\setlength{\leftmargini}{10pt}
+        \item \textbf{Tight Signal Coupling:} Modern vehicles host 70--100 ECUs exchanging thousands of interdependent CAN signals.
+        \item \textbf{Secondary Symptom Floods:} A single faulty sensor or disconnected ECU starves downstream nodes, triggering multiple false DTCs.
+        \item \textbf{Misdiagnosis \& Warranty Cost:} Scan tools list symptoms equally, causing unnecessary healthy-ECU replacements and long downtime.
+        \item \textbf{Safety Control Hazard:} Conflicting fault flags risk inappropriate torque cuts, gear lockouts, or phantom braking.
       \end{itemize}
     \end{tcolorbox}
   \end{column}
 
-  \begin{column}{0.485\textwidth}
-    \begin{tcolorbox}[cardstyle, colframe=accentblue!75, colbacktitle=accentblue!8, height=5.32cm,
-      title={\normalsize\bfseries\color{accentblue} Project Objectives \& Contributions}]
-      \footnotesize\color{slatedark}\raggedright\vspace{-2pt}
-      \begin{itemize}\setlength{\itemsep}{6pt}\setlength{\leftmargini}{10pt}
-        \item \textbf{DAG Signal Modeling:} Formulate in-vehicle signal flows as a Directed Acyclic Graph $G=(V, E)$ capturing causal links.
-        \item \textbf{On-Bus Pruning Engine:} Implement in-degree topological filtering in CAPL to isolate root causes in real time.
-        \item \textbf{Vector CANoe 19 Validation:} Validate across 6 failure modes (sensor shorts, ECU dropouts, stuck switches) at 100\% accuracy.
-      \end{itemize}
+  \begin{column}{0.50\textwidth}
+    \begin{tcolorbox}[whitecard, height=5.95cm, left=4pt, right=4pt, top=5pt, bottom=4pt]
+      \centering
+      \includegraphics[width=\linewidth, height=4.35cm, keepaspectratio]{problem_statement_img.jpg}\\[5pt]
+      \scriptsize\color{slategrey}
+      \textbf{Real-World Symptom Cascade:} Single wheel-speed sensor fault (\texttt{C0035}) triggers simultaneous ECM (\texttt{P0500}) and TCM (\texttt{U0415}) dashboard alarms.
     \end{tcolorbox}
   \end{column}
 
 \end{columns}
 
-\vspace{0.08cm}
-\begin{tcolorbox}[colback=slategrey!10, colframe=cardborder, boxrule=0.7pt, arc=4pt, left=6pt, right=6pt, top=3pt, bottom=3pt]
-  \centering\scriptsize\color{slatedark}
-  \textbf{Target Scope:} 4 ECUs (ECM, ABS, TCM, BCM) \textbullet{} 15 CAN Messages \textbullet{} 43 Powertrain \& Chassis Signals \textbullet{} 500 kbps CAN
-\end{tcolorbox}
+\end{frame}
+
+% =============================================================================
+% SLIDE 3: Research Objectives & Target Scope (Dedicated Slide)
+% =============================================================================
+\begin{frame}[t]
+\slidetitle{Research Objectives \& Target Scope}{Topological Graph Modeling \textbullet{} Automated On-Bus Isolation \textbullet{} CANoe 19 Validation}
+
+\begin{columns}[T,totalwidth=\textwidth]
+
+  \begin{column}{0.485\textwidth}
+    \begin{tcolorbox}[cardstyle, colframe=accentblue!75, colbacktitle=accentblue!8, height=5.95cm,
+      title={\normalsize\bfseries\color{accentblue} Primary Research Objectives}]
+      \footnotesize\color{slatedark}\raggedright
+      \vspace{2pt}
+      \begin{itemize}\setlength{\itemsep}{6pt}\setlength{\leftmargini}{10pt}
+        \item \textbf{Causal DAG Modeling:} Formulate cross-ECU CAN signal flows as a Directed Acyclic Graph $G=(V, E)$.
+        \item \textbf{In-Degree Topological Pruning:} Isolate root-cause nodes ($\deg_S^-(v_i)=0$) and suppress downstream symptom DTCs via UDS.
+        \item \textbf{Safe Fallback Behavior:} Differentiate ASIL-D Safe Stop hazards from ASIL-B degraded limp/coastdown responses.
+        \item \textbf{Multi-Scenario Validation:} Achieve 100\% isolation accuracy across 6 hardware and sensor failure modes in Vector CANoe 19.
+      \end{itemize}
+    \end{tcolorbox}
+  \end{column}
+
+  \begin{column}{0.485\textwidth}
+    \begin{tcolorbox}[cardstyle, colframe=accentgreen!75, colbacktitle=accentgreen!8, height=5.95cm,
+      title={\normalsize\bfseries\color{accentgreen} Target Vehicle Network Scope}]
+      \footnotesize\color{slatedark}\raggedright
+      \vspace{2pt}
+      \begin{itemize}\setlength{\itemsep}{6pt}\setlength{\leftmargini}{10pt}
+        \item \textbf{4 Powertrain \& Body ECUs:} ECM (\texttt{0x100/0x105}), ABS/ESP (\texttt{0x200/0x205}), TCM (\texttt{0x300}), BCM (\texttt{0x400}).
+        \item \textbf{CAN Bus Specification:} High-Speed CAN 500 kbps (ISO 11898-1) with 15 messages and 43 signals.
+        \item \textbf{ISO 14229-1 Diagnostics:} Functional broadcast \texttt{0x7DF} and physical UDS pairs \texttt{0x7E0--0x7E3 / 0x7E8--0x7EB}.
+        \item \textbf{6 Fault Modes Covered:} WSS open, throttle low, coolant overheat (138$^\circ$C), brake switch stuck, ECM/ABS node cutoffs.
+      \end{itemize}
+    \end{tcolorbox}
+  \end{column}
+
+\end{columns}
 
 \end{frame}
 
@@ -491,11 +523,9 @@ beamer_code = r"""\documentclass[aspectratio=169,10pt]{beamer}
   \end{column}
 
   \begin{column}{0.52\textwidth}
-    \begin{tcolorbox}[whitecard, height=5.95cm]
-      \centering
-      \includegraphics[width=\linewidth, height=4.45cm, keepaspectratio]{PANEL_NORMAL.png}\\[6pt]
-      \footnotesize\color{slategrey}
-      \textbf{CANoe 19 Cockpit HMI:} Fault-free cruise at 160.0 km/h (4200 RPM, 5th gear D5), showing healthy green status across all 4 ECUs.
+    \begin{tcolorbox}[whitecard, height=5.95cm, left=4pt, right=4pt, top=4pt, bottom=4pt]
+      \centering\vspace*{0.70cm}
+      \includegraphics[width=\linewidth, height=5.55cm, keepaspectratio]{PANEL_NORMAL.png}
     \end{tcolorbox}
   \end{column}
 
@@ -504,51 +534,7 @@ beamer_code = r"""\documentclass[aspectratio=169,10pt]{beamer}
 \end{frame}
 
 % =============================================================================
-% SLIDE 7: Demonstration of Solution – Multi-Scenario Fault Isolation
-% =============================================================================
-\begin{frame}[t]
-\slidetitle{Solution Demonstration: Multi-Scenario Fault Isolation}{6 Real-World Failure Modes \textbullet{} 100\% Disambiguation Accuracy \textbullet{} Zero False Replacements}
-
-\begin{columns}[T,totalwidth=\textwidth]
-
-  \begin{column}{0.485\textwidth}
-    \begin{tcolorbox}[cardstyle, colframe=vectorred!70, colbacktitle=vectorred!8, height=5.12cm,
-      title={\footnotesize\bfseries\color{vectorred} Scenario 1: Wheel Speed Sensor Open (ASIL-D)}]
-      \centering
-      \includegraphics[width=\linewidth, height=2.36cm, keepaspectratio]{ABS_fAULT.png}\\[3pt]
-      \begin{minipage}{0.98\linewidth}
-        \scriptsize\color{slatedark}\raggedright
-        \textbf{Raw Codes:} ABS (C0035-13), ECM (P0500-00), TCM (U0415-81).\\[2pt]
-        \textbf{Topological Result:} ABS isolated ($\deg_S^- = 0$); ECM \& TCM suppressed ($\deg_S^- \ge 1$). 66.7\% DTC reduction; TCM enters speed-gated limp mode.
-      \end{minipage}
-    \end{tcolorbox}
-  \end{column}
-
-  \begin{column}{0.485\textwidth}
-    \begin{tcolorbox}[cardstyle, colframe=accentblue!70, colbacktitle=accentblue!8, height=5.12cm,
-      title={\footnotesize\bfseries\color{accentblue} Scenario 5: Brake Switch Stuck Closed (ASIL-B)}]
-      \centering
-      \includegraphics[width=\linewidth, height=2.36cm, keepaspectratio]{bRAKE_SWITCH_STUCK.png}\\[3pt]
-      \begin{minipage}{0.98\linewidth}
-        \scriptsize\color{slatedark}\raggedright
-        \textbf{Raw Codes:} BCM (B1318-11), ECM (P0504-00), TCM (U0422-81).\\[2pt]
-        \textbf{Topological Result:} BCM isolated ($\deg_S^- = 0$); ECM \& TCM suppressed. Hydraulic check ($P_{\text{hyd}} < 5$ bar) avoids phantom braking; BTO limits throttle without shutting down engine (ASIL-B).
-      \end{minipage}
-    \end{tcolorbox}
-  \end{column}
-
-\end{columns}
-
-\vspace{0.08cm}
-\begin{tcolorbox}[colback=slategrey!10, colframe=cardborder, boxrule=0.7pt, arc=4pt, left=6pt, right=6pt, top=3pt, bottom=3pt]
-  \centering\scriptsize\color{slatedark}
-  \textbf{Other Tested Scenarios:} Sc. 2 (Throttle Low P0122-12, ASIL-D Safe Stop) \quad\textbar\quad Sc. 4 (Coolant Overheat P0217-00, 138$^\circ$C) \quad\textbar\quad Sc. 3 \& 6 (ECM U0100-00 / ABS U0121-00 Bus-Off)
-\end{tcolorbox}
-
-\end{frame}
-
-% =============================================================================
-% SLIDE 8: Full-Page Video Demonstration Only (Direct Launch Action!)
+% SLIDE 8: Full-Page Video Demonstration Only (YouTube Link)
 % =============================================================================
 \begin{frame}[t]
 \slidetitle{Project Video Demonstration}{Vector CANoe 19 Live Simulation Execution \textbullet{} 1080p Full HD (30 fps) \textbullet{} 17m 57s}
