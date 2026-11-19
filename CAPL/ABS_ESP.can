@@ -47,6 +47,7 @@ variables
   byte g_Fault_Cutoff_ABS_Active = 0;
   byte g_Fault_ECM_Throttle_Active = 0;
   byte g_Fault_ECM_Cutoff_Active = 0;
+  byte g_Fault_BCM_Brake_Active = 0;
 }
 
 on start
@@ -96,6 +97,10 @@ on timer t_ABS_10ms
       {
         g_Fault_ECM_Cutoff_Active = 1;
       }
+      if (@sysvar::Fault_BCM_BrakeSwitch == 1)
+      {
+        g_Fault_BCM_Brake_Active = 1;
+      }
     }
   }
 
@@ -134,7 +139,7 @@ on timer t_ABS_10ms
         g_BrakePressure = 15.0; // Standstill brake hold (bar)
       }
     }
-    else if (@sysvar::Sim_AcceleratorPedal > 0.0 && @sysvar::Fault_BCM_BrakeSwitch == 0)
+    else if (@sysvar::Sim_AcceleratorPedal > 0.0 && g_Fault_BCM_Brake_Active == 0 && @sysvar::Fault_BCM_BrakeSwitch == 0)
     {
       targetSpeed = @sysvar::Sim_AcceleratorPedal * 1.6; // Demand target speed
       g_BrakePressure = 0.0; // Brakes released under throttle
@@ -377,6 +382,7 @@ void Reset_ABS_Node()
   g_Fault_Cutoff_ABS_Active = 0;
   g_Fault_ECM_Throttle_Active = 0;
   g_Fault_ECM_Cutoff_Active = 0;
+  g_Fault_BCM_Brake_Active = 0;
   g_ESP_Fault = 0;
   g_ABS_Active = 0;
   g_VehicleSpeed = @sysvar::Sim_AcceleratorPedal * 1.6;
@@ -396,5 +402,13 @@ on sysvar sysvar::Fault_Reset_All
   if (@sysvar::Fault_Reset_All == 1)
   {
     Reset_ABS_Node();
+  }
+}
+
+on sysvar sysvar::Fault_BCM_BrakeSwitch
+{
+  if (@this == 1 && @sysvar::Sim_IgnitionState >= 2 && @sysvar::Sim_BatteryVoltage >= 9.5 && @sysvar::Sim_BatteryVoltage <= 16.0)
+  {
+    g_Fault_BCM_Brake_Active = 1;
   }
 }

@@ -54,6 +54,7 @@ variables
   byte g_Fault_Cutoff_TCM_Active = 0;
   byte g_Fault_ECM_Throttle_Active = 0;
   byte g_Fault_ECM_Cutoff_Active = 0;
+  byte g_Fault_BCM_Brake_Active = 0;
 }
 
 on start
@@ -97,6 +98,10 @@ on timer t_TCM_20ms
       if (@sysvar::Fault_Node_Cutoff_ECM == 1)
       {
         g_Fault_ECM_Cutoff_Active = 1;
+      }
+      if (@sysvar::Fault_BCM_BrakeSwitch == 1)
+      {
+        g_Fault_BCM_Brake_Active = 1;
       }
     }
   }
@@ -301,7 +306,7 @@ on message 0x400
   byte brakePressed;
   brakePressed = (this.byte(0) >> 2) & 0x01;
   // Qualify conflict only if brake switch is stuck high while throttle is demanded (>25%) or fault injected
-  if (brakePressed == 1 && (g_RxThrottlePos > 25.0 || @sysvar::Fault_BCM_BrakeSwitch == 1))
+  if (brakePressed == 1 && (g_RxThrottlePos > 25.0 || @sysvar::Sim_AcceleratorPedal > 25.0 || g_Fault_BCM_Brake_Active == 1 || @sysvar::Fault_BCM_BrakeSwitch == 1))
   {
     if (g_Symptom_Brake_Active == 0)
     {
@@ -310,9 +315,9 @@ on message 0x400
       write("[TCM] SECONDARY SYMPTOM DETECTED: U0422-81 (Invalid Data from BCM - Brake Switch Conflict).");
     }
   }
-  else if (brakePressed == 0 || (g_RxThrottlePos <= 25.0 && @sysvar::Fault_BCM_BrakeSwitch == 0))
+  else if (brakePressed == 0 || (g_RxThrottlePos <= 25.0 && @sysvar::Sim_AcceleratorPedal <= 25.0 && g_Fault_BCM_Brake_Active == 0 && @sysvar::Fault_BCM_BrakeSwitch == 0))
   {
-    if (g_Symptom_Brake_Active == 1 && @sysvar::Fault_BCM_BrakeSwitch == 0)
+    if (g_Symptom_Brake_Active == 1 && g_Fault_BCM_Brake_Active == 0 && @sysvar::Fault_BCM_BrakeSwitch == 0)
     {
       g_Symptom_Brake_Active = 0;
     }
@@ -425,6 +430,7 @@ void Reset_TCM_Node()
   g_Fault_Cutoff_TCM_Active = 0;
   g_Fault_ECM_Throttle_Active = 0;
   g_Fault_ECM_Cutoff_Active = 0;
+  g_Fault_BCM_Brake_Active = 0;
   g_Symptom_U0415_Active = 0;
   g_Symptom_U0401_Active = 0;
   g_Symptom_U0100_Active = 0;
@@ -447,5 +453,13 @@ on sysvar sysvar::Fault_Reset_All
   if (@sysvar::Fault_Reset_All == 1)
   {
     Reset_TCM_Node();
+  }
+}
+
+on sysvar sysvar::Fault_BCM_BrakeSwitch
+{
+  if (@this == 1 && @sysvar::Sim_IgnitionState >= 2 && @sysvar::Sim_BatteryVoltage >= 9.5 && @sysvar::Sim_BatteryVoltage <= 16.0)
+  {
+    g_Fault_BCM_Brake_Active = 1;
   }
 }

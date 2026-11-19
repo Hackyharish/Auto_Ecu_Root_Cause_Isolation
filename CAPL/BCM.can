@@ -236,3 +236,11 @@ on sysvar sysvar::Fault_Reset_All
     Reset_BCM_Node();
   }
 }
+
+on sysvar sysvar::Fault_BCM_BrakeSwitch
+{
+  if (@this == 1 && @sysvar::Sim_IgnitionState >= 2 && @sysvar::Sim_BatteryVoltage >= 9.5 && @sysvar::Sim_BatteryVoltage <= 16.0)
+  {
+    g_Fault_BrakeActive = 1;
+  }
+}
