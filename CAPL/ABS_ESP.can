@@ -134,14 +134,14 @@ on timer t_ABS_10ms
         g_BrakePressure = 15.0; // Standstill brake hold (bar)
       }
     }
-    else if (@sysvar::Sim_AcceleratorPedal > 0.0)
+    else if (@sysvar::Sim_AcceleratorPedal > 0.0 && @sysvar::Fault_BCM_BrakeSwitch == 0)
     {
       targetSpeed = @sysvar::Sim_AcceleratorPedal * 1.6; // Demand target speed
       g_BrakePressure = 0.0; // Brakes released under throttle
     }
     else
     {
-      targetSpeed = 0.0; // Idle coasting
+      targetSpeed = 0.0; // Idle coasting (includes ASIL-B Brake-Throttle Override overrun coastdown)
       g_BrakePressure = 0.0;
     }
 

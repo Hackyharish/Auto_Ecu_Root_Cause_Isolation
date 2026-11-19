@@ -73,6 +73,7 @@ on start
 on timer t_ECM_10ms
 {
   byte isAsilDSafeStop;
+  isAsilDSafeStop = 0;
   // Vehicle Operational State & Diagnostic Enable Criteria Check
   if (@sysvar::Sim_IgnitionState < 2)
   {
@@ -123,15 +124,15 @@ on timer t_ECM_10ms
   {
     g_ThrottlePos = 0.0;
     g_EngineTorque = 0.0;
-    if (@sysvar::Disp_VehicleSpeed <= 1.0)
+    if (@sysvar::Disp_VehicleSpeed <= 1.0 && g_Fault_BrakeConflictActive == 0 && @sysvar::Fault_BCM_BrakeSwitch == 0)
     {
       g_EngineRPM = 0.0;
       g_EngineStatus = 1; // STOPPED at standstill
     }
     else
     {
-      g_EngineStatus = 2; // COASTING / ASIL-D BRAKE-THROTTLE OVERRIDE
-      // Gradual RPM wind-down following vehicle coast-down
+      g_EngineStatus = 2; // COASTING / BRAKE-THROTTLE OVERRIDE (ASIL-B)
+      // Gradual RPM wind-down following coast-down; keep engine idling (>= 850 RPM) during BTO
       g_EngineRPM = 850.0 + (@sysvar::Disp_VehicleSpeed * 10.0);
     }
   }
@@ -468,7 +469,7 @@ on message 0x400
   byte brakePressed;
   brakePressed = (this.byte(0) >> 2) & 0x01; // BrakeSwitchStatus bit 2
 
-  if (brakePressed == 1 && g_ThrottlePos > 25.0)
+  if (brakePressed == 1 && (g_ThrottlePos > 25.0 || @sysvar::Sim_AcceleratorPedal > 25.0))
   {
     if (g_Fault_BrakeConflictActive == 0)
     {
